@@ -1,0 +1,9 @@
+{
+    "DB_ERROR": "Some error occurred. Please try again.",
+    "USER_REGISTERED_SUCCESSFULLY": "User Registerd Successfully",
+    "ROLES": "Roles fetched Successfully",
+    "INVALID_ROLE": "Ivalid Role",
+    "WALLET_ADDRESS_ALREADY_REGISTERD": "Wallet Address alreadyy registered",
+    "SUCCESS": "SUCCESS",
+    "USER_UPDATED_SUCCESSFULLY": "User Updated Successfully"
+}
