@@ -28,6 +28,6 @@ userRoute.get("/list", list);
 
 // get user details
 const getDetails = [auth.isAuthenticatedUser, UserCtr.getUserDetails];
-userRoute.get("/userDetails", list);
+userRoute.get("/userDetails", getDetails);
 
 module.exports = userRoute;

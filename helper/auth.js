@@ -14,7 +14,6 @@ auth.isAuthenticatedUser = async (req, res, next) => {
     token = req.body && req.body["x-auth-token"];
   }
   const userTokenData = jwtUtil.decodeAuthToken(token);
-  // console.log("user tokn is:",userTokenData);
 
   if (utils.empty(userTokenData)) {
     return errorUtil.notAuthenticated(res, req);
@@ -34,12 +33,14 @@ auth.isAuthenticatedUser = async (req, res, next) => {
     }
   } else {
     const fetchUserDetails = await userModel.findById(userTokenData._id);
+
     if (fetchUserDetails && fetchUserDetails.isActive) {
       // console.log("userdata is:",fetchUserDetails.email)
       req.userData = fetchUserDetails;
       req.role = fetchRole.roleName;
       return next();
     } else {
+      console.log("in else");
       return errorUtil.notAuthenticated(res, req);
     }
   }
