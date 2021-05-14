@@ -5,5 +5,9 @@
     "INVALID_ROLE": "Ivalid Role",
     "WALLET_ADDRESS_ALREADY_REGISTERD": "Wallet Address alreadyy registered",
     "SUCCESS": "SUCCESS",
-    "USER_UPDATED_SUCCESSFULLY": "User Updated Successfully"
+    "USER_UPDATED_SUCCESSFULLY": "User Updated Successfully",
+    "ADMIN_ADDED_SUCCESSFULLY": "Admin Added Successfully",
+    "INVALID_DETAILS": "Invalid User Details",
+    "USERNAME_EMAIL": "Username or email already exsits",
+    "INCORRECT_EMAIL_PASSWORD": "Incorrect Email Or Password"
 }

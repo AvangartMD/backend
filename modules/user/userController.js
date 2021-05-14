@@ -56,9 +56,10 @@ UserCtr.updateUserDetails = async (req, res) => {
   }
 };
 
+// get all active roles
 UserCtr.getAllRoles = async (req, res) => {
   try {
-    const getRoles = await RoleModel.find({});
+    const getRoles = await RoleModel.find({ isActive: true });
 
     return res.status(200).json({
       message: req.t("ROLES"),
@@ -74,7 +75,7 @@ UserCtr.getAllRoles = async (req, res) => {
     });
   }
 };
-
+// login initally
 UserCtr.login = async (req, res) => {
   try {
     const checkAddressAvalaible = await UserModel.findOne(
@@ -140,4 +141,70 @@ UserCtr.login = async (req, res) => {
   }
 };
 
+// list all users for admin
+UserCtr.list = async (req, res) => {
+  try {
+    const query = {};
+    if (req.query.roleId) {
+      query.role = req.query.roleId;
+    }
+    if (req.query.staus) {
+      query.status = req.query.status.toUpperCase();
+    }
+
+    const list = await UserModel.find(query).populate({
+      path: "role",
+      select: { _id: 1, roleName: 1 },
+    });
+
+    return res.status(200).json({
+      message: req.t("SUCCESS"),
+      status: true,
+      data: list,
+    });
+  } catch (err) {
+    Utils.echoLog("error in listing user   ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get user details
+UserCtr.getUserDetails = async (req, res) => {
+  try {
+    const query = {};
+    if (req.query.userId && req.role == "ADMIN") {
+      query._id = req.query.userId;
+    } else {
+      if (req.userData && req.userData._id && req.role !== "ADMIN") {
+        query._id = req.userData._id;
+      }
+    }
+
+    if (Object.keys(query).length) {
+      const fetchUserData = await UserModel.findOne(query);
+
+      return res.status(200).json({
+        message: req.t("SUCCESS"),
+        status: true,
+        data: fetchUserData,
+      });
+    } else {
+      return res.status(400).json({
+        message: req.t("INVALID_DETAILS"),
+        status: false,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog("error in listing user   ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
 module.exports = UserCtr;
