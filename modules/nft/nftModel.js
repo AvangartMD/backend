@@ -1,18 +1,46 @@
 const mongoose = require("mongoose");
-const { roles } = require("../../helper/enum");
 
 const { Schema } = mongoose;
 
 const nftSchema = new Schema(
   {
-    roleName: {
+    title: {
+      type: String,
+      required: true,
+    },
+    description: {
       type: String,
       required: false,
       default: null,
     },
-    isActive: {
+    image: {
+      original: {
+        type: String,
+        default: null,
+      },
+      compressed: {
+        type: String,
+        default: null,
+      },
+    },
+    collectionId: {
+      type: Schema.Types.ObjectId,
+      ref: "collection",
+      required: false,
+    },
+    isActive: { type: Boolean, default: true },
+    ownerId: {
+      type: Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
+    digitalKey: {
+      type: String,
+      default: null,
+    },
+    unlockContent: {
       type: Boolean,
-      default: true,
+      default: false,
     },
   },
 

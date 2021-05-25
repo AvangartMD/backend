@@ -30,4 +30,23 @@ userRoute.get("/list", list);
 const getDetails = [auth.isAuthenticatedUser, UserCtr.getUserDetails];
 userRoute.get("/userDetails", getDetails);
 
+// approve user as creator
+const approveAsCreator = [
+  auth.isAuthenticatedUser,
+  auth.isAdmin,
+  UserMiddleware.ValidateApproveAsCreator,
+  UserCtr.approveAsCreator,
+];
+userRoute.post("/aprrove", approveAsCreator);
+
+// enable and disable user
+
+const disableUser = [
+  auth.isAuthenticatedUser,
+  auth.isAdmin,
+  UserMiddleware.disbaleEnableValidator,
+  UserCtr.disableUser,
+];
+userRoute.post("/disableUser", disableUser);
+
 module.exports = userRoute;

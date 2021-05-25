@@ -6,11 +6,11 @@ const UserMiddleware = {};
 
 UserMiddleware.signUpValidator = (req, res, next) => {
   const portfolioSchema = Joi.object().keys({
-    instagarm: Joi.string(),
-    facebook: Joi.string(),
-    github: Joi.string(),
-    twitter: Joi.string(),
-    website: Joi.string(),
+    instagarm: [Joi.string().optional(), Joi.allow(null)],
+    facebook: [Joi.string().optional(), Joi.allow(null)],
+    github: [Joi.string().optional(), Joi.allow(null)],
+    twitter: [Joi.string().optional(), Joi.allow(null)],
+    website: [Joi.string().optional(), Joi.allow(null)],
   });
 
   const schema = Joi.object({
@@ -59,4 +59,28 @@ UserMiddleware.loginValidator = async (req, res, next) => {
   validate.validateRequest(req, res, next, schema);
 };
 
+// aprove as Creator Validator
+UserMiddleware.ValidateApproveAsCreator = async (req, res, next) => {
+  const userSchema = Joi.array().items({
+    id: Joi.string().required(),
+    status: Joi.boolean().required(),
+  });
+
+  const schema = Joi.object({
+    user: userSchema,
+    transactionId: Joi.string().required(),
+  });
+
+  validate.validateRequest(req, res, next, schema);
+};
+
+//disable or enable user
+UserMiddleware.disbaleEnableValidator = async (req, res, next) => {
+  const schema = Joi.object({
+    id: Joi.string().required(),
+    status: Joi.boolean().required(),
+  });
+
+  validate.validateRequest(req, res, next, schema);
+};
 module.exports = UserMiddleware;

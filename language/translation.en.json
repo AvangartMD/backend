@@ -9,5 +9,16 @@
     "ADMIN_ADDED_SUCCESSFULLY": "Admin Added Successfully",
     "INVALID_DETAILS": "Invalid User Details",
     "USERNAME_EMAIL": "Username or email already exsits",
-    "INCORRECT_EMAIL_PASSWORD": "Incorrect Email Or Password"
+    "INCORRECT_EMAIL_PASSWORD": "Incorrect Email Or Password",
+    "USER_STATUS_UPDATED": "User Status Updated Successfully",
+    "USER_DISABLED_SUCCESSFULLY": "User Disabled Successfully",
+    "INVALID_USER_DETAILS": "Invalid User Details",
+    "ADD_NEW_NFT": "Nft Added Successfully",
+    "COLLECTION_ADDED": "Collection Added Successfully",
+    "COLLECTION_UPDATED": "Collection Updated Successdully",
+    "COLLECTION_LIST": "Collection List by user",
+    "INVALID_COLLECTION": "Invalid Collection",
+    "NFT_UPDATED": "Nft updated Successfully",
+    "INVALID_NFT": "Invalid Nft details",
+    "COLLECTION_ALREADY": "Collection Already Avalaible with same name"
 }

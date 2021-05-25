@@ -87,6 +87,10 @@ const userSchema = new Schema(
         default: null,
       },
     },
+    transactionId: {
+      type: String,
+      default: null,
+    },
   },
 
   {

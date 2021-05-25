@@ -83,7 +83,10 @@ UserCtr.login = async (req, res) => {
         walletAddress: req.body.walletAddress.toLowerCase().trim(),
       },
       { acceptedByAdmin: 0, stage: 0 }
-    );
+    ).populate({
+      path: "role",
+      select: { _id: 1, roleName: 1 },
+    });
 
     if (checkAddressAvalaible) {
       // create the token and sent i tin response
@@ -127,6 +130,10 @@ UserCtr.login = async (req, res) => {
             status: saveUser.status,
             profile: saveUser.profile,
             portfolio: saveUser.portfolio,
+            role: {
+              roleName: "COLLECTOR",
+              _id: saveUser.role,
+            },
           },
         },
       });
@@ -207,4 +214,87 @@ UserCtr.getUserDetails = async (req, res) => {
     });
   }
 };
+
+// approve user as a creator
+UserCtr.approveAsCreator = async (req, res) => {
+  try {
+    const { user } = req.body;
+    if (user.length) {
+      for (let i = 0; i < user.length; i++) {
+        const getUserDetails = await UserModel.findById(user[i].id);
+        if (getUserDetails) {
+          const getRoleDetails = await RoleModel.findOne({
+            roleName: "CREATOR",
+          });
+
+          const stage = {
+            approved: user[i].status ? +new Date() : null,
+            rejected: !user[i].status ? +new Date() : null,
+          };
+
+          if (user[i].status) {
+            getUserDetails.acceptedByAdmin = true;
+            getUserDetails.role = getRoleDetails._id;
+            getUserDetails.status = statusObject.APPROVED;
+            getUserDetails.stage = stage;
+            getUserDetails.transactionId = req.body.transactionId;
+          } else {
+            getUserDetails.acceptedByAdmin = false;
+            getUserDetails.status = statusObject.REJECTED;
+            getUserDetails.stage = stage;
+          }
+          await getUserDetails.save();
+        } else {
+          next();
+        }
+      }
+
+      return res.status(200).json({
+        message: req.t("USER_STATUS_UPDATED"),
+        status: true,
+      });
+    } else {
+      return res.status(200).json({
+        message: req.t("USER_STATUS_UPDATED"),
+        status: true,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog("error in approving  user   ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// disable user for using platform
+UserCtr.disableUser = async (req, res) => {
+  try {
+    const getUserDetails = await UserModel.findById(req.body.id);
+    if (getUserDetails) {
+      UserModel.isActive = req.body.status;
+
+      await getUserDetails.save();
+      return res.status(200).json({
+        message: req.t("USER_DISABLED_SUCCESSFULLY"),
+        status: true,
+      });
+    } else {
+      return res.status(400).json({
+        message: req.t("INVALID_USER_DETAILS"),
+        status: false,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog("error in disabling user ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
 module.exports = UserCtr;
