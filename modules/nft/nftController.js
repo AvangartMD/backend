@@ -74,7 +74,7 @@ nftCtr.addNewCollection = async (req, res) => {
 // update the collection
 nftCtr.updateCollection = async (req, res) => {
   try {
-    const fetchCollection = await CollectionModel.findById(req.parms.id);
+    const fetchCollection = await CollectionModel.findById(req.params.id);
 
     if (fetchCollection) {
       if (req.body.logo) {

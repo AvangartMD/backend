@@ -20,5 +20,6 @@
     "INVALID_COLLECTION": "Invalid Collection",
     "NFT_UPDATED": "Nft updated Successfully",
     "INVALID_NFT": "Invalid Nft details",
-    "COLLECTION_ALREADY": "Collection Already Avalaible with same name"
+    "COLLECTION_ALREADY": "Collection Already Avalaible with same name",
+    "NOT_AUTHROZIED": "Not Authrozied"
 }

@@ -117,9 +117,10 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
     }),
     collectionId: Joi.string(),
     unlockContent: Joi.boolean(),
-    digitalKey: Joi.alternatives().conditional(req.body.unlockContent, {
-      is: true,
+    digitalKey: Joi.alternatives().conditional("unlockContent", {
+      is: 1,
       then: Joi.string().required(),
+      otherwise: Joi.string(),
     }),
   });
 
@@ -142,7 +143,10 @@ NftMiddleware.canUpdateNft = async (req, res, next) => {
   try {
     const getNftDetails = await NftModel.findById(req.params.id);
 
-    if (getNftDetails && getNftDetails.ownerId === req.userData._id) {
+    if (
+      getNftDetails &&
+      getNftDetails.ownerId.toString() === req.userData._id.toString()
+    ) {
       return next();
     } else if (req.role === "ADMIN") {
       return next();
@@ -169,7 +173,7 @@ NftMiddleware.canUpdateCollection = async (req, res, next) => {
 
     if (
       getCollectionDetails &&
-      getCollectionDetails.ownerId === req.userData._id
+      getCollectionDetails.ownerId.toString() === req.userData._id.toString()
     ) {
       return next();
     } else if (req.role === "ADMIN") {
