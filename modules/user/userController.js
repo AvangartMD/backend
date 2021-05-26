@@ -155,7 +155,7 @@ UserCtr.list = async (req, res) => {
     if (req.query.roleId) {
       query.role = req.query.roleId;
     }
-    if (req.query.staus) {
+    if (req.query.status) {
       query.status = req.query.status.toUpperCase();
     }
 
