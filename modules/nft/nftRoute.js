@@ -52,6 +52,6 @@ const getCollectionListForAdmin = [
   Auth.isAdmin,
   NftCtr.getListOfCollectionForAdmin,
 ];
-nftRoute.get("/listCollectionForAdmin", getList);
+nftRoute.get("/listCollectionForAdmin", getCollectionListForAdmin);
 
 module.exports = nftRoute;

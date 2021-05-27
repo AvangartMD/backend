@@ -3,45 +3,52 @@ const { roles, status } = require("../../helper/enum");
 
 const { Schema } = mongoose;
 
+const portFolioSchema = new Schema({
+  username: {
+    type: String,
+    default: null,
+  },
+  url: {
+    type: String,
+    default: null,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 const userSchema = new Schema(
   {
     name: {
       type: String,
       required: false,
       default: null,
+      lowercase: true,
     },
-    surname: {
+    email: {
       type: String,
       required: false,
+      unique: true,
       default: null,
     },
 
+    bio: {
+      type: String,
+      required: false,
+    },
+
     portfolio: {
-      instagarm: {
-        type: String,
-        lowercase: true,
-        default: null,
-      },
-      facebook: {
-        type: String,
-        lowercase: true,
-        default: null,
-      },
-      github: {
-        type: String,
-        lowercase: true,
-        default: null,
-      },
-      twitter: {
-        type: String,
-        lowercase: true,
-        default: null,
-      },
-      website: {
-        type: String,
-        lowercase: true,
-        default: null,
-      },
+      instagarm: portFolioSchema,
+      facebook: portFolioSchema,
+      github: portFolioSchema,
+      twitter: portFolioSchema,
+      website: portFolioSchema,
+      discord: portFolioSchema,
+      youtube: portFolioSchema,
+      twitch: portFolioSchema,
+      tiktok: portFolioSchema,
+      snapchat: portFolioSchema,
     },
     profile: {
       type: String,

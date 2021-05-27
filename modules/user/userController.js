@@ -9,7 +9,7 @@ const UserCtr = {};
 // update user details
 UserCtr.updateUserDetails = async (req, res) => {
   try {
-    const { name, surname, portfolio, profile, isCreator } = req.body;
+    const { name, email, portfolio, profile, isCreator, bio } = req.body;
 
     const fetchUserDetails = await UserModel.findById(req.userData._id);
 
@@ -17,8 +17,11 @@ UserCtr.updateUserDetails = async (req, res) => {
       if (name) {
         fetchUserDetails.name = name;
       }
-      if (surname) {
-        fetchUserDetails.surname = surname;
+      if (bio) {
+        fetchUserDetails.bio = bio;
+      }
+      if (email) {
+        fetchUserDetails.email = email;
       }
       if (portfolio && Object.keys(portfolio).length) {
         fetchUserDetails.portfolio = portfolio;
@@ -42,6 +45,8 @@ UserCtr.updateUserDetails = async (req, res) => {
             status: saveUser.status,
             profile: saveUser.profile,
             portfolio: saveUser.portfolio,
+            email: saveUser.email,
+            bio: saveUser.bio,
           },
         },
       });

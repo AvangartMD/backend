@@ -5,12 +5,18 @@ const UserModel = require("./userModal");
 const UserMiddleware = {};
 
 UserMiddleware.signUpValidator = (req, res, next) => {
+  const socailSchema = Joi.object().keys({
+    username: [Joi.string().optional(), Joi.allow(null)],
+    url: [Joi.string().optional(), Joi.allow(null)],
+    isVerified: Joi.boolean(),
+  });
+
   const portfolioSchema = Joi.object().keys({
-    instagarm: [Joi.string().optional(), Joi.allow(null)],
-    facebook: [Joi.string().optional(), Joi.allow(null)],
-    github: [Joi.string().optional(), Joi.allow(null)],
-    twitter: [Joi.string().optional(), Joi.allow(null)],
-    website: [Joi.string().optional(), Joi.allow(null)],
+    instagarm: socailSchema,
+    facebook: socailSchema,
+    github: socailSchema,
+    twitter: socailSchema,
+    website: socailSchema,
   });
 
   const schema = Joi.object({
@@ -18,6 +24,8 @@ UserMiddleware.signUpValidator = (req, res, next) => {
     surname: Joi.string(),
     isCreator: Joi.boolean().required(),
     portfolio: portfolioSchema,
+    email: Joi.string().email(),
+    bio: Joi.string(),
   });
   validate.validateRequest(req, res, next, schema);
 };
