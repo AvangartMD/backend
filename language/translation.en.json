@@ -21,5 +21,10 @@
     "NFT_UPDATED": "Nft updated Successfully",
     "INVALID_NFT": "Invalid Nft details",
     "COLLECTION_ALREADY": "Collection Already Avalaible with same name",
-    "NOT_AUTHROZIED": "Not Authrozied"
+    "NOT_AUTHROZIED": "Not Authrozied",
+    "CATEGORY_ADDED": "Category Added Sucessfully",
+    "CATEGORY_UPDATED": "Category Updated Sucessfully",
+    "INVALID_CATEGORY": "Invalid Category",
+    "CATEGORY_LIST": "Category List",
+    "CATEGORY_ALREADY_ADDED": "Category Already Added"
 }

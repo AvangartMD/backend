@@ -114,6 +114,9 @@ nftCtr.updateNft = async (req, res) => {
       if (req.body.title) {
         fetchNftDetails.title = req.body.title;
       }
+      if (req.body.category) {
+        fetchNftDetails.category = req.body.category;
+      }
       if (req.body.description) {
         fetchNftDetails.description = req.body.description;
       }
