@@ -29,6 +29,42 @@ CategoryCtr.addNewCategory = async (req, res) => {
   }
 };
 
+// get category
+CategoryCtr.getCategoryDetails = async (req, res) => {
+  try {
+    const query = {};
+    if (req.query.categoryId && req.role == "ADMIN") {
+      query._id = req.query.categoryId;
+    } else {
+      if (req.categoryData && req.categoryData._id && req.role !== "ADMIN") {
+        query._id = req.categoryData._id;
+      }
+    }
+
+    if (Object.keys(query).length) {
+      const fetchCategoryData = await CategoryModel.findOne(query);
+
+      return res.status(200).json({
+        message: req.t("SUCCESS"),
+        status: true,
+        data: fetchCategoryData,
+      });
+    } else {
+      return res.status(400).json({
+        message: req.t("INVALID_DETAILS"),
+        status: false,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog("error in getting category ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+}
+
 // update category
 CategoryCtr.updateCategory = async (req, res) => {
   try {

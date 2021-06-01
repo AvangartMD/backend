@@ -15,6 +15,14 @@ const addNewCategory = [
 ];
 categoryRoute.post("/add", addNewCategory);
 
+// get category
+const getCategoryDetails = [
+  Auth.isAuthenticatedUser,
+  Auth.isAdmin,
+  CategoryCtr.getCategoryDetails, 
+]
+categoryRoute.get("/categoryDetails", getCategoryDetails);
+
 // update category
 const updateCategory = [
   Auth.isAuthenticatedUser,
