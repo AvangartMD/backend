@@ -76,10 +76,10 @@ CategoryCtr.updateCategory = async (req, res) => {
         getCategoryDetails.slugText = req.body.name;
       }
       if (!req.body.status) {
-        getCategoryDetails.status = false;
+        getCategoryDetails.isActive = false;
       }
       if (req.body.status) {
-        getCategoryDetails.status = true;
+        getCategoryDetails.isActive = true;
       }
 
       await getCategoryDetails.save();
