@@ -33,7 +33,7 @@ CategoryCtr.addNewCategory = async (req, res) => {
 CategoryCtr.getCategoryDetails = async (req, res) => {
   try {
     const query = {};
-    if (req.query.categoryId && req.role == "ADMIN") {
+    if (req.query.categoryId && req.role === "ADMIN") {
       query._id = req.query.categoryId;
     } else {
       if (req.categoryData && req.categoryData._id && req.role !== "ADMIN") {
@@ -63,7 +63,7 @@ CategoryCtr.getCategoryDetails = async (req, res) => {
       err: err.message ? err.message : err,
     });
   }
-}
+};
 
 // update category
 CategoryCtr.updateCategory = async (req, res) => {

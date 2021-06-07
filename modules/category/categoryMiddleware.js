@@ -52,17 +52,21 @@ CategoryMiddleware.checkCategoryAlreadyAddedForUpdate = async (
   next
 ) => {
   try {
-    const slugify = Utils.slugText(req.body.name).toLowerCase();
-    const checkAlreadyAvalaible = await CategoryModel.findOne({
-      slugText: slugify.trim(),
-      _id: { $ne: req.params.id },
-    });
-
-    if (checkAlreadyAvalaible) {
-      return res.status(400).json({
-        message: req.t("CATEGORY_ALREADY_ADDED"),
-        status: false,
+    if (req.body.name) {
+      const slugify = Utils.slugText(req.body.name).toLowerCase();
+      const checkAlreadyAvalaible = await CategoryModel.findOne({
+        slugText: slugify.trim(),
+        _id: { $ne: req.params.id },
       });
+
+      if (checkAlreadyAvalaible) {
+        return res.status(400).json({
+          message: req.t("CATEGORY_ALREADY_ADDED"),
+          status: false,
+        });
+      } else {
+        return next();
+      }
     } else {
       return next();
     }
