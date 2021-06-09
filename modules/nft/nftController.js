@@ -2,6 +2,7 @@ const NftModel = require("./nftModel");
 const CollectionModel = require("./collectionModel");
 const Utils = require("../../helper/utils");
 const NftMiddleware = require("./nftMiddleware");
+const { statusObject } = require("../../helper/enum");
 
 const nftCtr = {};
 // add a new NFT
@@ -236,6 +237,37 @@ nftCtr.getUserNftDetails = async (req, res) => {
     });
   } catch (err) {
     Utils.echoLog("error in getting nft list ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// mint the nft
+nftCtr.mintNft = async (req, res) => {
+  try {
+    const getNftDetails = await NftModel.findById(req.params.id);
+    if (getNftDetails) {
+      getNftDetails.tokenId = req.body.tokenId;
+      getNftDetails.status = statusObject.PENDING;
+
+      await getNftDetails.save();
+
+      return res.status(200).json({
+        message: req.t("TOKEN_MINTED_ADDED"),
+        status: true,
+        data: getAllNftsByUser,
+      });
+    } else {
+      return res.status(400).json({
+        message: req.t("INVALID_NFT_ID"),
+        status: false,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog("error in mintNft nft  ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
       status: true,

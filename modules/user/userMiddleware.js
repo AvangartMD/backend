@@ -91,4 +91,42 @@ UserMiddleware.disbaleEnableValidator = async (req, res, next) => {
 
   validate.validateRequest(req, res, next, schema);
 };
+
+// add new user as creator by admin
+UserMiddleware.addNewUserByAdmin = async (req, res, next) => {
+  const schema = Joi.object({
+    walletAddress: Joi.string().required(),
+    name: Joi.string().required(),
+    profile: Joi.string(),
+    bio: Joi.string(),
+    email: Joi.string().email(),
+  });
+
+  validate.validateRequest(req, res, next, schema);
+};
+
+// check address already registed
+UserMiddleware.checkAddressAlreadyRegistered = async (req, res, next) => {
+  try {
+    const checkWalletRegisterded = await UserModel.findOne({
+      walletAddress: req.body.walletAddress.toLowerCase().trim(),
+    });
+    if (checkWalletRegisterded) {
+      return res.status(400).json({
+        message: req.t("USER_WALLET_ALREADY_REGISTERED"),
+        status: false,
+      });
+    } else {
+      return next();
+    }
+  } catch (err) {
+    Utils.echoLog("error in listing user   ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
 module.exports = UserMiddleware;

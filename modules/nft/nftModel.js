@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const { Schema } = mongoose;
+const { roles, nftStatus } = require("../../helper/enum");
 
 const nftSchema = new Schema(
   {
@@ -34,6 +35,23 @@ const nftSchema = new Schema(
       required: false,
     },
     isActive: { type: Boolean, default: true },
+
+    approvedByAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: nftStatus,
+      default: "NOT_MINTED",
+    },
+    tokenId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      default: undefined,
+    },
     ownerId: {
       type: Schema.Types.ObjectId,
       ref: "users",

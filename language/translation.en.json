@@ -26,5 +26,12 @@
     "CATEGORY_UPDATED": "Category Updated Sucessfully",
     "INVALID_CATEGORY": "Invalid Category",
     "CATEGORY_LIST": "Category List",
-    "CATEGORY_ALREADY_ADDED": "Category Already Added"
+    "CATEGORY_ALREADY_ADDED": "Category Already Added",
+    "TOKEN_MINTED_ADDED": "Token Minted Data Added Successfully",
+    "INVALID_NFT_ID": "Invalid Nft id",
+    "NOTIFICATION_ADDED": "Notification added successfuly",
+    "NOTIFICATION_LIST": "Notification List",
+    "REQUEST_ACCEPTED": "Your Request for CREATOR is Accepted",
+    "REQUSET_REJECTED": "Your Request for CREATOR is Rejected",
+    "USER_WALLET_ALREADY_REGISTERED": "User Wallet Adready registered"
 }

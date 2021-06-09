@@ -2,6 +2,7 @@ const UserModel = require("./userModal");
 const RoleModel = require("../roles/rolesModal");
 const Utils = require("../../helper/utils");
 const jwtUtil = require("../../helper/jwtUtils");
+const NotificationModel = require("../notification/notificationModel");
 const { statusObject } = require("../../helper/enum");
 
 const UserCtr = {};
@@ -249,6 +250,15 @@ UserCtr.approveAsCreator = async (req, res) => {
             getUserDetails.stage = stage;
           }
           await getUserDetails.save();
+
+          const addNewNotication = new NotificationModel({
+            text: user[i].status
+              ? req.t("REQUEST_ACCEPTED")
+              : req.t("REQUSET_REJECTED"),
+            userId: getUserDetails,
+          });
+
+          addNewNotication.save();
         } else {
           next();
         }
@@ -294,6 +304,42 @@ UserCtr.disableUser = async (req, res) => {
     }
   } catch (err) {
     Utils.echoLog("error in disabling user ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// add user as creator by admin
+UserCtr.addUserByAdmin = async (req, res) => {
+  try {
+    const { walletAddress, name, profile, bio, email } = req.body;
+    const fetchRole = await RoleModel.findOne({ roleName: "CREATOR" });
+
+    const addNewUser = new UserModel({
+      name: name,
+      walletAddress: walletAddress,
+      profile: profile ? profile : null,
+      bio: bio ? bio : null,
+      email: email ? email : null,
+      role: fetchRole._id,
+    });
+
+    const saveUser = await addNewUser.save();
+
+    return res.status(200).json({
+      message: req.t("USER_REGISTERED_SUCCESSFULLY"),
+      status: true,
+      data: {
+        _id: saveUser._id,
+        name: saveUser.name,
+        walletAddress: saveUser.walletAddress,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog("error in adding new user  by admin ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
       status: true,

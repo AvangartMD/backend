@@ -49,4 +49,14 @@ const disableUser = [
 ];
 userRoute.post("/disableUser", disableUser);
 
+// add new user by admin
+const addUserAsCreatorByAdmin = [
+  auth.isAuthenticatedUser,
+  auth.isAdmin,
+  UserMiddleware.addNewUserByAdmin,
+  UserMiddleware.checkAddressAlreadyRegistered,
+  UserCtr.addUserByAdmin,
+];
+userRoute.post("/addNewUserByAdmin", addUserAsCreatorByAdmin);
+
 module.exports = userRoute;
