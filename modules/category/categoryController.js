@@ -72,8 +72,8 @@ CategoryCtr.updateCategory = async (req, res) => {
 
     console.log("req.body.name");
     if (getCategoryDetails) {
-      if (req.body.name) {
-        getCategoryDetails.categoryName = req.body.name;
+      if (req.body.categoryName) {
+        getCategoryDetails.categoryName = req.body.categoryName;
         getCategoryDetails.slugText = req.body.name;
       }
       if (!req.body.status) {

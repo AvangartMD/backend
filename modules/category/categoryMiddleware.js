@@ -40,7 +40,7 @@ CategoryMiddleware.checkCategoryAlreadyAdded = async (req, res, next) => {
 
 CategoryMiddleware.validateUpdate = (req, res, next) => {
   const schema = Joi.object({
-    name: Joi.string(),
+    categoryName: Joi.string(),
     status: Joi.boolean(),
   });
   validate.validateRequest(req, res, next, schema);
