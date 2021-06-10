@@ -21,7 +21,7 @@ auth.isAuthenticatedUser = async (req, res, next) => {
 
   const fetchRole = await RoleModel.findById(userTokenData.role);
 
-  if (fetchRole.roleName === "ADMIN") {
+  if (fetchRole && fetchRole.roleName === "ADMIN") {
     const fetchAdminDetails = await AdminModel.findById(userTokenData._id);
 
     if (fetchAdminDetails && fetchAdminDetails.isActive) {
