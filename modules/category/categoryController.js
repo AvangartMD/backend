@@ -83,11 +83,16 @@ CategoryCtr.updateCategory = async (req, res) => {
         getCategoryDetails.isActive = true;
       }
 
-      await getCategoryDetails.save();
+      const saveDetails = await getCategoryDetails.save();
 
       return res.status(200).json({
         message: req.t("CATEGORY_UPDATED"),
         status: true,
+        data: {
+          _id: saveDetails._id,
+          categoryName: saveDetails.categoryName,
+          isActive: saveDetails.isActive,
+        },
       });
     } else {
       return res.status(400).json({
