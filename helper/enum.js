@@ -7,3 +7,7 @@ exports.statusObject = {
   REJECTED: "REJECTED",
   NOT_MINTED: "NOT_MINTED",
 };
+
+exports.cachedData = {
+  LIST_BANNER: "banner-list",
+};

@@ -58,3 +58,5 @@ NotificationCtr.list = async (req, res) => {
     });
   }
 };
+
+module.exports = NotificationCtr;

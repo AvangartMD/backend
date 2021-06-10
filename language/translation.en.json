@@ -33,5 +33,11 @@
     "NOTIFICATION_LIST": "Notification List",
     "REQUEST_ACCEPTED": "Your Request for CREATOR is Accepted",
     "REQUSET_REJECTED": "Your Request for CREATOR is Rejected",
-    "USER_WALLET_ALREADY_REGISTERED": "User Wallet Adready registered"
+    "USER_WALLET_ALREADY_REGISTERED": "User Wallet Adready registered",
+    "BANNER_UPDATED_SUCCESSFULLY": "Banner Updates Successfully",
+    "BANNER_ADDED_SUCCESSFULLY": "Banner Added Successfully",
+    "INVALID_BANNER": "Invalid banner id",
+    "BANNER_DELETED": "Banner Deleted Sucessfully",
+    "BANNER_LIST": "Banner List",
+    "BANNER_DETAILS": "Banner Details"
 }
