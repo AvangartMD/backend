@@ -48,8 +48,8 @@ BannerCtr.updateBanner = async (req, res) => {
       if (req.body.url) {
         fetchBannerDetails.url = req.body.url;
       }
-      if (req.body.image) {
-        fetchBannerDetails.image = req.body.image;
+      if (req.body.banner) {
+        fetchBannerDetails.banner = req.body.banner;
       }
       if (req.body.status) {
         fetchBannerDetails.isActive = req.body.status;

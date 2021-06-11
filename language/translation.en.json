@@ -39,5 +39,7 @@
     "INVALID_BANNER": "Invalid banner id",
     "BANNER_DELETED": "Banner Deleted Sucessfully",
     "BANNER_LIST": "Banner List",
-    "BANNER_DETAILS": "Banner Details"
+    "BANNER_DETAILS": "Banner Details",
+    "POPULAR_UPDATED_SUCCESSFULLY": "Popular Nft Updated",
+    "POPULAR_ADDED_SUCCESSFULLY": "Popular Added Successfully"
 }

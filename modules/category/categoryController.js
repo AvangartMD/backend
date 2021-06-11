@@ -70,7 +70,6 @@ CategoryCtr.updateCategory = async (req, res) => {
   try {
     const getCategoryDetails = await CategoryModel.findById(req.params.id);
 
-    console.log("req.body.name");
     if (getCategoryDetails) {
       if (req.body.categoryName) {
         getCategoryDetails.categoryName = req.body.categoryName;
