@@ -40,7 +40,6 @@ auth.isAuthenticatedUser = async (req, res, next) => {
       req.role = fetchRole.roleName;
       return next();
     } else {
-      console.log("in else");
       return errorUtil.notAuthenticated(res, req);
     }
   }
