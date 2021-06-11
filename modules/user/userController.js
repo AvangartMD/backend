@@ -157,7 +157,9 @@ UserCtr.login = async (req, res) => {
 // list all users for admin
 UserCtr.list = async (req, res) => {
   try {
+    const page = req.query.page || 1;
     const query = {};
+
     if (req.query.roleId) {
       query.role = req.query.roleId;
     }
@@ -165,15 +167,27 @@ UserCtr.list = async (req, res) => {
       query.status = req.query.status.toUpperCase();
     }
 
-    const list = await UserModel.find(query).populate({
-      path: "role",
-      select: { _id: 1, roleName: 1 },
-    });
+    const totalCount = await UserModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const list = await UserModel.find(query)
+      .populate({
+        path: "role",
+        select: { _id: 1, roleName: 1 },
+      })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
 
     return res.status(200).json({
       message: req.t("SUCCESS"),
       status: true,
       data: list,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
     });
   } catch (err) {
     Utils.echoLog("error in listing user   ", err);

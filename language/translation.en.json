@@ -41,5 +41,9 @@
     "BANNER_LIST": "Banner List",
     "BANNER_DETAILS": "Banner Details",
     "POPULAR_UPDATED_SUCCESSFULLY": "Popular Nft Updated",
-    "POPULAR_ADDED_SUCCESSFULLY": "Popular Added Successfully"
+    "POPULAR_ADDED_SUCCESSFULLY": "Popular Added Successfully",
+    "INVALID_ID": "Invalid Details",
+    "DELETED": "Deleted Successfully",
+    "POPULARLIST": "Popular list",
+    "LIST": "list"
 }
