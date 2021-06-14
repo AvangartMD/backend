@@ -3,7 +3,10 @@ const RoleModel = require("../roles/rolesModal");
 const Utils = require("../../helper/utils");
 const jwtUtil = require("../../helper/jwtUtils");
 const NotificationModel = require("../notification/notificationModel");
+const crypto = require("crypto");
 const { statusObject } = require("../../helper/enum");
+const asyncRedis = require("async-redis");
+const client = asyncRedis.createClient();
 
 const UserCtr = {};
 
@@ -362,4 +365,31 @@ UserCtr.addUserByAdmin = async (req, res) => {
   }
 };
 
+// genrate a nonce
+UserCtr.genrateNonce = async (req, res) => {
+  try {
+    let nonce = crypto.randomBytes(16).toString("hex");
+    const data = {
+      walletAddress: req.params.address,
+      nonce: nonce,
+    };
+
+    await client.set(nonce, JSON.stringify(data), "EX", 60 * 10);
+
+    return res.status(200).json({
+      message: req.t("NONCE_GENRATED"),
+      status: true,
+      data: {
+        nonce: nonce,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog("error in genrating nonce  ", err);
+    return res.status(500).json({
+      message: req.t("DB_ERROR"),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
 module.exports = UserCtr;

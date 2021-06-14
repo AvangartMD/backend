@@ -37,7 +37,7 @@ nftCtr.addNewNft = async (req, res) => {
     Utils.echoLog("error in nft create", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }
@@ -66,7 +66,7 @@ nftCtr.addNewCollection = async (req, res) => {
     Utils.echoLog("error in adding new collection", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }
@@ -100,7 +100,7 @@ nftCtr.updateCollection = async (req, res) => {
     Utils.echoLog("error in updating the collection ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }
@@ -144,7 +144,7 @@ nftCtr.updateNft = async (req, res) => {
     Utils.echoLog("error in updating NFT ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }
@@ -170,7 +170,7 @@ nftCtr.getCollectionByUsers = async (req, res) => {
     Utils.echoLog("error in getting  collection list", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }
@@ -210,7 +210,7 @@ nftCtr.getListOfCollectionForAdmin = async (req, res) => {
     Utils.echoLog("error in getting  collection list for admin", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }
@@ -239,7 +239,7 @@ nftCtr.getUserNftDetails = async (req, res) => {
     Utils.echoLog("error in getting nft list ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }
@@ -270,7 +270,7 @@ nftCtr.mintNft = async (req, res) => {
     Utils.echoLog("error in mintNft nft  ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }

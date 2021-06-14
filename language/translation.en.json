@@ -45,5 +45,6 @@
     "INVALID_ID": "Invalid Details",
     "DELETED": "Deleted Successfully",
     "POPULARLIST": "Popular list",
-    "LIST": "list"
+    "LIST": "list",
+    "NFT_ALREADY_ADDED": "Nft Already added to popular list"
 }

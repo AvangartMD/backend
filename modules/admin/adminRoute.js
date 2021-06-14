@@ -2,6 +2,7 @@ const express = require("express");
 const AdminCtr = require("./adminController");
 const AdminMiddleware = require("./adminMiddleware");
 const bannerRoute = require("./banner/bannerRoute");
+const popularRoute = require("./popular-nft/popularRoute");
 const Auth = require("../../helper/auth");
 
 const adminRoute = express.Router();

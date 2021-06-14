@@ -59,4 +59,8 @@ const addUserAsCreatorByAdmin = [
 ];
 userRoute.post("/addNewUserByAdmin", addUserAsCreatorByAdmin);
 
+// genrate nonce
+const genrateNonce = [UserCtr.genrateNonce];
+userRoute.get("/genrateNonce/:address", genrateNonce);
+
 module.exports = userRoute;
