@@ -116,12 +116,34 @@ CategoryCtr.list = async (req, res) => {
     if (req.query.list === "all") {
       query = {};
     }
-    const list = await CategoryModel.find(query);
-    return res.status(200).json({
-      message: req.t("CATEGORY_LIST"),
-      status: true,
-      data: list,
-    });
+    if (req.role !== "ADMIN") {
+      const list = await CategoryModel.find(query);
+      return res.status(200).json({
+        message: req.t("CATEGORY_LIST"),
+        status: true,
+        data: list,
+      });
+    } else {
+      const page = req.query.page || 1;
+      const totalCount = await CategoryModel.countDocuments(query);
+      const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+      const list = await CategoryModel.find(query)
+        .skip((+page - 1 || 0) * +process.env.LIMIT)
+        .limit(+process.env.LIMIT);
+
+      return res.status(200).json({
+        message: req.t("SUCCESS"),
+        status: true,
+        data: list,
+        pagination: {
+          pageNo: page,
+          totalRecords: totalCount,
+          totalPages: pageCount,
+          limit: +process.env.LIMIT,
+        },
+      });
+    }
   } catch (err) {
     Utils.echoLog("error in listing  user ", err);
     return res.status(500).json({

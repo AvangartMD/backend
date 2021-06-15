@@ -135,11 +135,24 @@ BannerCtr.list = async (req, res) => {
 // list banner for admin
 BannerCtr.listForAdmin = async (req, res) => {
   try {
-    const list = await BannerModel.find({}).sort({ createdAt: -1 });
+    const page = req.query.page || 1;
+    const totalCount = await BannerModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+    const list = await BannerModel.find({})
+      .sort({ createdAt: -1 })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
     return res.status(200).json({
       message: req.t("BANNER_LIST"),
       status: true,
       data: list,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
     });
   } catch (err) {
     Utils.echoLog("error in listing banner for admin ", err);
