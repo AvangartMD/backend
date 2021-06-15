@@ -6,4 +6,8 @@ const seedersRoute = express.Router();
 const initializeSeeders = [seeders.inializeProject];
 seedersRoute.get("/initialize", initializeSeeders);
 
+// initialize dashbaord
+const initializeDashboard = [seeders.initializeDashboard];
+seedersRoute.get("/initializeDashboard", initializeDashboard);
+
 module.exports = seedersRoute;

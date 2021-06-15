@@ -3,6 +3,7 @@ const AdminCtr = require("./adminController");
 const AdminMiddleware = require("./adminMiddleware");
 const bannerRoute = require("./banner/bannerRoute");
 const popularRoute = require("./popular-nft/popularRoute");
+const dashbaordRoute = require("./dashboard/dashboardRoute");
 const Auth = require("../../helper/auth");
 
 const adminRoute = express.Router();
@@ -21,4 +22,6 @@ adminRoute.post("/login", login);
 // banner route
 adminRoute.use("/banner", bannerRoute);
 
+// dahborad route
+adminRoute.use("/dashboard", dashbaordRoute);
 module.exports = adminRoute;

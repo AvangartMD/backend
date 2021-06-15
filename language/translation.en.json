@@ -49,5 +49,6 @@
     "NFT_ALREADY_ADDED": "Nft Already added to popular list",
     "LOGIN_AGAIN": "Please login again",
     "INVALID_SIGNATURE": "Invalid signature",
-    "Inavalid call": "Invalid call"
+    "Inavalid call": "Invalid call",
+    "DASHBOARD_UPDATED": "Dashboard updated successfully"
 }
