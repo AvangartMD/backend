@@ -190,6 +190,7 @@ UserCtr.login = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log("err is :", err);
     Utils.echoLog("error in singnup  ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
