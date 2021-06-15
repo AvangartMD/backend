@@ -136,7 +136,7 @@ BannerCtr.list = async (req, res) => {
 BannerCtr.listForAdmin = async (req, res) => {
   try {
     const page = req.query.page || 1;
-    const totalCount = await BannerModel.countDocuments(query);
+    const totalCount = await BannerModel.countDocuments({});
     const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
     const list = await BannerModel.find({})
       .sort({ createdAt: -1 })
