@@ -138,7 +138,7 @@ UserCtr.login = async (req, res) => {
             const getRoles = await RoleModel.findOne({ roleName: "COLLECTOR" });
             const createUser = new UserModel({
               role: getRoles._id,
-              walletAddress: req.body.walletAddress.toLowerCase(),
+              walletAddress: parsedRedisData.walletAddress.toLowerCase(),
             });
 
             const saveUser = await createUser.save();
@@ -190,7 +190,6 @@ UserCtr.login = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log("err is :", err);
     Utils.echoLog("error in singnup  ", err);
     return res.status(500).json({
       message: req.t("DB_ERROR"),
