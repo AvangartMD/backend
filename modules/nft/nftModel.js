@@ -65,6 +65,16 @@ const nftSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    coCreator: {
+      address: {
+        type: String,
+        lowerCase: true,
+      },
+      percentage: {
+        type: Number,
+        default: null,
+      },
+    },
   },
 
   {

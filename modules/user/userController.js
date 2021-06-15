@@ -5,6 +5,7 @@ const jwtUtil = require("../../helper/jwtUtils");
 const NotificationModel = require("../notification/notificationModel");
 const crypto = require("crypto");
 const { statusObject } = require("../../helper/enum");
+const Web3 = require("web3");
 const asyncRedis = require("async-redis");
 const client = asyncRedis.createClient();
 
@@ -87,64 +88,105 @@ UserCtr.getAllRoles = async (req, res) => {
 // login initally
 UserCtr.login = async (req, res) => {
   try {
-    const checkAddressAvalaible = await UserModel.findOne(
-      {
-        walletAddress: req.body.walletAddress.toLowerCase().trim(),
-      },
-      { acceptedByAdmin: 0, stage: 0 }
-    ).populate({
-      path: "role",
-      select: { _id: 1, roleName: 1 },
-    });
+    const { nonce, signature } = req.body;
+    const web3 = new Web3(
+      new Web3.providers.HttpProvider(
+        "https://data-seed-prebsc-1-s1.binance.org:8545/"
+      )
+    );
 
-    if (checkAddressAvalaible) {
-      // create the token and sent i tin response
-      const token = jwtUtil.getAuthToken({
-        _id: checkAddressAvalaible._id,
-        role: checkAddressAvalaible.role,
-        walletAddress: checkAddressAvalaible.walletAddress,
-      });
+    const signer = await web3.eth.accounts.recover(nonce, signature);
 
-      return res.status(200).json({
-        message: req.t("SUCCESS"),
-        status: true,
-        data: {
-          token,
-          details: checkAddressAvalaible,
-        },
-      });
-    } else {
-      const getRoles = await RoleModel.findOne({ roleName: "COLLECTOR" });
-      const createUser = new UserModel({
-        role: getRoles._id,
-        walletAddress: req.body.walletAddress.toLowerCase(),
-      });
+    console.log("sin is:", signer);
 
-      const saveUser = await createUser.save();
+    if (signer) {
+      const fetchRedisData = await client.get(nonce);
 
-      const token = jwtUtil.getAuthToken({
-        _id: saveUser._id,
-        role: saveUser.role,
-        walletAddress: saveUser.walletAddress,
-      });
+      if (fetchRedisData) {
+        const parsedRedisData = JSON.parse(fetchRedisData);
+        const checkAddressMatched =
+          parsedRedisData.walletAddress.toLowerCase() === signer.toLowerCase();
 
-      return res.status(200).json({
-        message: req.t("SUCCESS"),
-        status: true,
-        data: {
-          token,
-          details: {
-            name: saveUser.name,
-            surname: saveUser.surname,
-            status: saveUser.status,
-            profile: saveUser.profile,
-            portfolio: saveUser.portfolio,
-            role: {
-              roleName: "COLLECTOR",
-              _id: saveUser.role,
+        if (checkAddressMatched) {
+          const checkAddressAvalaible = await UserModel.findOne(
+            {
+              walletAddress: signer.toLowerCase().trim(),
             },
-          },
-        },
+            { acceptedByAdmin: 0, stage: 0 }
+          ).populate({
+            path: "role",
+            select: { _id: 1, roleName: 1 },
+          });
+
+          if (checkAddressAvalaible) {
+            // create the token and sent i tin response
+            const token = jwtUtil.getAuthToken({
+              _id: checkAddressAvalaible._id,
+              role: checkAddressAvalaible.role,
+              walletAddress: checkAddressAvalaible.walletAddress,
+            });
+
+            return res.status(200).json({
+              message: req.t("SUCCESS"),
+              status: true,
+              data: {
+                token,
+                details: checkAddressAvalaible,
+              },
+            });
+          } else {
+            const getRoles = await RoleModel.findOne({ roleName: "COLLECTOR" });
+            const createUser = new UserModel({
+              role: getRoles._id,
+              walletAddress: req.body.walletAddress.toLowerCase(),
+            });
+
+            const saveUser = await createUser.save();
+
+            const token = jwtUtil.getAuthToken({
+              _id: saveUser._id,
+              role: saveUser.role,
+              walletAddress: saveUser.walletAddress,
+            });
+
+            return res.status(200).json({
+              message: req.t("SUCCESS"),
+              status: true,
+              data: {
+                token,
+                details: {
+                  name: saveUser.name,
+                  surname: saveUser.surname,
+                  status: saveUser.status,
+                  profile: saveUser.profile,
+                  portfolio: saveUser.portfolio,
+                  role: {
+                    roleName: "COLLECTOR",
+                    _id: saveUser.role,
+                  },
+                },
+              },
+            });
+          }
+        } else {
+          // invalid address
+          return res.status(400).json({
+            message: req.t("INVALID_CALL"),
+            status: false,
+          });
+        }
+      } else {
+        // redis data not avalible login again
+        return res.status(400).json({
+          message: req.t("LOGIN_AGAIN"),
+          status: false,
+        });
+      }
+    } else {
+      // inavlid signature
+      return res.status(400).json({
+        message: req.t("INVALID_SIGNATURE"),
+        status: false,
       });
     }
   } catch (err) {

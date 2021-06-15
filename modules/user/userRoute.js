@@ -18,7 +18,7 @@ const updateUserDetails = [
 userRoute.put("/update", updateUserDetails);
 
 // login user
-const login = [UserMiddleware.loginValidator, UserCtr.login];
+const login = [UserMiddleware.loginCheck, UserCtr.login];
 userRoute.post("/login", login);
 
 // list all user for admin only

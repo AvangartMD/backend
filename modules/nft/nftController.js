@@ -15,6 +15,7 @@ nftCtr.addNewNft = async (req, res) => {
       collectionId,
       digitalKey,
       unlockContent,
+      coCreator,
     } = req.body;
 
     const createNewNft = new NftModel({
@@ -25,6 +26,7 @@ nftCtr.addNewNft = async (req, res) => {
       collectionId: collectionId ? collectionId : null,
       digitalKey: digitalKey,
       unlockContent: unlockContent ? unlockContent : false,
+      coCreator: req.body.coCreator ? req.body.coCreator : null,
     });
 
     await createNewNft.save();

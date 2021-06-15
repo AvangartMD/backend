@@ -67,6 +67,15 @@ UserMiddleware.loginValidator = async (req, res, next) => {
   validate.validateRequest(req, res, next, schema);
 };
 
+// login
+UserMiddleware.loginCheck = async (req, res, next) => {
+  const schema = Joi.object({
+    nonce: Joi.string().required(),
+    signature: Joi.string().required(),
+  });
+  validate.validateRequest(req, res, next, schema);
+};
+
 // aprove as Creator Validator
 UserMiddleware.ValidateApproveAsCreator = async (req, res, next) => {
   const userSchema = Joi.array().items({

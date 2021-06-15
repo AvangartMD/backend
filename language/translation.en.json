@@ -46,5 +46,8 @@
     "DELETED": "Deleted Successfully",
     "POPULARLIST": "Popular list",
     "LIST": "list",
-    "NFT_ALREADY_ADDED": "Nft Already added to popular list"
+    "NFT_ALREADY_ADDED": "Nft Already added to popular list",
+    "LOGIN_AGAIN": "Please login again",
+    "INVALID_SIGNATURE": "Invalid signature",
+    "Inavalid call": "Invalid call"
 }
