@@ -2,6 +2,7 @@ const express = require("express");
 const CategoryCtr = require("./categoryController");
 const CategoryMiddleware = require("./categoryMiddleware");
 const Auth = require("../../helper/auth");
+const auth = require("../../helper/auth");
 
 const categoryRoute = express.Router();
 
@@ -19,8 +20,8 @@ categoryRoute.post("/add", addNewCategory);
 const getCategoryDetails = [
   Auth.isAuthenticatedUser,
   Auth.isAdmin,
-  CategoryCtr.getCategoryDetails, 
-]
+  CategoryCtr.getCategoryDetails,
+];
 categoryRoute.get("/categoryDetails", getCategoryDetails);
 
 // update category
@@ -35,7 +36,7 @@ categoryRoute.put("/update/:id", updateCategory);
 
 // list category
 
-const listCategory = [CategoryCtr.list];
+const listCategory = [auth.checkIsAutheticated, CategoryCtr.list];
 categoryRoute.get("/list", listCategory);
 
 module.exports = categoryRoute;

@@ -116,7 +116,7 @@ CategoryCtr.list = async (req, res) => {
     if (req.query.list === "all") {
       query = {};
     }
-    console.log("role is:", req.userData);
+
     if (req.role !== "ADMIN") {
       const list = await CategoryModel.find(query);
       return res.status(200).json({
