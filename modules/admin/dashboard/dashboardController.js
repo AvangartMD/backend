@@ -54,7 +54,7 @@ DashBoardCtr.update = async (req, res) => {
     const fetchDetails = await DashboardModel.findOne({ _id: req.params.id });
     if (fetchDetails) {
       if (req.body.isActive) {
-        fetchDetails.isActive = fetchDetails.isActive;
+        fetchDetails.isActive = true;
       }
 
       if (!req.body.isActive) {
