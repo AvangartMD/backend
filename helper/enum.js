@@ -10,4 +10,5 @@ exports.statusObject = {
 
 exports.cachedData = {
   LIST_BANNER: "banner-list",
+  LIST_INFO: "info-list",
 };
