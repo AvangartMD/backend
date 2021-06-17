@@ -1,8 +1,8 @@
-const NftModel = require("./nftModel");
-const CollectionModel = require("./collectionModel");
-const Utils = require("../../helper/utils");
-const NftMiddleware = require("./nftMiddleware");
-const { statusObject } = require("../../helper/enum");
+const NftModel = require('./nftModel');
+const CollectionModel = require('./collectionModel');
+const Utils = require('../../helper/utils');
+const NftMiddleware = require('./nftMiddleware');
+const { statusObject } = require('../../helper/enum');
 
 const nftCtr = {};
 // add a new NFT
@@ -22,23 +22,26 @@ nftCtr.addNewNft = async (req, res) => {
       title: title,
       description: description ? description : null,
       image: image,
-      ownerId: req.role === "ADMIN" ? req.body.ownerId : req.userData._id,
+      ownerId: req.role === 'ADMIN' ? req.body.ownerId : req.userData._id,
       collectionId: collectionId ? collectionId : null,
       digitalKey: digitalKey,
       unlockContent: unlockContent ? unlockContent : false,
       coCreator: req.body.coCreator ? req.body.coCreator : null,
+      price: req.body.price,
+      saleState: req.body.saleState,
+      auctionTime: req.body.auctionTime ? req.body.auctionTime : 0,
     });
 
     await createNewNft.save();
 
     return res.status(200).json({
-      message: req.t("ADD_NEW_NFT"),
+      message: req.t('ADD_NEW_NFT'),
       status: true,
     });
   } catch (err) {
-    Utils.echoLog("error in nft create", err);
+    Utils.echoLog('error in nft create', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -55,19 +58,19 @@ nftCtr.addNewCollection = async (req, res) => {
       name,
       slugText: name,
       description,
-      ownerId: req.role === "ADMIN" ? req.body.ownerId : req.userData._id,
+      ownerId: req.role === 'ADMIN' ? req.body.ownerId : req.userData._id,
     });
 
     await addNewCollection.save();
 
     return res.status(200).json({
-      message: req.t("COLLECTION_ADDED"),
+      message: req.t('COLLECTION_ADDED'),
       status: true,
     });
   } catch (err) {
-    Utils.echoLog("error in adding new collection", err);
+    Utils.echoLog('error in adding new collection', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -94,14 +97,14 @@ nftCtr.updateCollection = async (req, res) => {
       await fetchCollection.save();
 
       return res.status(200).json({
-        message: req.t("COLLECTION_UPDATED"),
+        message: req.t('COLLECTION_UPDATED'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in updating the collection ", err);
+    Utils.echoLog('error in updating the collection ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -133,19 +136,19 @@ nftCtr.updateNft = async (req, res) => {
 
       await fetchNftDetails.save();
       return res.status(200).json({
-        message: req.t("NFT_UPDATED"),
+        message: req.t('NFT_UPDATED'),
         status: true,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_NFT"),
+        message: req.t('INVALID_NFT'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in updating NFT ", err);
+    Utils.echoLog('error in updating NFT ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -164,14 +167,14 @@ nftCtr.getCollectionByUsers = async (req, res) => {
     );
 
     return res.status(200).json({
-      message: req.t("COLLECTION_LIST"),
+      message: req.t('COLLECTION_LIST'),
       status: true,
       data: getCollectionByUser,
     });
   } catch (err) {
-    Utils.echoLog("error in getting  collection list", err);
+    Utils.echoLog('error in getting  collection list', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -190,7 +193,7 @@ nftCtr.getListOfCollectionForAdmin = async (req, res) => {
       isActive: true,
     })
       .populate({
-        path: "ownerId",
+        path: 'ownerId',
         select: { _id: 1, walletAddress: 1 },
       })
       .sort({ createdAt: -1 })
@@ -198,7 +201,7 @@ nftCtr.getListOfCollectionForAdmin = async (req, res) => {
       .limit(+process.env.LIMIT);
 
     return res.status(200).json({
-      message: req.t("COLLECTION_LIST"),
+      message: req.t('COLLECTION_LIST'),
       status: true,
       data: getCollectionList,
       pagination: {
@@ -209,9 +212,9 @@ nftCtr.getListOfCollectionForAdmin = async (req, res) => {
       },
     });
   } catch (err) {
-    Utils.echoLog("error in getting  collection list for admin", err);
+    Utils.echoLog('error in getting  collection list for admin', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -228,19 +231,19 @@ nftCtr.getUserNftDetails = async (req, res) => {
     }
 
     const getAllNftsByUser = await NftModel.find(query).populate({
-      path: "collectionId",
+      path: 'collectionId',
       select: { name: 1, logo: 1 },
     });
 
     return res.status(200).json({
-      message: req.t("NFT_LIST"),
+      message: req.t('NFT_LIST'),
       status: true,
       data: getAllNftsByUser,
     });
   } catch (err) {
-    Utils.echoLog("error in getting nft list ", err);
+    Utils.echoLog('error in getting nft list ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -258,20 +261,20 @@ nftCtr.mintNft = async (req, res) => {
       await getNftDetails.save();
 
       return res.status(200).json({
-        message: req.t("TOKEN_MINTED_ADDED"),
+        message: req.t('TOKEN_MINTED_ADDED'),
         status: true,
         data: getAllNftsByUser,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_NFT_ID"),
+        message: req.t('INVALID_NFT_ID'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in mintNft nft  ", err);
+    Utils.echoLog('error in mintNft nft  ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });

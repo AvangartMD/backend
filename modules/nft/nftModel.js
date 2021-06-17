@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
-const { roles, nftStatus } = require("../../helper/enum");
+const { roles, nftStatus } = require('../../helper/enum');
 
 const nftSchema = new Schema(
   {
@@ -26,12 +26,12 @@ const nftSchema = new Schema(
     },
     category: {
       type: Schema.Types.ObjectId,
-      ref: "categories",
+      ref: 'categories',
       required: false,
     },
     collectionId: {
       type: Schema.Types.ObjectId,
-      ref: "collection",
+      ref: 'collection',
       required: false,
     },
     isActive: { type: Boolean, default: true },
@@ -44,7 +44,7 @@ const nftSchema = new Schema(
       type: String,
       required: true,
       enum: nftStatus,
-      default: "NOT_MINTED",
+      default: 'NOT_MINTED',
     },
     tokenId: {
       type: String,
@@ -54,7 +54,7 @@ const nftSchema = new Schema(
     },
     ownerId: {
       type: Schema.Types.ObjectId,
-      ref: "users",
+      ref: 'users',
       required: true,
     },
     digitalKey: {
@@ -65,10 +65,28 @@ const nftSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    price: {
+      type: Number,
+      required: true,
+    },
+    saleState: {
+      type: String,
+      enum: ['BUY', 'AUCTION'],
+      required: true,
+    },
+    auctionTime: {
+      type: Number,
+      default: 0,
+    },
+    auctionStartData: {
+      type: String,
+      default: null,
+    },
     coCreator: {
-      address: {
-        type: String,
-        lowerCase: true,
+      userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'users',
+        default: null,
       },
       percentage: {
         type: Number,
@@ -85,4 +103,4 @@ const nftSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("nft", nftSchema);
+module.exports = mongoose.model('nft', nftSchema);

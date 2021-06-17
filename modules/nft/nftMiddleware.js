@@ -1,8 +1,8 @@
-const Joi = require("joi");
-const validate = require("../../helper/validateRequest");
-const NftModel = require("./nftModel");
-const CollectionModel = require("./collectionModel");
-const Utils = require("../../helper/utils");
+const Joi = require('joi');
+const validate = require('../../helper/validateRequest');
+const NftModel = require('./nftModel');
+const CollectionModel = require('./collectionModel');
+const Utils = require('../../helper/utils');
 
 const NftMiddleware = {};
 // validate add request body
@@ -12,21 +12,34 @@ NftMiddleware.validateAdd = async (req, res, next) => {
     compressed: Joi.string().required(),
   });
 
+  const coCreatorSchema = Joi.object().keys({
+    userId: Joi.string(),
+    percentage: Joi.number(),
+  });
+
   const schema = Joi.object({
     title: Joi.string().required(),
     description: Joi.string(),
     image: imageSchema,
     ownerId: Joi.alternatives().conditional(req.role, {
-      is: "ADMIN",
+      is: 'ADMIN',
       then: Joi.string().required(),
     }),
     collectionId: Joi.string(),
-    digitalKey: Joi.alternatives().conditional("unlockContent", {
+    digitalKey: Joi.alternatives().conditional('unlockContent', {
       is: 1,
       then: Joi.string().required(),
       otherwise: Joi.string(),
     }),
     unlockContent: Joi.boolean().required(),
+    coCreator: coCreatorSchema,
+    price: Joi.number().required(),
+    saleState: Joi.string().valid('BUY', 'AUCTION').required(),
+    auctionTime: Joi.alternatives().conditional('saleState', {
+      is: 'AUCTION',
+      then: Joi.number().required(),
+      otherwise: Joi.number(),
+    }),
   });
   validate.validateRequest(req, res, next, schema);
 };
@@ -34,7 +47,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
 // check collection id valid or not
 NftMiddleware.checkCollection = async (req, res, next) => {
   try {
-    if (req.body.collectionId && req.role != "ADMIN") {
+    if (req.body.collectionId && req.role != 'ADMIN') {
       const checkCollection = await CollectionModel.findOne({
         _id: req.body.collectionId,
         ownerId: req.userData._id,
@@ -44,19 +57,19 @@ NftMiddleware.checkCollection = async (req, res, next) => {
         return next();
       } else {
         return res.status(200).json({
-          message: req.t("INVALID_COLLECTION"),
+          message: req.t('INVALID_COLLECTION'),
           status: false,
         });
       }
-    } else if (req.role === "ADMIN") {
+    } else if (req.role === 'ADMIN') {
       return next();
     } else {
       return next();
     }
   } catch (err) {
-    Utils.echoLog("error in collection middleware", err);
+    Utils.echoLog('error in collection middleware', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -84,16 +97,16 @@ NftMiddleware.checkCollectionAlreadyAdded = async (req, res, next) => {
 
     if (checkAlreadyAvalaible) {
       return res.status(400).json({
-        message: req.t("COLLECTION_ALREADY"),
+        message: req.t('COLLECTION_ALREADY'),
         status: false,
       });
     } else {
       return next();
     }
   } catch (err) {
-    Utils.echoLog("error in checkCollectionAlreadyAdded middleware ", err);
+    Utils.echoLog('error in checkCollectionAlreadyAdded middleware ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -112,12 +125,12 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
     description: Joi.string(),
     image: imageSchema,
     ownerId: Joi.alternatives().conditional(req.role, {
-      is: "ADMIN",
+      is: 'ADMIN',
       then: Joi.string().required(),
     }),
     collectionId: Joi.string(),
     unlockContent: Joi.boolean(),
-    digitalKey: Joi.alternatives().conditional("unlockContent", {
+    digitalKey: Joi.alternatives().conditional('unlockContent', {
       is: 1,
       then: Joi.string().required(),
       otherwise: Joi.string(),
@@ -148,18 +161,18 @@ NftMiddleware.canUpdateNft = async (req, res, next) => {
       getNftDetails.ownerId.toString() === req.userData._id.toString()
     ) {
       return next();
-    } else if (req.role === "ADMIN") {
+    } else if (req.role === 'ADMIN') {
       return next();
     } else {
       return res.status(403).json({
-        message: req.t("NOT_AUTHROZIED"),
+        message: req.t('NOT_AUTHROZIED'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in can update middleware", err);
+    Utils.echoLog('error in can update middleware', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -176,18 +189,18 @@ NftMiddleware.canUpdateCollection = async (req, res, next) => {
       getCollectionDetails.ownerId.toString() === req.userData._id.toString()
     ) {
       return next();
-    } else if (req.role === "ADMIN") {
+    } else if (req.role === 'ADMIN') {
       return next();
     } else {
       return res.status(403).json({
-        message: req.t("NOT_AUTHROZIED"),
+        message: req.t('NOT_AUTHROZIED'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in can update middleware", err);
+    Utils.echoLog('error in can update middleware', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -196,11 +209,17 @@ NftMiddleware.canUpdateCollection = async (req, res, next) => {
 
 // can add nft
 NftMiddleware.canAddNft = async (req, res, next) => {
-  if (req.role === "ADMIN" || req.role === "CREATOR") {
+  if (req.role === 'ADMIN') {
+    return next();
+  } else if (
+    req.role === 'CREATOR' &&
+    req.userData &&
+    req.userData.acceptedByAdmin
+  ) {
     return next();
   } else {
     return res.status(403).json({
-      message: req.t("NOT_AUTHROZIED"),
+      message: req.t('NOT_AUTHROZIED'),
       status: false,
     });
   }
