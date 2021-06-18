@@ -1,21 +1,20 @@
-const InfoModel = require("./infoModel");
-const Utils = require("../../../helper/utils");
-const asyncRedis = require("async-redis");
+const InfoModel = require('./infoModel');
+const Utils = require('../../../helper/utils');
+const asyncRedis = require('async-redis');
 const client = asyncRedis.createClient();
-const { cachedData } = require("../../../helper/enum");
+const { cachedData } = require('../../../helper/enum');
 const InfoCtr = {};
-
 
 // add new info
 InfoCtr.addNewInfo = async (req, res) => {
   try {
     const { url, banner, button_text, button_url } = req.body;
     if (button_text && !button_url) {
-        return res.status(500).json({
-          message: req.t("DB_ERROR"),
-          status: true,
-          err: 'button_url is not given',
-        });
+      return res.status(500).json({
+        message: req.t('DB_ERROR'),
+        status: true,
+        err: 'button_url is not given',
+      });
     }
     const addNewInfo = new InfoModel({
       url,
@@ -25,9 +24,8 @@ InfoCtr.addNewInfo = async (req, res) => {
     });
     const saveInfo = await addNewInfo.save();
 
-    client.del(cachedData.LIST_INFO);
     return res.status(200).json({
-      message: req.t("INFO_ADDED_SUCCESSFULLY"),
+      message: req.t('INFO_ADDED_SUCCESSFULLY'),
       status: true,
       data: {
         details: {
@@ -40,9 +38,12 @@ InfoCtr.addNewInfo = async (req, res) => {
       },
     });
   } catch (err) {
-    Utils.echoLog("error in  creating new info ", err);
+    Utils.echoLog(
+      'error in      client.del(cachedData.LIST_INFO);creating new info ',
+      err
+    );
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -75,17 +76,11 @@ InfoCtr.updateInfo = async (req, res) => {
       if (!req.body.status) {
         fetchInfoDetails.isActive = req.body.status;
       }
-      if (!req.body.button_text) {
-        fetchInfoDetails.button_text = req.body.button_text;
-      }
-      if (!req.body.button_url) {
-        fetchInfoDetails.button_url = req.body.button_url;
-      }
+
       if (req.body.button_text && !req.body.button_url) {
-        return res.status(500).json({
-          message: req.t("DB_ERROR"),
+        return res.status(400).json({
+          message: req.t('BUTTON_URL_NOT'),
           status: true,
-          err: 'button_url is not given',
         });
       }
       if (!req.body.button_text && req.body.button_url) {
@@ -94,22 +89,20 @@ InfoCtr.updateInfo = async (req, res) => {
 
       await fetchInfoDetails.save();
 
-      client.del(cachedData.LIST_INFO);
-
       return res.status(200).json({
-        message: req.t("INFO_UPDATED_SUCCESSFULLY"),
+        message: req.t('INFO_UPDATED_SUCCESSFULLY'),
         status: true,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_INFO"),
+        message: req.t('INVALID_INFO'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in updating info ", err);
+    Utils.echoLog('error in updating info ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -123,19 +116,19 @@ InfoCtr.deleteInfo = async (req, res) => {
 
     if (deleteInfo && deleteInfo.deletedCount > 0) {
       return res.status(200).json({
-        message: req.t("INFO_DELETED"),
+        message: req.t('INFO_DELETED'),
         status: true,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_INFO"),
+        message: req.t('INVALID_INFO'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in  creating deleting info ", err);
+    Utils.echoLog('error in  creating deleting info ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -148,20 +141,20 @@ InfoCtr.getInfoDetails = async (req, res) => {
     const getInfoDetails = await InfoModel.findOne({ _id: req.params.id });
     if (getInfoDetails) {
       return res.status(200).json({
-        message: req.t("INFO_DETAILS"),
+        message: req.t('INFO_DETAILS'),
         status: true,
         data: getInfoDetails,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_INFO"),
+        message: req.t('INVALID_INFO'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in listing info ", err);
+    Utils.echoLog('error in listing info ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -170,35 +163,35 @@ InfoCtr.getInfoDetails = async (req, res) => {
 
 // list info for admin
 InfoCtr.listForAdmin = async (req, res) => {
-    try {
-      const page = req.query.page || 1;
-      const totalCount = await InfoModel.countDocuments({});
-      const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
-      const list = await InfoModel.find({})
-        .sort({ createdAt: -1 })
-        .skip((+page - 1 || 0) * +process.env.LIMIT)
-        .limit(+process.env.LIMIT);
-  
-      return res.status(200).json({
-        message: req.t("INFO_LIST"),
-        status: true,
-        data: list,
-        pagination: {
-          pageNo: page,
-          totalRecords: totalCount,
-          totalPages: pageCount,
-          limit: +process.env.LIMIT,
-        },
-      });
-    } catch (err) {
-      Utils.echoLog("error in listing info for admin ", err);
-      return res.status(500).json({
-        message: req.t("DB_ERROR"),
-        status: true,
-        err: err.message ? err.message : err,
-      });
-    }
-};  
+  try {
+    const page = req.query.page || 1;
+    const totalCount = await InfoModel.countDocuments({});
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+    const list = await InfoModel.find({})
+      .sort({ createdAt: -1 })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: req.t('INFO_LIST'),
+      status: true,
+      data: list,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog('error in listing info for admin ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
 
 // list info for users
 InfoCtr.list = async (req, res) => {
@@ -208,17 +201,16 @@ InfoCtr.list = async (req, res) => {
       { isActive: 0, createdAt: 0, updatedAt: 0 }
     );
     if (getList) {
-      await client.set("info-list", JSON.stringify(getList), "EX", 60 * 10);
       return res.status(200).json({
-        message: req.t("INFO_LIST"),
+        message: req.t('INFO_LIST'),
         status: true,
         data: getList,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in listing info ", err);
+    Utils.echoLog('error in listing info ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });

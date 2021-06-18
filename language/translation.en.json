@@ -56,5 +56,6 @@
     "LOGIN_AGAIN": "Please login again",
     "INVALID_SIGNATURE": "Invalid signature",
     "Inavalid call": "Invalid call",
-    "DASHBOARD_UPDATED": "Dashboard updated successfully"
+    "DASHBOARD_UPDATED": "Dashboard updated successfully",
+    "BUTTON_URL_NOT": "Button url is needed"
 }
