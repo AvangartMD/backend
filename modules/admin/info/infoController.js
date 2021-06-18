@@ -1,8 +1,6 @@
 const InfoModel = require('./infoModel');
 const Utils = require('../../../helper/utils');
-const asyncRedis = require('async-redis');
-const client = asyncRedis.createClient();
-const { cachedData } = require('../../../helper/enum');
+
 const InfoCtr = {};
 
 // add new info
