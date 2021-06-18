@@ -32,6 +32,7 @@ nftCtr.addNewNft = async (req, res) => {
       price: req.body.price,
       saleState: req.body.saleState,
       auctionTime: req.body.auctionTime ? req.body.auctionTime : 0,
+      edition: req.body.edition ? req.body.edition : 1,
     });
 
     const saveNft = await createNewNft.save();
@@ -150,6 +151,10 @@ nftCtr.updateNft = async (req, res) => {
 
       if (req.body.auctionTime) {
         fetchNftDetails.auctionTime = req.body.auctionTime;
+      }
+
+      if (req.body.edition) {
+        fetchNftDetails.edition = req.body.edition;
       }
 
       await fetchNftDetails.save();

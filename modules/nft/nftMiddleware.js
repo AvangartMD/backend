@@ -41,6 +41,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
       then: Joi.number().required(),
       otherwise: Joi.number(),
     }),
+    edition: Joi.number().required(),
   });
   validate.validateRequest(req, res, next, schema);
 };
@@ -146,6 +147,7 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
       then: Joi.string().required(),
       otherwise: Joi.string(),
     }),
+    edition: Joi.number(),
   });
 
   validate.validateRequest(req, res, next, schema);
