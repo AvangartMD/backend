@@ -307,6 +307,23 @@ nftCtr.mintNft = async (req, res) => {
   }
 };
 
-// list nft
+// list user NFT
+nftCtr.listUsersNft = async (req, res) => {
+  try {
+    const query = {};
+
+    if (req.query.filter === 'draft') {
+      query.status = 'NOT_MINTED';
+    }
+
+    const list = NftModel.find(
+      { ownerId: req.userData._id },
+      { approvedByAdmin: 0 }
+    ).populate({
+      path: 'role',
+      select: { _id: 1, roleName: 1 },
+    });
+  } catch (err) {}
+};
 
 module.exports = nftCtr;

@@ -38,7 +38,7 @@ const nftSchema = new Schema(
 
     approvedByAdmin: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     status: {
       type: String,

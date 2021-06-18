@@ -236,4 +236,6 @@ NftMiddleware.canAddNft = async (req, res, next) => {
   }
 };
 
+// get users NFT
+
 module.exports = NftMiddleware;
