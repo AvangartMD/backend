@@ -74,6 +74,13 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    category: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'categories',
+        required: false,
+      },
+    ],
     acceptedByAdmin: {
       type: Boolean,
       required: true,

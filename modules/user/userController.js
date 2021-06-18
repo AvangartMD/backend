@@ -14,8 +14,16 @@ const UserCtr = {};
 // update user details
 UserCtr.updateUserDetails = async (req, res) => {
   try {
-    const { name, email, username, portfolio, profile, isCreator, bio } =
-      req.body;
+    const {
+      name,
+      email,
+      username,
+      portfolio,
+      profile,
+      isCreator,
+      bio,
+      category,
+    } = req.body;
 
     const fetchUserDetails = await UserModel.findById(req.userData._id);
 
@@ -41,6 +49,9 @@ UserCtr.updateUserDetails = async (req, res) => {
       if (isCreator) {
         const fetchRole = await RoleModel.findOne({ roleName: 'CREATOR' });
         fetchUserDetails.role = fetchRole._id;
+      }
+      if (category && category.length) {
+        fetchUserDetails.category = category;
       }
 
       const saveUser = await fetchUserDetails.save();
@@ -431,6 +442,35 @@ UserCtr.genrateNonce = async (req, res) => {
     });
   } catch (err) {
     Utils.echoLog('error in genrating nonce  ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// seacrh creator
+UserCtr.searchCreator = async (req, res) => {
+  try {
+    const fetchCreatorRoleId = await RoleModel.findOne({ roleName: 'CREATOR' });
+    const findUsers = await UserModel.find(
+      {
+        isActive: 1,
+        role: fetchCreatorRoleId._id,
+        username: { $regex: `${req.params.name}.*` },
+        acceptedByAdmin: true,
+      },
+      { _id: 1, username: 1 }
+    );
+
+    return res.status(200).json({
+      message: 'Creator List',
+      status: true,
+      data: findUsers,
+    });
+  } catch (err) {
+    Utils.echoLog('Erro in searchng creator');
     return res.status(500).json({
       message: req.t('DB_ERROR'),
       status: true,

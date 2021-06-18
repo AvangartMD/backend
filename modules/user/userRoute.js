@@ -64,4 +64,8 @@ userRoute.post('/addNewUserByAdmin', addUserAsCreatorByAdmin);
 const genrateNonce = [UserCtr.genrateNonce];
 userRoute.get('/genrateNonce/:address', genrateNonce);
 
+// search creator
+const searchCreator = [auth.isAuthenticatedUser, UserCtr.searchCreator];
+userRoute.get('/searchCreator/:name', searchCreator);
+
 module.exports = userRoute;
