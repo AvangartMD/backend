@@ -35,7 +35,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
     coCreator: coCreatorSchema,
     price: Joi.number().required(),
     saleState: Joi.string().valid('BUY', 'AUCTION').required(),
-    category: Joi.string().required(),
+    category: Joi.array().items(Joi.string()).required(),
     auctionTime: Joi.alternatives().conditional('saleState', {
       is: 'AUCTION',
       then: Joi.number().required(),
@@ -139,7 +139,7 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
     coCreator: coCreatorSchema,
     price: Joi.number(),
     saleState: Joi.string().valid('BUY', 'AUCTION'),
-    category: Joi.string().required(),
+    category: Joi.array().items(Joi.string()),
     auctionTime: Joi.number(),
     digitalKey: Joi.alternatives().conditional('unlockContent', {
       is: 1,

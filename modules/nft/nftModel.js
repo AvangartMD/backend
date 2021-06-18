@@ -24,11 +24,13 @@ const nftSchema = new Schema(
         default: null,
       },
     },
-    category: {
-      type: Schema.Types.ObjectId,
-      ref: 'categories',
-      required: false,
-    },
+    category: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'categories',
+        required: false,
+      },
+    ],
     collectionId: {
       type: Schema.Types.ObjectId,
       ref: 'collection',
