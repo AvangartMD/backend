@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { roles, status } = require("../../helper/enum");
+const mongoose = require('mongoose');
+const { roles, status } = require('../../helper/enum');
 
 const { Schema } = mongoose;
 
@@ -31,6 +31,11 @@ const userSchema = new Schema(
       required: false,
       default: null,
     },
+    username: {
+      type: String,
+      unique: true,
+      lowercase: true,
+    },
 
     bio: {
       type: String,
@@ -56,7 +61,7 @@ const userSchema = new Schema(
     },
     role: {
       type: Schema.Types.ObjectId,
-      ref: "roles",
+      ref: 'roles',
       required: true,
     },
     walletAddress: {
@@ -78,7 +83,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       enum: status,
-      default: "PENDING",
+      default: 'PENDING',
     },
     stage: {
       createdOn: {
@@ -108,4 +113,4 @@ const userSchema = new Schema(
   }
 );
 // coinSchema.index({ address: 1 }, { unique: true });
-module.exports = mongoose.model("users", userSchema);
+module.exports = mongoose.model('users', userSchema);

@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
-mongoose.Promise = require("bluebird");
+const mongoose = require('mongoose');
+const Utils = require('../helper/utils');
+mongoose.Promise = require('bluebird');
 
 mongoose
   .connect(
@@ -15,8 +16,9 @@ mongoose
     // mongoose.pluralize(null);
     // mongoose.set('debug',true);
 
-    console.log("database connected successfully");
+    console.log('database connected successfully');
   })
   .catch((error) => {
-    console.log("error in connecting with database ", error);
+    Utils.echoLog('error in connecting with database ', error);
+    console.log('error in connecting with database ', error);
   });

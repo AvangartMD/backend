@@ -57,5 +57,6 @@
     "INVALID_SIGNATURE": "Invalid signature",
     "Inavalid call": "Invalid call",
     "DASHBOARD_UPDATED": "Dashboard updated successfully",
-    "BUTTON_URL_NOT": "Button url is needed"
+    "BUTTON_URL_NOT": "Button url is needed",
+    "USERNAME_ALREADY": "Username Already avalaible",
 }

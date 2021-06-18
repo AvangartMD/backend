@@ -38,7 +38,7 @@ const nftSchema = new Schema(
 
     approvedByAdmin: {
       type: Boolean,
-      default: false,
+      default: true,
     },
     status: {
       type: String,
@@ -78,8 +78,12 @@ const nftSchema = new Schema(
       type: Number,
       default: 0,
     },
-    auctionStartData: {
+    auctionStartDate: {
       type: String,
+      default: null,
+    },
+    auctionEndDate: {
+      type: Number,
       default: null,
     },
     coCreator: {

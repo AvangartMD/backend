@@ -1,12 +1,12 @@
-const UserModel = require("./userModal");
-const RoleModel = require("../roles/rolesModal");
-const Utils = require("../../helper/utils");
-const jwtUtil = require("../../helper/jwtUtils");
-const NotificationModel = require("../notification/notificationModel");
-const crypto = require("crypto");
-const { statusObject } = require("../../helper/enum");
-const Web3 = require("web3");
-const asyncRedis = require("async-redis");
+const UserModel = require('./userModal');
+const RoleModel = require('../roles/rolesModal');
+const Utils = require('../../helper/utils');
+const jwtUtil = require('../../helper/jwtUtils');
+const NotificationModel = require('../notification/notificationModel');
+const crypto = require('crypto');
+const { statusObject } = require('../../helper/enum');
+const Web3 = require('web3');
+const asyncRedis = require('async-redis');
 const client = asyncRedis.createClient();
 
 const UserCtr = {};
@@ -14,7 +14,8 @@ const UserCtr = {};
 // update user details
 UserCtr.updateUserDetails = async (req, res) => {
   try {
-    const { name, email, portfolio, profile, isCreator, bio } = req.body;
+    const { name, email, username, portfolio, profile, isCreator, bio } =
+      req.body;
 
     const fetchUserDetails = await UserModel.findById(req.userData._id);
 
@@ -34,14 +35,17 @@ UserCtr.updateUserDetails = async (req, res) => {
       if (profile) {
         fetchUserDetails.profile = profile;
       }
+      if (username) {
+        fetchUserDetails.username = username;
+      }
       if (isCreator) {
-        const fetchRole = await RoleModel.findOne({ roleName: "CREATOR" });
+        const fetchRole = await RoleModel.findOne({ roleName: 'CREATOR' });
         fetchUserDetails.role = fetchRole._id;
       }
 
       const saveUser = await fetchUserDetails.save();
       return res.status(200).json({
-        message: req.t("USER_UPDATED_SUCCESSFULLY"),
+        message: req.t('USER_UPDATED_SUCCESSFULLY'),
         status: true,
         data: {
           details: {
@@ -57,9 +61,9 @@ UserCtr.updateUserDetails = async (req, res) => {
       });
     }
   } catch (err) {
-    Utils.echoLog("error in creating user ", err);
+    Utils.echoLog('error in creating user ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -72,14 +76,14 @@ UserCtr.getAllRoles = async (req, res) => {
     const getRoles = await RoleModel.find({ isActive: true });
 
     return res.status(200).json({
-      message: req.t("ROLES"),
+      message: req.t('ROLES'),
       status: true,
       data: getRoles,
     });
   } catch (err) {
-    Utils.echoLog("error in gettting  user roles ", err);
+    Utils.echoLog('error in gettting  user roles ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -91,13 +95,13 @@ UserCtr.login = async (req, res) => {
     const { nonce, signature } = req.body;
     const web3 = new Web3(
       new Web3.providers.HttpProvider(
-        "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        'https://data-seed-prebsc-1-s1.binance.org:8545/'
       )
     );
 
     const signer = await web3.eth.accounts.recover(nonce, signature);
 
-    console.log("sin is:", signer);
+    console.log('sin is:', signer);
 
     if (signer) {
       const fetchRedisData = await client.get(nonce);
@@ -114,7 +118,7 @@ UserCtr.login = async (req, res) => {
             },
             { acceptedByAdmin: 0, stage: 0 }
           ).populate({
-            path: "role",
+            path: 'role',
             select: { _id: 1, roleName: 1 },
           });
 
@@ -127,7 +131,7 @@ UserCtr.login = async (req, res) => {
             });
 
             return res.status(200).json({
-              message: req.t("SUCCESS"),
+              message: req.t('SUCCESS'),
               status: true,
               data: {
                 token,
@@ -135,7 +139,7 @@ UserCtr.login = async (req, res) => {
               },
             });
           } else {
-            const getRoles = await RoleModel.findOne({ roleName: "COLLECTOR" });
+            const getRoles = await RoleModel.findOne({ roleName: 'COLLECTOR' });
             const createUser = new UserModel({
               role: getRoles._id,
               walletAddress: parsedRedisData.walletAddress.toLowerCase(),
@@ -150,7 +154,7 @@ UserCtr.login = async (req, res) => {
             });
 
             return res.status(200).json({
-              message: req.t("SUCCESS"),
+              message: req.t('SUCCESS'),
               status: true,
               data: {
                 token,
@@ -161,7 +165,7 @@ UserCtr.login = async (req, res) => {
                   profile: saveUser.profile,
                   portfolio: saveUser.portfolio,
                   role: {
-                    roleName: "COLLECTOR",
+                    roleName: 'COLLECTOR',
                     _id: saveUser.role,
                   },
                 },
@@ -171,28 +175,28 @@ UserCtr.login = async (req, res) => {
         } else {
           // invalid address
           return res.status(400).json({
-            message: req.t("INVALID_CALL"),
+            message: req.t('INVALID_CALL'),
             status: false,
           });
         }
       } else {
         // redis data not avalible login again
         return res.status(400).json({
-          message: req.t("LOGIN_AGAIN"),
+          message: req.t('LOGIN_AGAIN'),
           status: false,
         });
       }
     } else {
       // inavlid signature
       return res.status(400).json({
-        message: req.t("INVALID_SIGNATURE"),
+        message: req.t('INVALID_SIGNATURE'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in singnup  ", err);
+    Utils.echoLog('error in singnup  ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -217,14 +221,14 @@ UserCtr.list = async (req, res) => {
 
     const list = await UserModel.find(query)
       .populate({
-        path: "role",
+        path: 'role',
         select: { _id: 1, roleName: 1 },
       })
       .skip((+page - 1 || 0) * +process.env.LIMIT)
       .limit(+process.env.LIMIT);
 
     return res.status(200).json({
-      message: req.t("SUCCESS"),
+      message: req.t('SUCCESS'),
       status: true,
       data: list,
       pagination: {
@@ -235,9 +239,9 @@ UserCtr.list = async (req, res) => {
       },
     });
   } catch (err) {
-    Utils.echoLog("error in listing user   ", err);
+    Utils.echoLog('error in listing user   ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
@@ -248,10 +252,10 @@ UserCtr.list = async (req, res) => {
 UserCtr.getUserDetails = async (req, res) => {
   try {
     const query = {};
-    if (req.query.userId && req.role == "ADMIN") {
+    if (req.query.userId && req.role == 'ADMIN') {
       query._id = req.query.userId;
     } else {
-      if (req.userData && req.userData._id && req.role !== "ADMIN") {
+      if (req.userData && req.userData._id && req.role !== 'ADMIN') {
         query._id = req.userData._id;
       }
     }
@@ -260,20 +264,20 @@ UserCtr.getUserDetails = async (req, res) => {
       const fetchUserData = await UserModel.findOne(query);
 
       return res.status(200).json({
-        message: req.t("SUCCESS"),
+        message: req.t('SUCCESS'),
         status: true,
         data: fetchUserData,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_DETAILS"),
+        message: req.t('INVALID_DETAILS'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in listing user   ", err);
+    Utils.echoLog('error in listing user   ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -289,7 +293,7 @@ UserCtr.approveAsCreator = async (req, res) => {
         const getUserDetails = await UserModel.findById(user[i].id);
         if (getUserDetails) {
           const getRoleDetails = await RoleModel.findOne({
-            roleName: "CREATOR",
+            roleName: 'CREATOR',
           });
 
           const stage = {
@@ -312,8 +316,8 @@ UserCtr.approveAsCreator = async (req, res) => {
 
           const addNewNotication = new NotificationModel({
             text: user[i].status
-              ? req.t("REQUEST_ACCEPTED")
-              : req.t("REQUSET_REJECTED"),
+              ? req.t('REQUEST_ACCEPTED')
+              : req.t('REQUSET_REJECTED'),
             userId: getUserDetails,
           });
 
@@ -324,19 +328,19 @@ UserCtr.approveAsCreator = async (req, res) => {
       }
 
       return res.status(200).json({
-        message: req.t("USER_STATUS_UPDATED"),
+        message: req.t('USER_STATUS_UPDATED'),
         status: true,
       });
     } else {
       return res.status(200).json({
-        message: req.t("USER_STATUS_UPDATED"),
+        message: req.t('USER_STATUS_UPDATED'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in approving  user   ", err);
+    Utils.echoLog('error in approving  user   ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -352,19 +356,19 @@ UserCtr.disableUser = async (req, res) => {
 
       await getUserDetails.save();
       return res.status(200).json({
-        message: req.t("USER_DISABLED_SUCCESSFULLY"),
+        message: req.t('USER_DISABLED_SUCCESSFULLY'),
         status: true,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_USER_DETAILS"),
+        message: req.t('INVALID_USER_DETAILS'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in disabling user ", err);
+    Utils.echoLog('error in disabling user ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -375,7 +379,7 @@ UserCtr.disableUser = async (req, res) => {
 UserCtr.addUserByAdmin = async (req, res) => {
   try {
     const { walletAddress, name, profile, bio, email } = req.body;
-    const fetchRole = await RoleModel.findOne({ roleName: "CREATOR" });
+    const fetchRole = await RoleModel.findOne({ roleName: 'CREATOR' });
 
     const addNewUser = new UserModel({
       name: name,
@@ -389,7 +393,7 @@ UserCtr.addUserByAdmin = async (req, res) => {
     const saveUser = await addNewUser.save();
 
     return res.status(200).json({
-      message: req.t("USER_REGISTERED_SUCCESSFULLY"),
+      message: req.t('USER_REGISTERED_SUCCESSFULLY'),
       status: true,
       data: {
         _id: saveUser._id,
@@ -398,9 +402,9 @@ UserCtr.addUserByAdmin = async (req, res) => {
       },
     });
   } catch (err) {
-    Utils.echoLog("error in adding new user  by admin ", err);
+    Utils.echoLog('error in adding new user  by admin ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -410,25 +414,25 @@ UserCtr.addUserByAdmin = async (req, res) => {
 // genrate a nonce
 UserCtr.genrateNonce = async (req, res) => {
   try {
-    let nonce = crypto.randomBytes(16).toString("hex");
+    let nonce = crypto.randomBytes(16).toString('hex');
     const data = {
       walletAddress: req.params.address,
       nonce: nonce,
     };
 
-    await client.set(nonce, JSON.stringify(data), "EX", 60 * 10);
+    await client.set(nonce, JSON.stringify(data), 'EX', 60 * 10);
 
     return res.status(200).json({
-      message: req.t("NONCE_GENRATED"),
+      message: req.t('NONCE_GENRATED'),
       status: true,
       data: {
         nonce: nonce,
       },
     });
   } catch (err) {
-    Utils.echoLog("error in genrating nonce  ", err);
+    Utils.echoLog('error in genrating nonce  ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
