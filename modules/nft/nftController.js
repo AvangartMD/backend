@@ -34,11 +34,14 @@ nftCtr.addNewNft = async (req, res) => {
       auctionTime: req.body.auctionTime ? req.body.auctionTime : 0,
     });
 
-    await createNewNft.save();
+    const saveNft = await createNewNft.save();
 
     return res.status(200).json({
       message: req.t('ADD_NEW_NFT'),
       status: true,
+      data: {
+        _id: saveNft._id,
+      },
     });
   } catch (err) {
     Utils.echoLog('error in nft create', err);
@@ -316,14 +319,36 @@ nftCtr.listUsersNft = async (req, res) => {
       query.status = 'NOT_MINTED';
     }
 
-    const list = NftModel.find(
+    const list = await NftModel.find(
       { ownerId: req.userData._id },
       { approvedByAdmin: 0 }
-    ).populate({
-      path: 'role',
-      select: { _id: 1, roleName: 1 },
+    )
+      .populate({
+        path: 'collectionId',
+        select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+      })
+      .populate({
+        path: 'category',
+        select: { createdAt: 0, updatedAt: 0 },
+      })
+      .populate({
+        path: 'ownerId',
+        select: { name: 1, username: 1 },
+      });
+
+    return res.status(200).json({
+      message: req.t('USER_NFT_LIST'),
+      status: true,
+      data: list,
     });
-  } catch (err) {}
+  } catch (err) {
+    Utils.echoLog('error in listing user  nft  ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
 };
 
 module.exports = nftCtr;
