@@ -16,6 +16,7 @@ nftCtr.addNewNft = async (req, res) => {
       digitalKey,
       unlockContent,
       coCreator,
+      category,
     } = req.body;
 
     const createNewNft = new NftModel({
@@ -23,10 +24,11 @@ nftCtr.addNewNft = async (req, res) => {
       description: description ? description : null,
       image: image,
       ownerId: req.role === 'ADMIN' ? req.body.ownerId : req.userData._id,
+      category: category,
       collectionId: collectionId ? collectionId : null,
       digitalKey: digitalKey,
       unlockContent: unlockContent ? unlockContent : false,
-      coCreator: req.body.coCreator ? req.body.coCreator : null,
+      coCreator: coCreator ? req.body.coCreator : null,
       price: req.body.price,
       saleState: req.body.saleState,
       auctionTime: req.body.auctionTime ? req.body.auctionTime : 0,
@@ -133,6 +135,19 @@ nftCtr.updateNft = async (req, res) => {
         fetchNftDetails.unlockContent = true;
         fetchNftDetails.digitalKey = req.body.digitalKey;
       }
+      if (req.body.coCreator && Object.keys(req.body.coCreator).length) {
+        fetchNftDetails.coCreator = req.body.coCreator;
+      }
+      if (req.body.price) {
+        fetchNftDetails.price = req.body.price;
+      }
+      if (req.body.saleState) {
+        fetchNftDetails.saleState = req.body.saleState;
+      }
+
+      if (req.body.auctionTime) {
+        fetchNftDetails.auctionTime = req.body.auctionTime;
+      }
 
       await fetchNftDetails.save();
       return res.status(200).json({
@@ -158,7 +173,7 @@ nftCtr.updateNft = async (req, res) => {
 // list collection
 nftCtr.getCollectionByUsers = async (req, res) => {
   try {
-    const getCollectionByUser = await NftModel.find(
+    const getCollectionByUser = await CollectionModel.find(
       {
         ownerId: req.userData._id,
         isActive: 1,
@@ -255,8 +270,19 @@ nftCtr.mintNft = async (req, res) => {
   try {
     const getNftDetails = await NftModel.findById(req.params.id);
     if (getNftDetails) {
-      getNftDetails.tokenId = req.body.tokenId;
+      const currentDate = new Date();
+      const hours =
+        getNftDetails.saleState === 'AUCTION'
+          ? getNftDetails.auctionTime + 24
+          : 0;
+      const addHours =
+        getNftDetails.saleState === 'AUCTION' ? new Date().addHours(hours) : 0;
+
       getNftDetails.status = statusObject.PENDING;
+      getNftDetails.autionStartDate =
+        getNftDetails.saleState === 'AUCTION' ? +currentDate : 0;
+      getNftDetails.auctionEndDate =
+        getNftDetails.saleState === 'AUCTION' ? +addHours : 0;
 
       await getNftDetails.save();
 
@@ -280,5 +306,7 @@ nftCtr.mintNft = async (req, res) => {
     });
   }
 };
+
+// list nft
 
 module.exports = nftCtr;

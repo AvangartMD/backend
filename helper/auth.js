@@ -1,17 +1,17 @@
-const utils = require("./utils");
-const userModel = require("../modules/user/userModal");
-const RoleModel = require("../modules/roles/rolesModal");
-const AdminModel = require("../modules/admin/adminModel");
-const errorUtil = require("./error");
-const jwtUtil = require("./jwtUtils");
+const utils = require('./utils');
+const userModel = require('../modules/user/userModal');
+const RoleModel = require('../modules/roles/rolesModal');
+const AdminModel = require('../modules/admin/adminModel');
+const errorUtil = require('./error');
+const jwtUtil = require('./jwtUtils');
 
 const auth = {};
 // check authentication
 auth.isAuthenticatedUser = async (req, res, next) => {
-  let token = req.headers && req.headers["x-auth-token"];
+  let token = req.headers && req.headers['x-auth-token'];
 
   if (utils.empty(token)) {
-    token = req.body && req.body["x-auth-token"];
+    token = req.body && req.body['x-auth-token'];
   }
   const userTokenData = jwtUtil.decodeAuthToken(token);
 
@@ -21,7 +21,7 @@ auth.isAuthenticatedUser = async (req, res, next) => {
 
   const fetchRole = await RoleModel.findById(userTokenData.role);
 
-  if (fetchRole && fetchRole.roleName === "ADMIN") {
+  if (fetchRole && fetchRole.roleName === 'ADMIN') {
     const fetchAdminDetails = await AdminModel.findById(userTokenData._id);
 
     if (fetchAdminDetails && fetchAdminDetails.isActive) {
@@ -47,7 +47,7 @@ auth.isAuthenticatedUser = async (req, res, next) => {
 };
 
 auth.isAdmin = async (req, res, next) => {
-  if (req.role === "ADMIN") {
+  if (req.role === 'ADMIN') {
     return next();
   } else {
     return errorUtil.notAuthenticated(res, req);
@@ -55,10 +55,10 @@ auth.isAdmin = async (req, res, next) => {
 };
 
 auth.checkIsAutheticated = async (req, res, next) => {
-  let token = req.headers && req.headers["x-auth-token"];
+  let token = req.headers && req.headers['x-auth-token'];
 
   if (utils.empty(token)) {
-    token = req.body && req.body["x-auth-token"];
+    token = req.body && req.body['x-auth-token'];
   }
   const userTokenData = jwtUtil.decodeAuthToken(token);
 
@@ -68,7 +68,7 @@ auth.checkIsAutheticated = async (req, res, next) => {
 
   const fetchRole = await RoleModel.findById(userTokenData.role);
 
-  if (fetchRole && fetchRole.roleName === "ADMIN") {
+  if (fetchRole && fetchRole.roleName === 'ADMIN') {
     const fetchAdminDetails = await AdminModel.findById(userTokenData._id);
 
     if (fetchAdminDetails && fetchAdminDetails.isActive) {

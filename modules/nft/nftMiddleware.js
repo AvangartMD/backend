@@ -35,6 +35,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
     coCreator: coCreatorSchema,
     price: Joi.number().required(),
     saleState: Joi.string().valid('BUY', 'AUCTION').required(),
+    category: Joi.string().required(),
     auctionTime: Joi.alternatives().conditional('saleState', {
       is: 'AUCTION',
       then: Joi.number().required(),
@@ -47,7 +48,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
 // check collection id valid or not
 NftMiddleware.checkCollection = async (req, res, next) => {
   try {
-    if (req.body.collectionId && req.role != 'ADMIN') {
+    if (req.body.collectionId && req.role !== 'ADMIN') {
       const checkCollection = await CollectionModel.findOne({
         _id: req.body.collectionId,
         ownerId: req.userData._id,
@@ -120,6 +121,11 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
     compressed: Joi.string(),
   });
 
+  const coCreatorSchema = Joi.object().keys({
+    userId: Joi.string(),
+    percentage: Joi.number(),
+  });
+
   const schema = Joi.object({
     title: Joi.string(),
     description: Joi.string(),
@@ -130,6 +136,11 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
     }),
     collectionId: Joi.string(),
     unlockContent: Joi.boolean(),
+    coCreator: coCreatorSchema,
+    price: Joi.number(),
+    saleState: Joi.string().valid('BUY', 'AUCTION'),
+    category: Joi.string().required(),
+    auctionTime: Joi.number(),
     digitalKey: Joi.alternatives().conditional('unlockContent', {
       is: 1,
       then: Joi.string().required(),
@@ -224,4 +235,5 @@ NftMiddleware.canAddNft = async (req, res, next) => {
     });
   }
 };
+
 module.exports = NftMiddleware;
