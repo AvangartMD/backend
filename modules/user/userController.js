@@ -389,7 +389,8 @@ UserCtr.disableUser = async (req, res) => {
 // add user as creator by admin
 UserCtr.addUserByAdmin = async (req, res) => {
   try {
-    const { walletAddress, name, profile, bio, email } = req.body;
+    const { walletAddress, name, profile, bio, email, category, username } =
+      req.body;
     const fetchRole = await RoleModel.findOne({ roleName: 'CREATOR' });
 
     const addNewUser = new UserModel({
@@ -399,6 +400,8 @@ UserCtr.addUserByAdmin = async (req, res) => {
       bio: bio ? bio : null,
       email: email ? email : null,
       role: fetchRole._id,
+      category: category,
+      username: username,
     });
 
     const saveUser = await addNewUser.save();

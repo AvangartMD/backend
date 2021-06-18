@@ -55,6 +55,7 @@ const addUserAsCreatorByAdmin = [
   auth.isAuthenticatedUser,
   auth.isAdmin,
   UserMiddleware.addNewUserByAdmin,
+  UserMiddleware.checkUsernameAlreadyAdded,
   UserMiddleware.checkAddressAlreadyRegistered,
   UserCtr.addUserByAdmin,
 ];
