@@ -56,7 +56,7 @@ const userSchema = new Schema(
     },
     profile: {
       type: String,
-      lowercase: true,
+      // lowercase: true,
       default: null,
     },
     role: {

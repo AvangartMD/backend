@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Utils = require("../../helper/utils");
+const mongoose = require('mongoose');
+const Utils = require('../../helper/utils');
 
 const { Schema } = mongoose;
 const setSlugText = (value) => {
@@ -22,6 +22,10 @@ const categorySchema = new Schema(
       type: Boolean,
       default: true,
     },
+    image: {
+      type: String,
+      default: null,
+    },
   },
 
   {
@@ -32,4 +36,4 @@ const categorySchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("categories", categorySchema);
+module.exports = mongoose.model('categories', categorySchema);
