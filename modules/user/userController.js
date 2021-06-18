@@ -461,7 +461,7 @@ UserCtr.searchCreator = async (req, res) => {
       {
         isActive: 1,
         role: fetchCreatorRoleId._id,
-        username: { $regex: `${req.params.name}.*` },
+        username: { $regex: `${req.params.name.toLowerCase()}.*` },
         acceptedByAdmin: true,
       },
       { _id: 1, username: 1 }
