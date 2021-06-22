@@ -1,5 +1,8 @@
 const Web3 = require('web3');
+const mongoose = require('mongoose');
 const ContractAbi = require('../abi/contract.json');
+const NftModel = require('../modules/nft/nftModel');
+const { statusObject } = require('./enum');
 const provider =
   process.env.NODE_ENV === 'development'
     ? 'wss://data-seed-prebsc-1-s1.binance.org:8545'
@@ -13,18 +16,46 @@ getWeb3Event.getTransferEvent = async (req, res) => {
 
     const contract = new web3.eth.Contract(
       ContractAbi,
-      '0x4B6c1c24A63d3D4bF69d7A84C2d6406148F21714'
+      '0x8d987f0188564A7620D707dD05B814e19545C66B'
     );
 
     contract.events
-      .TransferSingle({
-        filter: {
-          from: '0x0000000000000000000000000000000000000000', //,
-          // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
-        },
+      .OrderPlaced({
+        // filter: {
+        //   from: '0x0000000000000000000000000000000000000000', //,
+        //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
+        // },
         fromBlock: 6018110,
       })
-      .on('data', (e) => console.log(e.returnValues));
+      .on('data', async (e) => {
+        const result = e.returnValues;
+        const order = result['order'];
+
+        // check valid mongoose id
+
+        const checkIsValid = mongoose.isValidObjectId(result.tokenURI);
+
+        if (checkIsValid) {
+          const findNft = await NftModel.findOne({ _id: result.tokenURI });
+
+          if (findNft && !findNft.tokenId) {
+            findNft.tokenId = order.tokenId;
+            findNft.status = statusObject.APPROVED;
+            if (+order.saleType === 1) {
+              findNft.auctionStartDate = order.timeline;
+              findNft.auctionEndDate = result.timestamp;
+            }
+
+            await findNft.save();
+          } else if (findNft && findNft.tokenId) {
+            console.log('token already minted');
+          } else {
+            console.log('token not found');
+          }
+        } else {
+          console.log('not a valid token URI');
+        }
+      });
   } catch (err) {
     console.log('err in web3 helper', err);
   }

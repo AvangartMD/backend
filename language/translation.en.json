@@ -59,5 +59,6 @@
     "DASHBOARD_UPDATED": "Dashboard updated successfully",
     "BUTTON_URL_NOT": "Button url is needed",
     "USERNAME_ALREADY": "Username Already avalaible",
-    "USER_NFT_LIST": "User Nft list"
+    "USER_NFT_LIST": "User Nft list",
+    "NFT_URI": "Nft uri is"
 }

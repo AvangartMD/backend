@@ -14,6 +14,11 @@ const nftSchema = new Schema(
       required: false,
       default: null,
     },
+    tokenId: {
+      type: Number,
+      unique: true,
+      default: undefined,
+    },
     image: {
       original: {
         type: String,

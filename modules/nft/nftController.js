@@ -286,7 +286,7 @@ nftCtr.mintNft = async (req, res) => {
       const addHours =
         getNftDetails.saleState === 'AUCTION' ? new Date().addHours(hours) : 0;
 
-      getNftDetails.status = statusObject.PENDING;
+      getNftDetails.status = statusObject.APPROVED;
       getNftDetails.autionStartDate =
         getNftDetails.saleState === 'AUCTION' ? +currentDate : 0;
       getNftDetails.auctionEndDate =
@@ -348,6 +348,32 @@ nftCtr.listUsersNft = async (req, res) => {
     });
   } catch (err) {
     Utils.echoLog('error in listing user  nft  ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get nft details
+nftCtr.getNftUri = async (req, res) => {
+  try {
+    const getDetails = await NftModel.findById(req.params.id, {
+      title: 1,
+      description: 1,
+      image: 1,
+    });
+
+    if (getDetails) {
+      return res.status(200).json({
+        image: getDetails.image,
+        description: getDetails.description,
+        title: getDetails.title,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog('error in getNftUri  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
       status: false,
