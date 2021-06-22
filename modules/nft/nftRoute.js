@@ -2,6 +2,7 @@ const express = require('express');
 const NftCtr = require('./nftController');
 const NftMiddleware = require('./nftMiddleware');
 const Auth = require('../../helper/auth');
+const auth = require('../../helper/auth');
 
 const nftRoute = express.Router();
 // add new Nft
@@ -46,6 +47,13 @@ nftRoute.put('/updateCollection/:id', updateCollection);
 const getList = [Auth.isAuthenticatedUser, NftCtr.getCollectionByUsers];
 nftRoute.get('/listCollection', getList);
 
+// get user collection by user id
+const getCollectionListById = [
+  Auth.isAuthenticatedUser,
+  NftCtr.getCollectionByUsers,
+];
+nftRoute.get('/listCollection/:id', getCollectionListById);
+
 // get list of collection for admin
 const getCollectionListForAdmin = [
   Auth.isAuthenticatedUser,
@@ -54,8 +62,36 @@ const getCollectionListForAdmin = [
 ];
 nftRoute.get('/listCollectionForAdmin', getCollectionListForAdmin);
 
+// get user nft
+const getUserNft = [auth.isAuthenticatedUser, NftCtr.listUsersNft];
+nftRoute.get('/listNftByUser', getUserNft);
+
+// get single nft details
+const getSingleNftDetails = [
+  auth.checkIsAutheticated,
+  NftCtr.getSingleNftDetails,
+];
+nftRoute.get('/single/:id', getSingleNftDetails);
+
+// get nft list for admin
+const getNftListForAdmin = [
+  auth.isAuthenticatedUser,
+  auth.isAdmin,
+  NftCtr.listNftForAdmin,
+];
+nftRoute.get('/listNftForAdmin', getNftListForAdmin);
+
+// gets specific user nft
+const getNftListForAdmin = [
+  auth.isAuthenticatedUser,
+  auth.isAdmin,
+  NftCtr.listNftForAdmin,
+];
+nftRoute.get('/listNftForAdmin/:id', getNftListForAdmin);
+
 // get nft uri data
 
 const getUri = [NftCtr.getNftUri];
 nftRoute.get('/:id', getUri);
+
 module.exports = nftRoute;

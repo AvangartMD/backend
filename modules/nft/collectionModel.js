@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Utils = require("../../helper/utils");
+const mongoose = require('mongoose');
+const Utils = require('../../helper/utils');
 
 const { Schema } = mongoose;
 
@@ -30,7 +30,7 @@ const collectionSchema = new Schema(
     },
     ownerId: {
       type: Schema.Types.ObjectId,
-      ref: "user",
+      ref: 'users',
       required: true,
     },
     isActive: {
@@ -46,4 +46,4 @@ const collectionSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("collection", collectionSchema);
+module.exports = mongoose.model('collection', collectionSchema);

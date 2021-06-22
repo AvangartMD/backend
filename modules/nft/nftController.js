@@ -157,6 +157,13 @@ nftCtr.updateNft = async (req, res) => {
         fetchNftDetails.edition = req.body.edition;
       }
 
+      if (!req.body.isActive) {
+        fetchNftDetails.isActive = false;
+      }
+
+      if (req.body.isActive) {
+        fetchNftDetails.isActive = true;
+      }
       await fetchNftDetails.save();
       return res.status(200).json({
         message: req.t('NFT_UPDATED'),
@@ -181,12 +188,14 @@ nftCtr.updateNft = async (req, res) => {
 // list collection
 nftCtr.getCollectionByUsers = async (req, res) => {
   try {
+    const userId = req.params.id ? req.params.id : req.userData._id;
+
     const getCollectionByUser = await CollectionModel.find(
       {
-        ownerId: req.userData._id,
+        ownerId: userId,
         isActive: 1,
       },
-      { isActive: 0 }
+      { isActive: 0, createdAt: 0, updatedAt: 0 }
     );
 
     return res.status(200).json({
@@ -318,16 +327,20 @@ nftCtr.mintNft = async (req, res) => {
 // list user NFT
 nftCtr.listUsersNft = async (req, res) => {
   try {
-    const query = {};
+    const query = { status: 'APPROVED' };
 
     if (req.query.filter === 'draft') {
       query.status = 'NOT_MINTED';
     }
 
-    const list = await NftModel.find(
-      { ownerId: req.userData._id },
-      { approvedByAdmin: 0 }
-    )
+    if (req.userData.role !== 'ADMIN') {
+      query.ownerId = req.userData._id;
+    }
+
+    const list = await NftModel.find(query, {
+      approvedByAdmin: 0,
+      unlockContent: 0,
+    })
       .populate({
         path: 'collectionId',
         select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
@@ -347,7 +360,96 @@ nftCtr.listUsersNft = async (req, res) => {
       data: list,
     });
   } catch (err) {
+    console.log('error is:', err);
     Utils.echoLog('error in listing user  nft  ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// list nft for admin
+nftCtr.listNftForAdmin = async (req, res) => {
+  try {
+    const query = { status: 'APPROVED' };
+
+    if (req.query.filter === 'draft') {
+      query.status = 'NOT_MINTED';
+    }
+
+    if (req.params.id) {
+      query.ownerId = req.params.id;
+    }
+
+    const page = req.query.page || 1;
+    const totalCount = await NftModel.countDocuments(query);
+
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const list = await NftModel.find(query, { approvedByAdmin: 0 })
+      .populate({
+        path: 'collectionId',
+        select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+      })
+      .populate({
+        path: 'category',
+        select: { createdAt: 0, updatedAt: 0 },
+      })
+      .populate({
+        path: 'ownerId',
+        select: { name: 1, username: 1 },
+      })
+      .sort({ createdAt: -1 })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: req.t('COLLECTION_LIST'),
+      status: true,
+      data: list,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog('error in listing admin nft  ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get single nft details
+nftCtr.getSingleNftDetails = async (req, res) => {
+  try {
+    const getNftDetails = await NftModel.findById(req.params.id)
+      .populate({
+        path: 'collectionId',
+        select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+      })
+      .populate({
+        path: 'category',
+        select: { createdAt: 0, updatedAt: 0 },
+      })
+      .populate({
+        path: 'ownerId',
+        select: { name: 1, username: 1 },
+      });
+
+    return res.status(200).json({
+      message: req.t('SINGLE_NFT'),
+      status: true,
+      data: getNftDetails,
+    });
+  } catch (err) {
+    Utils.echoLog('error in getSingleNftDetails  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
       status: false,

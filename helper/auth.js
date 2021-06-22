@@ -35,7 +35,6 @@ auth.isAuthenticatedUser = async (req, res, next) => {
     const fetchUserDetails = await userModel.findById(userTokenData._id);
 
     if (fetchUserDetails && fetchUserDetails.isActive) {
-      // console.log("userdata is:",fetchUserDetails.email)
       req.userData = fetchUserDetails;
       req.role = fetchRole.roleName;
       return next();

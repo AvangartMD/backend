@@ -53,12 +53,7 @@ const nftSchema = new Schema(
       enum: nftStatus,
       default: 'NOT_MINTED',
     },
-    tokenId: {
-      type: String,
-      unique: true,
-      sparse: true,
-      default: undefined,
-    },
+
     ownerId: {
       type: Schema.Types.ObjectId,
       ref: 'users',
