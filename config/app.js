@@ -2,7 +2,7 @@ const express = require('express');
 global._ = require('lodash');
 require('./winston');
 require('./database.js');
-const web3Helper = require('../helper/web3Helper');
+// const web3Helper = require('../helper/web3Helper');
 const l10n = require('jm-ez-l10n');
 
 const bodyParser = require('body-parser');
