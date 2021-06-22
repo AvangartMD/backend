@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 const app = express();
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-web3Helper.getTransferEvent();
+// web3Helper.getTransferEvent();
 function exitHandler(options) {
   mongoose.connection.close();
   process.exit();
