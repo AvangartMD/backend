@@ -92,6 +92,6 @@ nftRoute.get('/listNftForAdmin/:id', getNftListForAdmin);
 // get nft uri data
 
 const getUri = [NftCtr.getNftUri];
-nftRoute.get('/:id', getUri);
+nftRoute.get('/metadata/:id', getUri);
 
 module.exports = nftRoute;
