@@ -82,12 +82,12 @@ const getNftListForAdmin = [
 nftRoute.get('/listNftForAdmin', getNftListForAdmin);
 
 // gets specific user nft
-const getNftListForAdmin = [
+const getNftListForAdmins = [
   auth.isAuthenticatedUser,
   auth.isAdmin,
   NftCtr.listNftForAdmin,
 ];
-nftRoute.get('/listNftForAdmin/:id', getNftListForAdmin);
+nftRoute.get('/listNftForAdmin/:id', getNftListForAdmins);
 
 // get nft uri data
 
