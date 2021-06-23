@@ -94,4 +94,11 @@ nftRoute.get('/listNftForAdmin/:id', getNftListForAdmins);
 const getUri = [NftCtr.getNftUri];
 nftRoute.get('/metadata/:id', getUri);
 
+// get single collection details
+const getSingleCollectionDetails = [
+  auth.isAuthenticatedUser,
+  NftCtr.getSingleCollectionDetails,
+];
+nftRoute.get('/collection/:id', getSingleCollectionDetails);
+
 module.exports = nftRoute;

@@ -213,6 +213,27 @@ nftCtr.getCollectionByUsers = async (req, res) => {
   }
 };
 
+// get single collection details
+nftCtr.getSingleCollectionDetails = async (req, res) => {
+  try {
+    const fetchCollectionDetails = await CollectionModel.findById(
+      req.params.id
+    );
+    return res.status(200).json({
+      message: req.t('COLLECTION_DETAILS'),
+      status: true,
+      data: fetchCollectionDetails,
+    });
+  } catch (err) {
+    Utils.echoLog('error in collection details list', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
 // get list for admin
 nftCtr.getListOfCollectionForAdmin = async (req, res) => {
   try {

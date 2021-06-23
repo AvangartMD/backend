@@ -61,5 +61,6 @@
     "USERNAME_ALREADY": "Username Already avalaible",
     "USER_NFT_LIST": "User Nft list",
     "NFT_URI": "Nft uri is",
-    "SINGLE_NFT": "Single Nft Details"
+    "SINGLE_NFT": "Single Nft Details",
+    "COLLECTION_DETAILS": "Collection Details"
 }
