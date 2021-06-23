@@ -21,10 +21,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
     title: Joi.string().required(),
     description: Joi.string(),
     image: imageSchema,
-    ownerId: Joi.alternatives().conditional(req.role, {
-      is: 'ADMIN',
-      then: Joi.string().required(),
-    }),
+    ownerId: Joi.string(),
     collectionId: Joi.string(),
     digitalKey: Joi.alternatives().conditional('unlockContent', {
       is: 1,
@@ -131,10 +128,7 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
     title: Joi.string(),
     description: Joi.string(),
     image: imageSchema,
-    ownerId: Joi.alternatives().conditional(req.role, {
-      is: 'ADMIN',
-      then: Joi.string().required(),
-    }),
+    ownerId: Joi.string(),
     collectionId: Joi.string(),
     unlockContent: Joi.boolean(),
     coCreator: coCreatorSchema,

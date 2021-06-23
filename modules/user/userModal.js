@@ -59,6 +59,12 @@ const userSchema = new Schema(
       // lowercase: true,
       default: null,
     },
+
+    cover: {
+      type: String,
+      default: null,
+    },
+
     role: {
       type: Schema.Types.ObjectId,
       ref: 'roles',

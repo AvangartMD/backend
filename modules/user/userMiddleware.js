@@ -27,6 +27,7 @@ UserMiddleware.signUpValidator = (req, res, next) => {
     email: Joi.string().email(),
     bio: Joi.string(),
     username: Joi.string(),
+    cover: Joi.string(),
     category: Joi.array().items(Joi.string()),
   });
   validate.validateRequest(req, res, next, schema);

@@ -20,6 +20,7 @@ UserCtr.updateUserDetails = async (req, res) => {
       username,
       portfolio,
       profile,
+      cover,
       isCreator,
       bio,
       category,
@@ -30,6 +31,9 @@ UserCtr.updateUserDetails = async (req, res) => {
     if (fetchUserDetails) {
       if (name) {
         fetchUserDetails.name = name;
+      }
+      if (cover) {
+        fetchUserDetails.cover = cover;
       }
       if (bio) {
         fetchUserDetails.bio = bio;
@@ -111,8 +115,6 @@ UserCtr.login = async (req, res) => {
     );
 
     const signer = await web3.eth.accounts.recover(nonce, signature);
-
-    console.log('sin is:', signer);
 
     if (signer) {
       const fetchRedisData = await client.get(nonce);
