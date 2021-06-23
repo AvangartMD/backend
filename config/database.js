@@ -10,6 +10,7 @@ mongoose
       useUnifiedTopology: true,
       useFindAndModify: true,
       useCreateIndex: true,
+      useFindAndModify: false,
     }
   )
   .then((res) => {

@@ -69,4 +69,8 @@ userRoute.get('/genrateNonce/:address', genrateNonce);
 const searchCreator = [auth.isAuthenticatedUser, UserCtr.searchCreator];
 userRoute.get('/searchCreator/:name', searchCreator);
 
+// list active creator
+const listActiveCreator = [UserCtr.listActiveCreator];
+userRoute.post('/listVerifiefCreator', listActiveCreator);
+
 module.exports = userRoute;

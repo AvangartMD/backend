@@ -1,5 +1,5 @@
-DashboardModel = require("./dashboardModel");
-const Utils = require("../../../helper/utils");
+DashboardModel = require('./dashboardModel');
+const Utils = require('../../../helper/utils');
 DashBoardCtr = {};
 
 // add new dashbaord ctr
@@ -15,13 +15,13 @@ DashBoardCtr.add = async (req, res) => {
     await addNew.save();
 
     return res.status(200).json({
-      message: req.t("BANNER_ADDED_SUCCESSFULLY"),
+      message: req.t('BANNER_ADDED_SUCCESSFULLY'),
       status: true,
     });
   } catch (err) {
-    Utils.echoLog("error in adding dashboard data ", err);
+    Utils.echoLog('error in adding dashboard data ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -34,14 +34,14 @@ DashBoardCtr.list = async (req, res) => {
     const list = await DashboardModel.find({});
 
     return res.status(200).json({
-      message: req.t("BANNER_ADDED_SUCCESSFULLY"),
+      message: req.t('BANNER_ADDED_SUCCESSFULLY'),
       status: true,
       data: list,
     });
   } catch (err) {
-    Utils.echoLog("error in listing dashboard data ", err);
+    Utils.echoLog('error in listing dashboard data ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -57,21 +57,21 @@ DashBoardCtr.update = async (req, res) => {
         fetchDetails.isActive = true;
       }
 
-      if (!req.body.isActive) {
+      if (req.body.isActive === false) {
         fetchDetails.isActive = false;
       }
 
       const saveDetails = await fetchDetails.save();
       return res.status(200).json({
-        message: req.t("DASHBOARD_UPDATED"),
+        message: req.t('DASHBOARD_UPDATED'),
         status: true,
         data: saveDetails,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in updating dashboard data ", err);
+    Utils.echoLog('error in updating dashboard data ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });

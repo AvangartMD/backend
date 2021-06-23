@@ -63,5 +63,7 @@
     "NFT_URI": "Nft uri is",
     "SINGLE_NFT": "Single Nft Details",
     "COLLECTION_DETAILS": "Collection Details",
-    "USER_CANT_FOLLOW": "User cant follow own"
+    "USER_CANT_FOLLOW": "User cant follow own",
+    "USER_FOLLOW": "User Followed Successfully",
+    "USER_UNFOLLOW": "User Unfollwed Successfully"
 }

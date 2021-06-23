@@ -2,6 +2,7 @@ const Web3 = require('web3');
 const mongoose = require('mongoose');
 const ContractAbi = require('../abi/contract.json');
 const NftModel = require('../modules/nft/nftModel');
+const UserModel = require('../modules/user/userModal');
 const { statusObject } = require('./enum');
 const provider =
   process.env.NODE_ENV === 'development'
@@ -46,7 +47,11 @@ getWeb3Event.getTransferEvent = async (req, res) => {
               findNft.auctionEndDate = result.timestamp;
             }
 
-            await findNft.save();
+            const saveNft = await findNft.save();
+            await UserModel.findByIdAndUpdate(
+              { _id: saveNft.ownerId },
+              { $inc: { nftCreated: 1 } }
+            );
           } else if (findNft && findNft.tokenId) {
             console.log('token already minted');
           } else {

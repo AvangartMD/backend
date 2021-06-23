@@ -6,6 +6,7 @@ const nftRoute = require('./modules/nft/nftRoute');
 const categoryRoute = require('./modules/category/categoryRoute');
 const notificationRoute = require('./modules/notification/notificationRoute');
 const likeRoute = require('./modules/like/likeRoute');
+const followRoute = require('./modules/follow/followRoute');
 // Routes Path
 
 const app = express.Router();
@@ -18,6 +19,7 @@ app.use('/api/v1/nft', nftRoute);
 app.use('/api/v1/category', categoryRoute);
 app.use('/api/v1/notification', notificationRoute);
 app.use('/api/v1/like', likeRoute);
+app.use('/api/v1/follow', followRoute);
 app.all('/*', (req, res) =>
   res.status(404).json({ message: 'Invalid Request' })
 );

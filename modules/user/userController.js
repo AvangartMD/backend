@@ -483,4 +483,75 @@ UserCtr.searchCreator = async (req, res) => {
     });
   }
 };
+
+// list creator for front
+UserCtr.listActiveCreator = async (req, res) => {
+  try {
+    const page = req.body.page || 1;
+    let sort = { createdAt: -1 };
+    const fetchCreatorRole = await RoleModel.findOne({ roleName: 'CREATOR' });
+    const query = {
+      role: fetchCreatorRole._id,
+      acceptedByAdmin: true,
+      isActive: true,
+    };
+
+    if (req.body.category && req.body.category.length) {
+      query.category = { $in: req.body.category };
+    }
+
+    if (req.body.search) {
+      query.username = { $regex: `${req.params.name.toLowerCase()}.*` };
+    }
+
+    if (req.body.rank) {
+      if (req.body.rank.toLowerCase() === 'name') {
+        sort = {};
+        sort['username'] = 1;
+      }
+      if (req.body.rank.toLowerCase() === 'follower') {
+        sort = {};
+        sort['followersCount'] = -1;
+      }
+    }
+
+    const totalCount = await UserModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const fetchAllCreator = await UserModel.find(
+      query,
+      {
+        portfolio: 0,
+        acceptedByAdmin: 0,
+        status: 0,
+        stage: 0,
+        transactionId: 0,
+      },
+      {
+        sort: sort,
+      }
+    )
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: 'CREATOR_LIST',
+      status: true,
+      data: fetchAllCreator,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog('Erro in searchng creator');
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
 module.exports = UserCtr;

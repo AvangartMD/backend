@@ -157,7 +157,7 @@ nftCtr.updateNft = async (req, res) => {
         fetchNftDetails.edition = req.body.edition;
       }
 
-      if (!req.body.isActive) {
+      if (req.body.isActive === false) {
         fetchNftDetails.isActive = false;
       }
 
