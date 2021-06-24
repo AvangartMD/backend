@@ -5,6 +5,7 @@ const NftModel = require('../modules/nft/nftModel');
 const UserModel = require('../modules/user/userModal');
 const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
+const Utils = require('./utils');
 const provider =
   process.env.NODE_ENV === 'development'
     ? 'wss://data-seed-prebsc-1-s1.binance.org:8545'
@@ -41,8 +42,6 @@ getWeb3Event.getTransferEvent = async (req, res) => {
 
         // check valid mongoose id
 
-        console.log(order.tokenId);
-
         const getTokenUri = await tokenContract.methods
           .tokenURI(order.tokenId)
           .call();
@@ -65,19 +64,20 @@ getWeb3Event.getTransferEvent = async (req, res) => {
                 await findUser.save();
               }
             } else if (findNft && findNft.tokenId) {
-              console.log('token already minted');
+              // console.log('token already minted');
+              Utils.echoLog(`token already minted ${findNft.tokenId}  `);
             } else {
-              console.log('token not found');
+              Utils.echoLog(`Token Uri not found in database ${getTokenUri}`);
             }
           } else {
-            console.log('not a valid token URI');
+            Utils.echoLog(`Not a cvalid token uri ${getTokenUri}`);
           }
         } else {
-          console.log('Token Id is inavlid');
+          Utils.echoLog(`Invalid token Uri ${getTokenUri}`);
         }
       });
   } catch (err) {
-    console.log('err in web3 helper', err);
+    Utils.echoLog(`Error in web3 listner for mint :${err}`);
   }
 };
 
