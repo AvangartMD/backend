@@ -50,10 +50,11 @@ getWeb3Event.getTransferEvent = async (req, res) => {
             }
 
             const saveNft = await findNft.save();
-            await UserModel.findByIdAndUpdate(
-              { _id: saveNft.ownerId },
-              { $inc: { nftCreated: 1 } }
-            );
+            const findUser = await UserModel.findById(saveNft.ownerId);
+            if (findUser) {
+              findUser.nftCreated = findUser.nftCreated + 1;
+              await findUser.save();
+            }
           } else if (findNft && findNft.tokenId) {
             console.log('token already minted');
           } else {
