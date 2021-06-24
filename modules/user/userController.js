@@ -466,7 +466,7 @@ UserCtr.searchCreator = async (req, res) => {
         username: { $regex: `${req.params.name.toLowerCase()}.*` },
         acceptedByAdmin: true,
       },
-      { _id: 1, username: 1 }
+      { _id: 1, username: 1, walletAddress: 1 }
     );
 
     return res.status(200).json({
