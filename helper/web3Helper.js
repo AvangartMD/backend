@@ -46,6 +46,8 @@ getWeb3Event.getTransferEvent = async (req, res) => {
           .tokenURI(order.tokenId)
           .call();
 
+        console.log('token uri is:', getTokenUri);
+
         if (getTokenUri) {
           const checkIsValid = mongoose.isValidObjectId(getTokenUri);
           if (checkIsValid) {
