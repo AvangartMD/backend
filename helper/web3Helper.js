@@ -17,7 +17,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
 
     const contract = new web3.eth.Contract(
       ContractAbi,
-      '0x8d987f0188564A7620D707dD05B814e19545C66B'
+      '0x2231a45CafF3a2599231036F59658AB92bc838C0'
     );
 
     contract.events
@@ -29,6 +29,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         fromBlock: 6018110,
       })
       .on('data', async (e) => {
+        // console.log('eis:', e);
         const result = e.returnValues;
         const order = result['order'];
 
@@ -42,6 +43,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
           if (findNft && !findNft.tokenId) {
             findNft.tokenId = order.tokenId;
             findNft.status = statusObject.APPROVED;
+
             if (+order.saleType === 1) {
               findNft.auctionStartDate = order.timeline;
               findNft.auctionEndDate = result.timestamp;
