@@ -185,12 +185,6 @@
             },
             {
                 "indexed": false,
-                "internalType": "string",
-                "name": "tokenURI",
-                "type": "string"
-            },
-            {
-                "indexed": false,
                 "internalType": "uint256",
                 "name": "nonce",
                 "type": "uint256"

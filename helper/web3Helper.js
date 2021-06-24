@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const ContractAbi = require('../abi/contract.json');
 const NftModel = require('../modules/nft/nftModel');
 const UserModel = require('../modules/user/userModal');
+const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
 const provider =
   process.env.NODE_ENV === 'development'
@@ -17,7 +18,12 @@ getWeb3Event.getTransferEvent = async (req, res) => {
 
     const contract = new web3.eth.Contract(
       ContractAbi,
-      '0x2231a45CafF3a2599231036F59658AB92bc838C0'
+      process.env.ESCROW_ADDRESS
+    );
+
+    const tokenContract = new web3.eth.Contract(
+      tokenContractJson,
+      process.env.TOKEN_ADDRESS
     );
 
     contract.events
@@ -35,33 +41,39 @@ getWeb3Event.getTransferEvent = async (req, res) => {
 
         // check valid mongoose id
 
-        const checkIsValid = mongoose.isValidObjectId(result.tokenURI);
+        console.log(order.tokenId);
 
-        if (checkIsValid) {
-          const findNft = await NftModel.findOne({ _id: result.tokenURI });
+        const getTokenUri = await tokenContract.methods
+          .tokenURI(order.tokenId)
+          .call();
 
-          if (findNft && !findNft.tokenId) {
-            findNft.tokenId = order.tokenId;
-            findNft.status = statusObject.APPROVED;
-
-            if (+order.saleType === 1) {
-              findNft.auctionStartDate = order.timeline;
-              findNft.auctionEndDate = result.timestamp;
+        if (getTokenUri) {
+          const checkIsValid = mongoose.isValidObjectId(getTokenUri);
+          if (checkIsValid) {
+            const findNft = await NftModel.findOne({ _id: getTokenUri });
+            if (findNft && !findNft.tokenId) {
+              findNft.tokenId = order.tokenId;
+              findNft.status = statusObject.APPROVED;
+              if (+order.saleType === 1) {
+                findNft.auctionStartDate = order.timeline;
+                findNft.auctionEndDate = result.timestamp;
+              }
+              const saveNft = await findNft.save();
+              const findUser = await UserModel.findById(saveNft.ownerId);
+              if (findUser) {
+                findUser.nftCreated = findUser.nftCreated + 1;
+                await findUser.save();
+              }
+            } else if (findNft && findNft.tokenId) {
+              console.log('token already minted');
+            } else {
+              console.log('token not found');
             }
-
-            const saveNft = await findNft.save();
-            const findUser = await UserModel.findById(saveNft.ownerId);
-            if (findUser) {
-              findUser.nftCreated = findUser.nftCreated + 1;
-              await findUser.save();
-            }
-          } else if (findNft && findNft.tokenId) {
-            console.log('token already minted');
           } else {
-            console.log('token not found');
+            console.log('not a valid token URI');
           }
         } else {
-          console.log('not a valid token URI');
+          console.log('Token Id is inavlid');
         }
       });
   } catch (err) {
