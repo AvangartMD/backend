@@ -17,6 +17,8 @@ mongoose
     // mongoose.pluralize(null);
     // mongoose.set('debug',true);
 
+    mongoose.set('useFindAndModify', false);
+
     console.log('database connected successfully');
   })
   .catch((error) => {
