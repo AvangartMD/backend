@@ -501,7 +501,7 @@ UserCtr.listActiveCreator = async (req, res) => {
     }
 
     if (req.body.search) {
-      query.username = { $regex: `${req.params.name.toLowerCase()}.*` };
+      query.username = { $regex: `${req.body.search.toLowerCase()}.*` };
     }
 
     if (req.body.rank) {
