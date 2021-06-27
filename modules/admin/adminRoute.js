@@ -3,6 +3,7 @@ const AdminCtr = require("./adminController");
 const AdminMiddleware = require("./adminMiddleware");
 const bannerRoute = require("./banner/bannerRoute");
 const infoRoute = require("./info/infoRoute");
+const frameRoute = require("./hall-frame-info/infoRoute");
 const popularRoute = require("./popular-nft/popularRoute");
 const dashbaordRoute = require("./dashboard/dashboardRoute");
 const Auth = require("../../helper/auth");
@@ -25,6 +26,9 @@ adminRoute.use("/banner", bannerRoute);
 
 // info route
 adminRoute.use("/info", infoRoute);
+
+// hall of frame info route
+adminRoute.use('/hall-frame-info', frameRoute);
 
 // dahborad route
 adminRoute.use("/dashboard", dashbaordRoute);
