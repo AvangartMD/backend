@@ -65,5 +65,6 @@
     "COLLECTION_DETAILS": "Collection Details",
     "USER_CANT_FOLLOW": "User cant follow own",
     "USER_FOLLOW": "User Followed Successfully",
-    "USER_UNFOLLOW": "User Unfollwed Successfully"
+    "USER_UNFOLLOW": "User Unfollwed Successfully",
+    "COLLECTION_NFT": "Collection Nft List"
 }

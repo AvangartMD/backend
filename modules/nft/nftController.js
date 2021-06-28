@@ -505,4 +505,45 @@ nftCtr.getNftUri = async (req, res) => {
   }
 };
 
+// get nfts under collection
+nftCtr.listCollectionNft = async (req, res) => {
+  try {
+    const getCollectionNfts = await NftModel.find(
+      {
+        collectionId: req.params.collectionId,
+        isActive: true,
+      },
+      { digitalKey: 0, createdAt: 0, updatedAt: 0 }
+    )
+      .populate({
+        path: 'ownerId',
+        select: { _id: 1, walletAddress: 1, username: 1 },
+      })
+      .populate({
+        path: 'category',
+        select: { _id: 1, isActive: 1, image: 1 },
+      });
+
+    return res.status(200).json({
+      message: req.t('COLLECTION_NFT'),
+      status: true,
+      data: getCollectionNfts,
+    });
+  } catch (err) {
+    Utils.echoLog('error in listCollectionNft  ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// market place api
+nftCtr.marketPlace = async (req, res) => {
+  try {
+    const listNftForMarketPlace = await NftModel.find();
+  } catch (err) {}
+};
+
 module.exports = nftCtr;

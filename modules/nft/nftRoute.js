@@ -3,6 +3,7 @@ const NftCtr = require('./nftController');
 const NftMiddleware = require('./nftMiddleware');
 const Auth = require('../../helper/auth');
 const auth = require('../../helper/auth');
+const nftCtr = require('./nftController');
 
 const nftRoute = express.Router();
 // add new Nft
@@ -100,5 +101,9 @@ const getSingleCollectionDetails = [
   NftCtr.getSingleCollectionDetails,
 ];
 nftRoute.get('/collection/:id', getSingleCollectionDetails);
+
+// get single collection nfts
+const getCollectionNfts = [NftCtr.listCollectionNft];
+nftRoute.get('/getCollectionInfo/:collectionId', getCollectionNfts);
 
 module.exports = nftRoute;
