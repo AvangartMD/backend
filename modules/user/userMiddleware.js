@@ -22,7 +22,7 @@ UserMiddleware.signUpValidator = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string(),
     surname: Joi.string(),
-    isCreator: Joi.boolean().required(),
+    isCreator: Joi.boolean(),
     portfolio: portfolioSchema,
     email: Joi.string().email(),
     bio: Joi.string(),
