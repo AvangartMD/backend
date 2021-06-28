@@ -72,10 +72,10 @@ CategoryCtr.updateCategory = async (req, res) => {
     const getCategoryDetails = await CategoryModel.findById(req.params.id);
 
     if (getCategoryDetails) {
-      // if (req.body.categoryName) {
-      //   getCategoryDetails.categoryName = req.body.categoryName;
-      //   getCategoryDetails.slugText = req.body.name;
-      // }
+      if (req.body.categoryName) {
+        getCategoryDetails.categoryName = req.body.categoryName;
+        getCategoryDetails.slugText = req.body.name;
+      }
       if (req.body.status === false) {
         getCategoryDetails.isActive = false;
       }
