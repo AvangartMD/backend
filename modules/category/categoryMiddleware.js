@@ -1,14 +1,15 @@
-const Joi = require("joi");
-const validate = require("../../helper/validateRequest");
-const CategoryModel = require("./categoryModel");
-const Utils = require("../../helper/utils");
-const { slugText } = require("../../helper/utils");
+const Joi = require('joi');
+const validate = require('../../helper/validateRequest');
+const CategoryModel = require('./categoryModel');
+const Utils = require('../../helper/utils');
+const { slugText } = require('../../helper/utils');
 
 const CategoryMiddleware = {};
 
 CategoryMiddleware.validateAddMiddleware = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string().required(),
+    image: Joi.string(),
   });
   validate.validateRequest(req, res, next, schema);
 };
@@ -22,16 +23,16 @@ CategoryMiddleware.checkCategoryAlreadyAdded = async (req, res, next) => {
 
     if (checkAlreadyAvalaible) {
       return res.status(400).json({
-        message: req.t("CATEGORY_ALREADY_ADDED"),
+        message: req.t('CATEGORY_ALREADY_ADDED'),
         status: false,
       });
     } else {
       return next();
     }
   } catch (err) {
-    Utils.echoLog("error in can checkCategoryAlreadyAdded middleware", err);
+    Utils.echoLog('error in can checkCategoryAlreadyAdded middleware', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -42,6 +43,7 @@ CategoryMiddleware.validateUpdate = (req, res, next) => {
   const schema = Joi.object({
     categoryName: Joi.string(),
     status: Joi.boolean(),
+    image: Joi.string(),
   });
   validate.validateRequest(req, res, next, schema);
 };
@@ -61,7 +63,7 @@ CategoryMiddleware.checkCategoryAlreadyAddedForUpdate = async (
 
       if (checkAlreadyAvalaible) {
         return res.status(400).json({
-          message: req.t("CATEGORY_ALREADY_ADDED"),
+          message: req.t('CATEGORY_ALREADY_ADDED'),
           status: false,
         });
       } else {
@@ -72,11 +74,11 @@ CategoryMiddleware.checkCategoryAlreadyAddedForUpdate = async (
     }
   } catch (err) {
     Utils.echoLog(
-      "error in can checkCategoryAlreadyAddedForUpdate middleware",
+      'error in can checkCategoryAlreadyAddedForUpdate middleware',
       err
     );
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });

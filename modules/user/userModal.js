@@ -56,9 +56,15 @@ const userSchema = new Schema(
     },
     profile: {
       type: String,
-      lowercase: true,
+      // lowercase: true,
       default: null,
     },
+
+    cover: {
+      type: String,
+      default: null,
+    },
+
     role: {
       type: Schema.Types.ObjectId,
       ref: 'roles',
@@ -74,6 +80,13 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+    category: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'categories',
+        required: false,
+      },
+    ],
     acceptedByAdmin: {
       type: Boolean,
       required: true,
@@ -102,6 +115,18 @@ const userSchema = new Schema(
     transactionId: {
       type: String,
       default: null,
+    },
+    followersCount: {
+      type: Number,
+      default: 0,
+    },
+    followingCount: {
+      type: Number,
+      default: 0,
+    },
+    nftCreated: {
+      type: Number,
+      default: 0,
     },
   },
 

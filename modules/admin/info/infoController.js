@@ -1,8 +1,6 @@
 const InfoModel = require('./infoModel');
 const Utils = require('../../../helper/utils');
-const asyncRedis = require('async-redis');
-const client = asyncRedis.createClient();
-const { cachedData } = require('../../../helper/enum');
+
 const InfoCtr = {};
 
 // add new info
@@ -10,10 +8,9 @@ InfoCtr.addNewInfo = async (req, res) => {
   try {
     const { url, banner, button_text, button_url } = req.body;
     if (button_text && !button_url) {
-      return res.status(500).json({
-        message: req.t('DB_ERROR'),
-        status: true,
-        err: 'button_url is not given',
+      return res.status(400).json({
+        message: 'button_url is not given',
+        status: false,
       });
     }
     const addNewInfo = new InfoModel({

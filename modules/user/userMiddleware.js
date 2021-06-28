@@ -27,6 +27,8 @@ UserMiddleware.signUpValidator = (req, res, next) => {
     email: Joi.string().email(),
     bio: Joi.string(),
     username: Joi.string(),
+    cover: Joi.string(),
+    category: Joi.array().items(Joi.string()),
   });
   validate.validateRequest(req, res, next, schema);
 };
@@ -127,6 +129,8 @@ UserMiddleware.addNewUserByAdmin = async (req, res, next) => {
     profile: Joi.string(),
     bio: Joi.string(),
     email: Joi.string().email(),
+    username: Joi.string().required(),
+    category: Joi.array().items(Joi.string()),
   });
 
   validate.validateRequest(req, res, next, schema);

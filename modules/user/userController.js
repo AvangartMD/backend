@@ -14,14 +14,26 @@ const UserCtr = {};
 // update user details
 UserCtr.updateUserDetails = async (req, res) => {
   try {
-    const { name, email, username, portfolio, profile, isCreator, bio } =
-      req.body;
+    const {
+      name,
+      email,
+      username,
+      portfolio,
+      profile,
+      cover,
+      isCreator,
+      bio,
+      category,
+    } = req.body;
 
     const fetchUserDetails = await UserModel.findById(req.userData._id);
 
     if (fetchUserDetails) {
       if (name) {
         fetchUserDetails.name = name;
+      }
+      if (cover) {
+        fetchUserDetails.cover = cover;
       }
       if (bio) {
         fetchUserDetails.bio = bio;
@@ -41,6 +53,9 @@ UserCtr.updateUserDetails = async (req, res) => {
       if (isCreator) {
         const fetchRole = await RoleModel.findOne({ roleName: 'CREATOR' });
         fetchUserDetails.role = fetchRole._id;
+      }
+      if (category && category.length) {
+        fetchUserDetails.category = category;
       }
 
       const saveUser = await fetchUserDetails.save();
@@ -100,8 +115,6 @@ UserCtr.login = async (req, res) => {
     );
 
     const signer = await web3.eth.accounts.recover(nonce, signature);
-
-    console.log('sin is:', signer);
 
     if (signer) {
       const fetchRedisData = await client.get(nonce);
@@ -378,7 +391,8 @@ UserCtr.disableUser = async (req, res) => {
 // add user as creator by admin
 UserCtr.addUserByAdmin = async (req, res) => {
   try {
-    const { walletAddress, name, profile, bio, email } = req.body;
+    const { walletAddress, name, profile, bio, email, category, username } =
+      req.body;
     const fetchRole = await RoleModel.findOne({ roleName: 'CREATOR' });
 
     const addNewUser = new UserModel({
@@ -388,6 +402,8 @@ UserCtr.addUserByAdmin = async (req, res) => {
       bio: bio ? bio : null,
       email: email ? email : null,
       role: fetchRole._id,
+      category: category,
+      username: username,
     });
 
     const saveUser = await addNewUser.save();
@@ -431,6 +447,106 @@ UserCtr.genrateNonce = async (req, res) => {
     });
   } catch (err) {
     Utils.echoLog('error in genrating nonce  ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// seacrh creator
+UserCtr.searchCreator = async (req, res) => {
+  try {
+    const fetchCreatorRoleId = await RoleModel.findOne({ roleName: 'CREATOR' });
+    const findUsers = await UserModel.find(
+      {
+        isActive: 1,
+        role: fetchCreatorRoleId._id,
+        username: { $regex: `${req.params.name.toLowerCase()}.*` },
+        acceptedByAdmin: true,
+      },
+      { _id: 1, username: 1, walletAddress: 1 }
+    );
+
+    return res.status(200).json({
+      message: 'Creator List',
+      status: true,
+      data: findUsers,
+    });
+  } catch (err) {
+    Utils.echoLog('Erro in searchng creator');
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// list creator for front
+UserCtr.listActiveCreator = async (req, res) => {
+  try {
+    const page = req.body.page || 1;
+    let sort = { createdAt: -1 };
+    const fetchCreatorRole = await RoleModel.findOne({ roleName: 'CREATOR' });
+    const query = {
+      role: fetchCreatorRole._id,
+      acceptedByAdmin: true,
+      isActive: true,
+    };
+
+    if (req.body.category && req.body.category.length) {
+      query.category = { $in: req.body.category };
+    }
+
+    if (req.body.search) {
+      query.username = { $regex: `${req.body.search.toLowerCase()}.*` };
+    }
+
+    if (req.body.rank) {
+      if (req.body.rank.toLowerCase() === 'name') {
+        sort = {};
+        sort['username'] = 1;
+      }
+      if (req.body.rank.toLowerCase() === 'follower') {
+        sort = {};
+        sort['followersCount'] = -1;
+      }
+    }
+
+    const totalCount = await UserModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const fetchAllCreator = await UserModel.find(
+      query,
+      {
+        portfolio: 0,
+        acceptedByAdmin: 0,
+        status: 0,
+        stage: 0,
+        transactionId: 0,
+      },
+      {
+        sort: sort,
+      }
+    )
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: 'CREATOR_LIST',
+      status: true,
+      data: fetchAllCreator,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog('Erro in searchng creator');
     return res.status(500).json({
       message: req.t('DB_ERROR'),
       status: true,

@@ -21,10 +21,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
     title: Joi.string().required(),
     description: Joi.string(),
     image: imageSchema,
-    ownerId: Joi.alternatives().conditional(req.role, {
-      is: 'ADMIN',
-      then: Joi.string().required(),
-    }),
+    ownerId: Joi.string(),
     collectionId: Joi.string(),
     digitalKey: Joi.alternatives().conditional('unlockContent', {
       is: 1,
@@ -35,12 +32,13 @@ NftMiddleware.validateAdd = async (req, res, next) => {
     coCreator: coCreatorSchema,
     price: Joi.number().required(),
     saleState: Joi.string().valid('BUY', 'AUCTION').required(),
-    category: Joi.string().required(),
+    category: Joi.array().items(Joi.string()).required(),
     auctionTime: Joi.alternatives().conditional('saleState', {
       is: 'AUCTION',
       then: Joi.number().required(),
       otherwise: Joi.number(),
     }),
+    edition: Joi.number().required(),
   });
   validate.validateRequest(req, res, next, schema);
 };
@@ -130,22 +128,20 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
     title: Joi.string(),
     description: Joi.string(),
     image: imageSchema,
-    ownerId: Joi.alternatives().conditional(req.role, {
-      is: 'ADMIN',
-      then: Joi.string().required(),
-    }),
+    ownerId: Joi.string(),
     collectionId: Joi.string(),
     unlockContent: Joi.boolean(),
     coCreator: coCreatorSchema,
     price: Joi.number(),
     saleState: Joi.string().valid('BUY', 'AUCTION'),
-    category: Joi.string().required(),
+    category: Joi.array().items(Joi.string()),
     auctionTime: Joi.number(),
     digitalKey: Joi.alternatives().conditional('unlockContent', {
       is: 1,
       then: Joi.string().required(),
       otherwise: Joi.string(),
     }),
+    edition: Joi.number(),
   });
 
   validate.validateRequest(req, res, next, schema);

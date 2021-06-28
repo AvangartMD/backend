@@ -55,6 +55,7 @@ const addUserAsCreatorByAdmin = [
   auth.isAuthenticatedUser,
   auth.isAdmin,
   UserMiddleware.addNewUserByAdmin,
+  UserMiddleware.checkUsernameAlreadyAdded,
   UserMiddleware.checkAddressAlreadyRegistered,
   UserCtr.addUserByAdmin,
 ];
@@ -63,5 +64,13 @@ userRoute.post('/addNewUserByAdmin', addUserAsCreatorByAdmin);
 // genrate nonce
 const genrateNonce = [UserCtr.genrateNonce];
 userRoute.get('/genrateNonce/:address', genrateNonce);
+
+// search creator
+const searchCreator = [auth.isAuthenticatedUser, UserCtr.searchCreator];
+userRoute.get('/searchCreator/:name', searchCreator);
+
+// list active creator
+const listActiveCreator = [UserCtr.listActiveCreator];
+userRoute.post('/listVerifiefCreator', listActiveCreator);
 
 module.exports = userRoute;

@@ -65,4 +65,12 @@
     "DASHBOARD_UPDATED": "Dashboard updated successfully",
     "BUTTON_URL_NOT": "Button url is needed",
     "USERNAME_ALREADY": "Username Already avalaible",
+    "USER_NFT_LIST": "User Nft list",
+    "NFT_URI": "Nft uri is",
+    "SINGLE_NFT": "Single Nft Details",
+    "COLLECTION_DETAILS": "Collection Details",
+    "USER_CANT_FOLLOW": "User cant follow own",
+    "USER_FOLLOW": "User Followed Successfully",
+    "USER_UNFOLLOW": "User Unfollwed Successfully",
+    "COLLECTION_NFT": "Collection Nft List"
 }
