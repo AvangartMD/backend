@@ -73,7 +73,7 @@ const nftSchema = new Schema(
     },
     saleState: {
       type: String,
-      enum: ['BUY', 'AUCTION'],
+      enum: ['BUY', 'AUCTION', 'SOLD'],
       required: true,
     },
     auctionTime: {

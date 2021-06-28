@@ -381,7 +381,6 @@ nftCtr.listUsersNft = async (req, res) => {
       data: list,
     });
   } catch (err) {
-    console.log('error is:', err);
     Utils.echoLog('error in listing user  nft  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
@@ -542,8 +541,66 @@ nftCtr.listCollectionNft = async (req, res) => {
 // market place api
 nftCtr.marketPlace = async (req, res) => {
   try {
-    const listNftForMarketPlace = await NftModel.find();
-  } catch (err) {}
+    const page = req.body.page || 1;
+    const query = { isActive: true, status: statusObject.APPROVED };
+
+    if (req.body.category && req.body.category.length) {
+      query.category = { $in: req.body.category };
+    }
+
+    if (req.body.filter && req.body.filter.length) {
+      query.saleState = { $in: req.body.filter };
+    }
+
+    if (req.body.search) {
+      query.title = {
+        $regex: `${req.body.search.toLowerCase()}.*`,
+        $options: 'i',
+      };
+    }
+
+    const totalCount = await NftModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const listNftForMarketPlace = await NftModel.find(query, {
+      approvedByAdmin: 0,
+      status: 0,
+      digitalKey: 0,
+    })
+      .populate({
+        path: 'ownerId',
+        select: { _id: 1, walletAddress: 1, username: 1 },
+      })
+      .populate({
+        path: 'category',
+        select: { _id: 1, isActive: 1, image: 1 },
+      })
+      .populate({
+        path: 'collectionId',
+        select: { _id: 1, name: 1, description: 1 },
+      })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: 'NFT_MARKET_PLACE_LIST',
+      status: true,
+      data: listNftForMarketPlace,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog(`Error inlist nft for market place`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
 };
 
 module.exports = nftCtr;
