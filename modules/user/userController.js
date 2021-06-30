@@ -274,7 +274,10 @@ UserCtr.getUserDetails = async (req, res) => {
     }
 
     if (Object.keys(query).length) {
-      const fetchUserData = await UserModel.findOne(query);
+      const fetchUserData = await UserModel.findOne(query).populate({
+        path: 'role',
+        select: { _id: 1, roleName: 1 },
+      });
 
       return res.status(200).json({
         message: req.t('SUCCESS'),
