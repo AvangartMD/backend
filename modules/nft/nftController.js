@@ -449,7 +449,9 @@ nftCtr.listNftForAdmin = async (req, res) => {
 // get single nft details
 nftCtr.getSingleNftDetails = async (req, res) => {
   try {
-    const getNftDetails = await NftModel.findById(req.params.id)
+    const getNftDetails = await NftModel.findById(req.params.id, {
+      digitalKey: 0,
+    })
       .populate({
         path: 'collectionId',
         select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
