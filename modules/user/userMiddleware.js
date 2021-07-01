@@ -51,7 +51,10 @@ UserMiddleware.checkUsernameAlreadyAdded = async (req, res, next) => {
     const checkUsernameAvalaible = await UserModel.findOne({
       username: req.body.username.toLowerCase(),
     });
-    if (checkUsernameAvalaible) {
+    if (
+      checkUsernameAvalaible &&
+      req.userData._id.toString() !== checkUsernameAvalaible._id.toString()
+    ) {
       return res.status(400).json({
         status: false,
         message: req.t('USERNAME_ALREADY'),
