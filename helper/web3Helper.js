@@ -104,12 +104,13 @@ getWeb3Event.getPastEvents = async (req, res) => {
   try {
     const web3 = new Web3(provider);
     const latestBlockNo = await web3.eth.getBlockNumber();
+    console.log('latest block no is:', latestBlockNo);
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
     );
     const getPastEvents = await contract.getPastEvents('OrderPlaced', {
-      fromBlock: BlockJson.endBlock,
+      fromBlock: +BlockJson.endBlock,
       toBlock: latestBlockNo,
     });
 
