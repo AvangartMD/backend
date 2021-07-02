@@ -372,7 +372,7 @@ nftCtr.listUsersNft = async (req, res) => {
       })
       .populate({
         path: 'ownerId',
-        select: { name: 1, username: 1 },
+        select: { name: 1, username: 1, profile: 1 },
       });
 
     return res.status(200).json({
@@ -571,7 +571,7 @@ nftCtr.marketPlace = async (req, res) => {
     })
       .populate({
         path: 'ownerId',
-        select: { _id: 1, walletAddress: 1, username: 1 },
+        select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
       })
       .populate({
         path: 'category',
