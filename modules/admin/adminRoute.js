@@ -7,6 +7,7 @@ const frameRoute = require('./hall-frame-info/infoRoute');
 const popularRoute = require('./popular-nft/popularRoute');
 const dashbaordRoute = require('./dashboard/dashboardRoute');
 const Auth = require('../../helper/auth');
+const web3Helper = require('../../helper/web3Helper');
 
 const adminRoute = express.Router();
 // get roles
@@ -35,4 +36,8 @@ adminRoute.use('/hall-frame-info', frameRoute);
 
 // dahborad route
 adminRoute.use('/dashboard', dashbaordRoute);
+
+const getAllPastEvnets = [web3Helper.getPastEvents];
+adminRoute.get('/getPastEvents', getAllPastEvnets);
+
 module.exports = adminRoute;

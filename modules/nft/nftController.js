@@ -465,7 +465,7 @@ nftCtr.getSingleNftDetails = async (req, res) => {
           })
           .populate({
             path: 'ownerId',
-            select: { name: 1, username: 1 },
+            select: { name: 1, username: 1, profile: 1 },
           })
       )
     );

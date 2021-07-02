@@ -6,10 +6,17 @@ const UserModel = require('../modules/user/userModal');
 const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
 const Utils = require('./utils');
-const provider =
+const BlockJson = require('../result/blockNo.json');
+const fs = require('fs');
+const webSocketProvider =
   process.env.NODE_ENV === 'development'
     ? 'wss://apis.ankr.com/wss/685960a71c81496fb48ac6f3db62fe0b/bba1c9bfcdf042fa0f335035c21d3ae5/binance/full/test'
     : 'wss://bsc-ws-node.nariox.org:443';
+
+const provider =
+  process.env.NODE_ENV === 'development'
+    ? 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+    : 'https://bsc-dataseed.binance.org/';
 
 const getWeb3Event = {};
 
@@ -92,5 +99,42 @@ async function checkMinting(result, order) {
     Utils.echoLog(`Error in check minting ${err}`);
   }
 }
+
+getWeb3Event.getPastEvents = async (req, res) => {
+  try {
+    const web3 = new Web3(provider);
+    const latestBlockNo = await web3.eth.getBlockNumber();
+    const contract = new web3.eth.Contract(
+      ContractAbi,
+      process.env.ESCROW_ADDRESS
+    );
+    const getPastEvents = await contract.getPastEvents('OrderPlaced', {
+      fromBlock: BlockJson.endBlock,
+      toBlock: latestBlockNo,
+    });
+
+    if (getPastEvents.length) {
+      const itreateEvents = (i) => {
+        if (i < getPastEvents.length) {
+          const result = getPastEvents[i].returnValues;
+          const order = result['order'];
+          checkMinting(result, order);
+          itreateEvents(i + 1);
+        } else {
+          let object = {
+            endBlock: latestBlockNo,
+          };
+
+          let data = JSON.stringify(object);
+          fs.writeFileSync('./result/blockNo.json', data);
+          Utils.echoLog('Cron fired successfully for fetching events');
+        }
+      };
+      itreateEvents(0);
+    }
+  } catch (err) {
+    Utils.echoLog('Err is:', err);
+  }
+};
 
 module.exports = getWeb3Event;
