@@ -1,5 +1,6 @@
 const NftModel = require('./nftModel');
 const CollectionModel = require('./collectionModel');
+const LikeModel = require('../like/likeModel');
 const Utils = require('../../helper/utils');
 const NftMiddleware = require('./nftMiddleware');
 const { statusObject } = require('../../helper/enum');
@@ -449,21 +450,40 @@ nftCtr.listNftForAdmin = async (req, res) => {
 // get single nft details
 nftCtr.getSingleNftDetails = async (req, res) => {
   try {
-    const getNftDetails = await NftModel.findById(req.params.id, {
-      digitalKey: 0,
-    })
-      .populate({
-        path: 'collectionId',
-        select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
-      })
-      .populate({
-        path: 'category',
-        select: { createdAt: 0, updatedAt: 0 },
-      })
-      .populate({
-        path: 'ownerId',
-        select: { name: 1, username: 1 },
+    const getNftDetails = JSON.parse(
+      JSON.stringify(
+        await NftModel.findById(req.params.id, {
+          digitalKey: 0,
+        })
+          .populate({
+            path: 'collectionId',
+            select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+          })
+          .populate({
+            path: 'category',
+            select: { createdAt: 0, updatedAt: 0 },
+          })
+          .populate({
+            path: 'ownerId',
+            select: { name: 1, username: 1 },
+          })
+      )
+    );
+
+    if (req.userData && req.userData._id) {
+      const checkIsLiked = await LikeModel.findOne({
+        nftId: getNftDetails._id,
+        userId: req.userData._id,
       });
+
+      if (checkIsLiked) {
+        getNftDetails.isLiked = true;
+      } else {
+        getNftDetails.isLiked = false;
+      }
+    } else {
+      getNftDetails.isLiked = false;
+    }
 
     return res.status(200).json({
       message: req.t('SINGLE_NFT'),
