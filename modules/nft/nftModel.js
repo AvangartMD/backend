@@ -85,7 +85,7 @@ const nftSchema = new Schema(
       default: 1,
     },
     auctionStartDate: {
-      type: String,
+      type: Number,
       default: null,
     },
     auctionEndDate: {
