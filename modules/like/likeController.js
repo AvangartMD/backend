@@ -37,4 +37,14 @@ LikeCtr.toggle = async (req, res) => {
   }
 };
 
+// like ctr details
+
+LikeCtr.checkIsLiked = async (req, res) => {
+  try {
+    if (req.userData && req.userData._id) {
+      const checkIsLiked = await User;
+    } else {
+    }
+  } catch (err) {}
+};
 module.exports = LikeCtr;

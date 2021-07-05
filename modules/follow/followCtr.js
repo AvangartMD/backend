@@ -83,4 +83,36 @@ FollowCtr.toggle = async (req, res) => {
   }
 };
 
+FollowCtr.checkIsFollowed = async (req, res) => {
+  try {
+    if (req.userData && req.userData._id) {
+      const checkIsFollowed = await FollowModel.findOne({
+        userId: req.userData._id,
+        follow: req.parms.userId,
+      });
+
+      return res.status(200).json({
+        status: true,
+        data: {
+          isFollowed: checkIsFollowed ? true : false,
+        },
+      });
+    } else {
+      return res.status(200).json({
+        status: false,
+        data: {
+          isFollowed: false,
+        },
+      });
+    }
+  } catch (err) {
+    Utils.echoLog('error in getting check is follwed');
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
 module.exports = FollowCtr;

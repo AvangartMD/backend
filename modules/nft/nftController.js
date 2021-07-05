@@ -538,7 +538,13 @@ nftCtr.listCollectionNft = async (req, res) => {
     )
       .populate({
         path: 'ownerId',
-        select: { _id: 1, walletAddress: 1, username: 1 },
+        select: {
+          _id: 1,
+          walletAddress: 1,
+          username: 1,
+          followersCount: 1,
+          followingCount: 1,
+        },
       })
       .populate({
         path: 'category',
