@@ -131,6 +131,13 @@ getWeb3Event.getPastEvents = async (req, res) => {
         }
       };
       itreateEvents(0);
+    } else {
+      let object = {
+        endBlock: latestBlockNo,
+      };
+
+      let data = JSON.stringify(object);
+      fs.writeFileSync('./result/blockNo.json', data);
     }
   } catch (err) {
     Utils.echoLog('Err is:', err);
