@@ -73,5 +73,6 @@
     "USER_FOLLOW": "User Followed Successfully",
     "USER_UNFOLLOW": "User Unfollwed Successfully",
     "COLLECTION_NFT": "Collection Nft List",
-    "NFT_MARKET_PLACE_LIST": "Nft market place list"
+    "NFT_MARKET_PLACE_LIST": "Nft market place list",
+    "SINGLE_USER_DETAILS": "Single user details"
 }

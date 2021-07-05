@@ -73,4 +73,12 @@ userRoute.get('/searchCreator/:name', searchCreator);
 const listActiveCreator = [UserCtr.listActiveCreator];
 userRoute.post('/listVerifiefCreator', listActiveCreator);
 
+// get single user Details
+
+const getSingleUserDetails = [
+  Auth.checkIsAutheticated,
+  UserCtr.getSingleUserDetails,
+];
+userRoute.get('/getSingleUser/:userId', getSingleUserDetails);
+
 module.exports = userRoute;

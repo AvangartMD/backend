@@ -44,7 +44,6 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         checkMinting(result, order);
       });
   } catch (err) {
-    console.log('err is:', err);
     Utils.echoLog(`Error in web3 listner for mint :${err}`);
   }
 };
@@ -61,7 +60,7 @@ async function checkMinting(result, order) {
     const getTokenUri = await tokenContract.methods
       .tokenURI(order.tokenId)
       .call();
-    console.log('token uri is:', getTokenUri);
+
     // if we get token uri from token contract
     if (getTokenUri) {
       // check token id is valid mongoose object id
