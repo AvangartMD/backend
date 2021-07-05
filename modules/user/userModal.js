@@ -35,7 +35,7 @@ const userSchema = new Schema(
       type: String,
       unique: true,
       lowercase: true,
-      default: null,
+      default: undefined,
       sparse: true,
     },
 
