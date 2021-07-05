@@ -8,4 +8,8 @@ const followRoute = express.Router();
 const toggle = [Auth.isAuthenticatedUser, FollowCtr.toggle];
 followRoute.get('/toggle/:userId', toggle);
 
+// check is followed
+const isFollowed = [FollowCtr.checkIsFollowed];
+followRoute.get('/checkIsFollowed/:userId', isFollowed);
+
 module.exports = followRoute;
