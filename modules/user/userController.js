@@ -157,6 +157,7 @@ UserCtr.login = async (req, res) => {
             const createUser = new UserModel({
               role: getRoles._id,
               walletAddress: parsedRedisData.walletAddress.toLowerCase(),
+              username: undefined,
             });
 
             const saveUser = await createUser.save();
