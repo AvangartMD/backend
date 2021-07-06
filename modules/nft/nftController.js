@@ -539,6 +539,7 @@ nftCtr.listCollectionNft = async (req, res) => {
             username: 1,
             followersCount: 1,
             followingCount: 1,
+            name: 1,
           },
         })
       )
