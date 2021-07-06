@@ -552,6 +552,7 @@ nftCtr.listCollectionNft = async (req, res) => {
       {
         collectionId: getCollectionDetails._id,
         isActive: true,
+        status: statusObject.APPROVED,
       },
       { digitalKey: 0, createdAt: 0, updatedAt: 0 }
     ).populate({
