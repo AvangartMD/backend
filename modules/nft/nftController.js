@@ -529,36 +529,65 @@ nftCtr.getNftUri = async (req, res) => {
 // get nfts under collection
 nftCtr.listCollectionNft = async (req, res) => {
   try {
-    const getCollectionNfts = await NftModel.find(
+    const getCollectionDetails = JSON.parse(
+      JSON.stringify(
+        await CollectionModel.findById(req.params.collectionId).populate({
+          path: 'ownerId',
+          select: {
+            _id: 1,
+            walletAddress: 1,
+            username: 1,
+            followersCount: 1,
+            followingCount: 1,
+          },
+        })
+      )
+    );
+
+    // get nft details
+    const getNftDetails = await NftModel.find(
       {
         collectionId: req.params.collectionId,
         isActive: true,
       },
       { digitalKey: 0, createdAt: 0, updatedAt: 0 }
-    )
-      .populate({
-        path: 'ownerId',
-        select: {
-          _id: 1,
-          walletAddress: 1,
-          username: 1,
-          followersCount: 1,
-          followingCount: 1,
-        },
-      })
-      .populate({
-        path: 'category',
-        select: { _id: 1, isActive: 1, image: 1 },
-      })
-      .populate({
-        path: 'collectionId',
-        select: { _id: 1, logo: 1, name: 1, description: 1 },
-      });
+    ).populate({
+      path: 'category',
+      select: { _id: 1, isActive: 1, image: 1 },
+    });
+
+    getCollectionDetails.nft = getNftDetails;
+
+    // const getCollectionNfts = await NftModel.find(
+    //   {
+    //     collectionId: req.params.collectionId,
+    //     isActive: true,
+    //   },
+    //   { digitalKey: 0, createdAt: 0, updatedAt: 0 }
+    // )
+    //   .populate({
+    //     path: 'ownerId',
+    //     select: {
+    //       _id: 1,
+    //       walletAddress: 1,
+    //       username: 1,
+    //       followersCount: 1,
+    //       followingCount: 1,
+    //     },
+    //   })
+    //   .populate({
+    //     path: 'category',
+    //     select: { _id: 1, isActive: 1, image: 1 },
+    //   })
+    //   .populate({
+    //     path: 'collectionId',
+    //     select: { _id: 1, logo: 1, name: 1, description: 1 },
+    //   });
 
     return res.status(200).json({
       message: req.t('COLLECTION_NFT'),
       status: true,
-      data: getCollectionNfts,
+      data: getCollectionDetails,
     });
   } catch (err) {
     Utils.echoLog('error in listCollectionNft  ', err);
