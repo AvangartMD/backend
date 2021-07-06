@@ -109,4 +109,9 @@ nftRoute.get('/getCollectionInfo/:collectionId', getCollectionNfts);
 // get market place nft
 const marketPlaceNft = [NftCtr.marketPlace];
 nftRoute.post('/listMarketPlace', marketPlaceNft);
+
+// get all collection llist for active
+const listCollectionsForUsers = [NftCtr.getCollectionsList];
+nftRoute.post('/listCollections', listCollectionsForUsers);
+
 module.exports = nftRoute;

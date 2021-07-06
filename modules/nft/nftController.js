@@ -635,4 +635,47 @@ nftCtr.marketPlace = async (req, res) => {
   }
 };
 
+// get all collections to get listed in collection tab
+nftCtr.getCollectionsList = async (req, res) => {
+  try {
+    const page = req.body.page || 1;
+    const query = { isActive: true };
+    if (req.body.search) {
+      query.name = {
+        $regex: `${req.body.search.toLowerCase()}.*`,
+        $options: 'i',
+      };
+    }
+    const totalCount = await CollectionModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const getCollections = await CollectionModel.find(query)
+      .populate({
+        path: 'ownerId',
+        select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+      })
+      .sort({ createdAt: -1 })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: req.t('COLLECTION_LIST'),
+      status: true,
+      data: getCollections,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog(`Error in getCollectionsList ${err}`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
 module.exports = nftCtr;

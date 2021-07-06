@@ -31,6 +31,10 @@ const editionSchema = new Schema(
       ref: 'users',
       required: true,
     },
+    isOpenForSale: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   {
