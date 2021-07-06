@@ -43,6 +43,7 @@ const nftSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'collection',
       required: false,
+      default: null,
     },
     isActive: { type: Boolean, default: true },
 

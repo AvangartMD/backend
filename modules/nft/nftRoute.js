@@ -103,7 +103,7 @@ const getSingleCollectionDetails = [
 nftRoute.get('/collection/:id', getSingleCollectionDetails);
 
 // get single collection nfts
-const getCollectionNfts = [NftCtr.listCollectionNft];
+const getCollectionNfts = [auth.checkIsAutheticated, NftCtr.listCollectionNft];
 nftRoute.get('/getCollectionInfo/:collectionId', getCollectionNfts);
 
 // get market place nft

@@ -100,6 +100,28 @@ nftCtr.updateCollection = async (req, res) => {
       if (req.body.description) {
         fetchCollection.description = req.body.description;
       }
+      // remove nft from collection
+      if (req.body.nftId && req.bodynftId.length) {
+        // find the nft of that user only
+
+        const query = { _id: { $in: req.body.nftId } };
+
+        if (req.role !== 'ADMIN') {
+          query.ownerId = req.userData._id;
+        }
+
+        const findNftAndUpdate = await NftModel.find(query);
+
+        if (findNftAndUpdate && findNftAndUpdate.length) {
+          for (let i = 0; i < findNftAndUpdate.length; i++) {
+            const update = await NftModel.update(
+              { _id: findNftAndUpdate[i]._id },
+              { $set: { collectionId: null } },
+              { upsert: true }
+            );
+          }
+        }
+      }
 
       await fetchCollection.save();
 
@@ -561,6 +583,23 @@ nftCtr.listCollectionNft = async (req, res) => {
     });
 
     getCollectionDetails.nft = getNftDetails;
+    getCollectionDetails.isOwner = false;
+
+    if (
+      req.userData &&
+      req.userData._id &&
+      getCollectionDetails &&
+      getCollectionDetails?.ownerId
+    ) {
+      if (
+        req.userData._id.toLowerCase() ===
+        getCollectionDetails.ownerId.toLowerCase()
+      ) {
+        getCollectionDetails.isOwner = true;
+      } else {
+        getCollectionDetails.isOwner = false;
+      }
+    }
 
     // const getCollectionNfts = await NftModel.find(
     //   {
@@ -711,4 +750,5 @@ nftCtr.getCollectionsList = async (req, res) => {
     });
   }
 };
+
 module.exports = nftCtr;

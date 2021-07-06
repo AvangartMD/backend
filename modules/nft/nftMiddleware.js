@@ -153,6 +153,7 @@ NftMiddleware.validateCollectionUpdate = async (req, res, next) => {
     name: Joi.string(),
     description: Joi.string(),
     logo: Joi.string(),
+    nftId: Joi.array(),
   });
 
   validate.validateRequest(req, res, next, schema);
