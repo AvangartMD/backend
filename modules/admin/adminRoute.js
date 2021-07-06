@@ -37,7 +37,12 @@ adminRoute.use('/hall-frame-info', frameRoute);
 // dahborad route
 adminRoute.use('/dashboard', dashbaordRoute);
 
+// get past events
 const getAllPastEvnets = [web3Helper.getPastEvents];
 adminRoute.get('/getPastEvents', getAllPastEvnets);
+
+// get buy nft events
+const getBuyEvents = [web3Helper.orderBuyedEvent];
+adminRoute.get('/getBuyedEvents', getBuyEvents);
 
 module.exports = adminRoute;

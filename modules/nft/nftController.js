@@ -593,7 +593,7 @@ nftCtr.listCollectionNft = async (req, res) => {
     ) {
       if (
         req.userData._id.toLowerCase() ===
-        getCollectionDetails.ownerId.toLowerCase()
+        getCollectionDetails.ownerId._id.toLowerCase()
       ) {
         getCollectionDetails.isOwner = true;
       } else {

@@ -8,6 +8,7 @@ const { statusObject } = require('./enum');
 const Utils = require('./utils');
 const BlockJson = require('../result/blockNo.json');
 const fs = require('fs');
+const console = require('console');
 const webSocketProvider =
   process.env.NODE_ENV === 'development'
     ? 'wss://apis.ankr.com/wss/685960a71c81496fb48ac6f3db62fe0b/bba1c9bfcdf042fa0f335035c21d3ae5/binance/full/test'
@@ -144,4 +145,33 @@ getWeb3Event.getPastEvents = async (req, res) => {
   }
 };
 
+getWeb3Event.orderBuyedEvent = async (req, res) => {
+  try {
+    const web3 = new Web3(provider);
+    const latestBlockNo = await web3.eth.getBlockNumber();
+    console.log('latest block no is:', latestBlockNo);
+    const contract = new web3.eth.Contract(
+      ContractAbi,
+      process.env.ESCROW_ADDRESS
+    );
+    const getBuyedEvents = await contract.getPastEvents('OrderBought', {
+      fromBlock: +BlockJson.endBlock,
+      toBlock: latestBlockNo,
+    });
+
+    // console.log('getBuyedEvents', getBuyedEvents);
+
+    if (getBuyedEvents.length) {
+      const itreateEvents = (i) => {
+        if (i < getBuyedEvents.length) {
+          const result = getBuyedEvents[i].returnValues;
+          const order = result['order'];
+          console.log('order is:', order);
+        } else {
+        }
+      };
+      itreateEvents(0);
+    }
+  } catch (err) {}
+};
 module.exports = getWeb3Event;

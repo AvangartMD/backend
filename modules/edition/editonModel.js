@@ -35,6 +35,11 @@ const editionSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    saleType: {
+      type: String,
+      enum: ['OFFER'],
+      default: null,
+    },
   },
 
   {
@@ -45,4 +50,4 @@ const editionSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model('roles', rolesSchema);
+module.exports = mongoose.model('edition', editionSchema);
