@@ -550,7 +550,7 @@ nftCtr.listCollectionNft = async (req, res) => {
     // get nft details
     const getNftDetails = await NftModel.find(
       {
-        collectionId: req.params.collectionId,
+        collectionId: getCollectionDetails._id,
         isActive: true,
       },
       { digitalKey: 0, createdAt: 0, updatedAt: 0 }
