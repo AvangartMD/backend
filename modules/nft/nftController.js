@@ -549,6 +549,10 @@ nftCtr.listCollectionNft = async (req, res) => {
       .populate({
         path: 'category',
         select: { _id: 1, isActive: 1, image: 1 },
+      })
+      .populate({
+        path: 'collectionId',
+        select: { _id: 1, logo: 1, name: 1, description: 1 },
       });
 
     return res.status(200).json({
