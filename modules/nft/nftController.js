@@ -3,6 +3,7 @@ const CollectionModel = require('./collectionModel');
 const LikeModel = require('../like/likeModel');
 const Utils = require('../../helper/utils');
 const NftMiddleware = require('./nftMiddleware');
+const EditionModel = require('../edition/editonModel');
 const { statusObject } = require('../../helper/enum');
 
 const nftCtr = {};
@@ -487,10 +488,23 @@ nftCtr.getSingleNftDetails = async (req, res) => {
           })
           .populate({
             path: 'ownerId',
-            select: { name: 1, username: 1, profile: 1 },
+            select: { name: 1, username: 1, profile: 1, name: 1 },
           })
       )
     );
+
+    const getEditionDetails = await EditionModel.find({
+      nftId: getSingleNftDetails._id,
+    })
+      .populate({
+        path: 'ownerId',
+        select: { name: 1, username: 1, profile: 1, name: 1 },
+      })
+      .sort({
+        edition: 1,
+      });
+
+    getNftDetails.edition = getEditionDetails;
 
     if (req.userData && req.userData._id) {
       const checkIsLiked = await LikeModel.findOne({
