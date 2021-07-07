@@ -115,17 +115,17 @@ PopularNftCtr.list = async (req, res) => {
             populate: {
               path: 'ownerId',
               select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
-              model: 'skills',
+              model: 'users',
             },
             populate: {
               path: 'collectionId',
               select: { _id: 1, name: 1, description: 1 },
-              model: 'skills',
+              model: 'collection',
             },
             populate: {
               path: 'category',
               select: { _id: 1, isActive: 1, image: 1, categoryName: 1 },
-              model: 'skills',
+              model: 'categories',
             },
           })
           .sort({
