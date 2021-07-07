@@ -3,12 +3,15 @@ const mongoose = require('mongoose');
 const ContractAbi = require('../abi/contract.json');
 const NftModel = require('../modules/nft/nftModel');
 const UserModel = require('../modules/user/userModal');
+const EditionModel = require('../modules/edition/editonModel');
+const HistoryModel = require('../modules/history/historyModel');
 const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
 const Utils = require('./utils');
 const BlockJson = require('../result/blockNo.json');
+const OrderBlockJson = require('../result/orderBlock.json');
 const fs = require('fs');
-const console = require('console');
+
 const webSocketProvider =
   process.env.NODE_ENV === 'development'
     ? 'wss://apis.ankr.com/wss/685960a71c81496fb48ac6f3db62fe0b/bba1c9bfcdf042fa0f335035c21d3ae5/binance/full/test'
@@ -155,18 +158,20 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       process.env.ESCROW_ADDRESS
     );
     const getBuyedEvents = await contract.getPastEvents('OrderBought', {
-      fromBlock: +BlockJson.endBlock,
+      fromBlock: +OrderBlockJson.endBlock,
       toBlock: latestBlockNo,
     });
 
     // console.log('getBuyedEvents', getBuyedEvents);
 
     if (getBuyedEvents.length) {
-      const itreateEvents = (i) => {
+      const itreateEvents = async (i) => {
         if (i < getBuyedEvents.length) {
           const result = getBuyedEvents[i].returnValues;
           const order = result['order'];
-          console.log('order is:', order);
+          const transactionHash = getBuyedEvents[i].transactionHash;
+          console.log('order is:', getBuyedEvents[i]);
+          // order[tokenId],order['seller],order[pricePerNft]
         } else {
         }
       };
@@ -174,4 +179,51 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
     }
   } catch (err) {}
 };
+
+async function orderEvent(result, order, transactionId) {
+  try {
+    const getNftDetails = await NftModel.findOne({
+      recordId: +order['tokenId'],
+    });
+    const getUserDetails = await UserModel.findOne({
+      walletAddress: order['seller'].toLowercase(),
+    });
+    if (getNftDetails && getUserDetails) {
+      const checkEditionAlreadyAdded = EditionModel.findOne({
+        nftId: getUserDetails._id,
+        edition: order['amount'],
+      });
+
+      if (checkEditionAlreadyAdded) {
+      } else {
+        const addNewEdition = new EditionModel({
+          nftId: getNftDetails._id,
+          ownerId: getUserDetails._id,
+          edition: +order['amount'],
+          transactionId: transactionId,
+          price: order['pricePerNFT'],
+          walletAddress: order['seller'],
+          saleAction: order['saleType'] === 0 ? 'BUY' : 'AUCTION',
+          timeline: order['timeline'],
+        });
+
+        await addNewEdition.save();
+
+        const addNewHistory = new HistoryModel({
+          nftId: getNftDetails._id,
+          editionNo: order['amount'],
+          ownerId: getUserDetails._id,
+          text: 'Nft buyed by user',
+          buyPrice: order['pricePerNFT'],
+          timeline: order['timeline'],
+        });
+
+        await addNewHistory.save();
+      }
+    }
+  } catch (err) {
+    Utils.echoLog(`Error in check orderEvent ${err}`);
+  }
+}
+
 module.exports = getWeb3Event;

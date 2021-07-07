@@ -21,6 +21,7 @@ const editionSchema = new Schema(
     walletAddress: {
       type: String,
       required: true,
+      lowercase: true,
     },
     edition: {
       type: Number,
@@ -39,6 +40,14 @@ const editionSchema = new Schema(
       type: String,
       enum: ['OFFER'],
       default: null,
+    },
+    saleAction: {
+      type: String,
+      enum: ['AUCTION', 'BUY'],
+    },
+    timeline: {
+      type: Number,
+      default: 0,
     },
   },
 

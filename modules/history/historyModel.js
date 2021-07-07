@@ -26,6 +26,10 @@ const historySchema = new Schema(
       ref: 'users',
       required: true,
     },
+    timeline: {
+      type: Number,
+      default: 0,
+    },
   },
 
   {

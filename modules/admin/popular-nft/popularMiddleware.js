@@ -1,7 +1,7 @@
-const PopularNftModel = require("./popularNftModel");
-const Utils = require("../../../helper/utils");
-const Joi = require("joi");
-const validate = require("../../../helper/validateRequest");
+const PopularNftModel = require('./popularNftModel');
+const Utils = require('../../../helper/utils');
+const Joi = require('joi');
+const validate = require('../../../helper/validateRequest');
 const PopularMiddleware = {};
 
 // validate add
@@ -30,7 +30,7 @@ PopularMiddleware.checkAlreadyAdded = async (req, res, next) => {
       });
       if (checkAlreadyAdded) {
         return res.status(400).json({
-          message: req.t(""),
+          message: req.t('ALREADY_ADDED_POPULAR'),
           status: false,
         });
       }
@@ -39,9 +39,9 @@ PopularMiddleware.checkAlreadyAdded = async (req, res, next) => {
       return next();
     }
   } catch (err) {
-    Utils.echoLog("error in checkAlreadyAdded ", checkAlreadyAdded);
+    Utils.echoLog('error in checkAlreadyAdded ', checkAlreadyAdded);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });

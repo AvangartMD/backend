@@ -75,5 +75,6 @@
     "COLLECTION_NFT": "Collection Nft List",
     "NFT_MARKET_PLACE_LIST": "Nft market place list",
     "SINGLE_USER_DETAILS": "Single user details",
-    "LIKE_STATUS": "like status "
+    "LIKE_STATUS": "like status ",
+    "ALREADY_ADDED_POPULAR": "Nft Already Added to popular list"
 }

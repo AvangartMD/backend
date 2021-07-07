@@ -1,5 +1,5 @@
-const PopularNftModel = require("./popularNftModel");
-const Utils = require("../../../helper/utils");
+const PopularNftModel = require('./popularNftModel');
+const Utils = require('../../../helper/utils');
 const PopularNftCtr = {};
 
 // add new popular nft
@@ -13,7 +13,7 @@ PopularNftCtr.addNewNft = async (req, res) => {
     const save = await addNewNft.save();
 
     return res.status(200).json({
-      message: req.t("POPULAR_ADDED_SUCCESSFULLY"),
+      message: req.t('POPULAR_ADDED_SUCCESSFULLY'),
       status: true,
       data: {
         details: {
@@ -23,9 +23,9 @@ PopularNftCtr.addNewNft = async (req, res) => {
       },
     });
   } catch (err) {
-    Utils.echoLog("error in  creating new banner ", err);
+    Utils.echoLog('error in  creating new banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -44,6 +44,10 @@ PopularNftCtr.updatePopular = async (req, res) => {
       if (req.body.isActive) {
         fetchDetails.isActive = req.body.isActive;
       }
+
+      if (req.body.isActive === false) {
+        fetchDetails.isActive = false;
+      }
       if (fetchDetails.ranking) {
         fetchDetails.ranking = req.body.ranking;
       }
@@ -51,7 +55,7 @@ PopularNftCtr.updatePopular = async (req, res) => {
       const updateDetails = await fetchDetails.save();
 
       return res.status(200).json({
-        message: req.t("POPULAR_UPDATED_SUCCESSFULLY"),
+        message: req.t('POPULAR_UPDATED_SUCCESSFULLY'),
         status: true,
         data: {
           _id: updateDetails._id,
@@ -60,14 +64,14 @@ PopularNftCtr.updatePopular = async (req, res) => {
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_ID"),
+        message: req.t('INVALID_ID'),
         status: false,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in  updating popular nft ", err);
+    Utils.echoLog('error in  updating popular nft ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -83,14 +87,14 @@ PopularNftCtr.delete = async (req, res) => {
 
     if (deletePopular && deletePopular.deletedCount > 0) {
       return res.status(200).json({
-        message: req.t("DELETED"),
+        message: req.t('DELETED'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in  deleteing popular nft ", err);
+    Utils.echoLog('error in  deleteing popular nft ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -107,16 +111,16 @@ PopularNftCtr.list = async (req, res) => {
 
     if (listPopular && listPopular.length) {
       return res.status(200).json({
-        message: req.t("POPULARLIST"),
+        message: req.t('POPULARLIST'),
         status: true,
         data: listPopular,
       });
     } else {
     }
   } catch (err) {
-    Utils.echoLog("error in  listing new banner ", err);
+    Utils.echoLog('error in  listing new banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -126,19 +130,23 @@ PopularNftCtr.list = async (req, res) => {
 // listnfts for admin
 PopularNftCtr.listForAdmin = async (req, res) => {
   try {
-    const listPopular = await PopularNftModel.find().sort({
-      ranking,
-    });
+    const listPopular = await PopularNftModel.find()
+      .populate({
+        path: 'nftId',
+      })
+      .sort({
+        ranking: 1,
+      });
 
     return res.status(200).json({
-      message: req.t("POPULARLIST"),
+      message: req.t('POPULARLIST'),
       status: true,
       data: listPopular,
     });
   } catch (err) {
-    Utils.echoLog("error in  creating new banner ", err);
+    Utils.echoLog('error in  creating new banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -148,17 +156,21 @@ PopularNftCtr.listForAdmin = async (req, res) => {
 // get perticular nft details
 PopularNftCtr.getPerticularNftDetails = async (req, res) => {
   try {
-    const getDetails = await PopularNftModel.find({ _id: req.params.id });
+    const getDetails = await PopularNftModel.find({
+      _id: req.params.id,
+    }).populate({
+      path: 'nftId',
+    });
 
     return res.status(200).json({
-      message: req.t("LIST"),
+      message: req.t('LIST'),
       status: true,
       data: getDetails,
     });
   } catch (err) {
-    Utils.echoLog("error in  creating new banner ", err);
+    Utils.echoLog('error in  creating new banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
