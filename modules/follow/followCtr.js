@@ -88,7 +88,7 @@ FollowCtr.checkIsFollowed = async (req, res) => {
     if (req.userData && req.userData._id) {
       const checkIsFollowed = await FollowModel.findOne({
         userId: req.userData._id,
-        follow: req.parms.userId,
+        follow: req.params.userId,
       });
 
       return res.status(200).json({
