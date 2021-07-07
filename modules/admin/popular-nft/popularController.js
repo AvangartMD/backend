@@ -1,5 +1,6 @@
 const PopularNftModel = require('./popularNftModel');
 const Utils = require('../../../helper/utils');
+const LikeModel = require('../../like/likeModel');
 const PopularNftCtr = {};
 
 // add new popular nft
@@ -105,18 +106,54 @@ PopularNftCtr.delete = async (req, res) => {
 
 PopularNftCtr.list = async (req, res) => {
   try {
-    const listPopular = await PopularNftModel.find({ isActive: true }).sort({
-      ranking,
-    });
+    const listPopular = JSON.parse(
+      JSON.stringify(
+        await PopularNftModel.find({ isActive: true })
+          .populate({
+            path: 'nftId',
+            select: { approvedByAdmin: 0, digitalKey: 0 },
+            populate: {
+              path: 'ownerId',
+              select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+              model: 'skills',
+            },
+            populate: {
+              path: 'collectionId',
+              select: { _id: 1, name: 1, description: 1 },
+              model: 'skills',
+            },
+            populate: {
+              path: 'category',
+              select: { _id: 1, isActive: 1, image: 1, categoryName: 1 },
+              model: 'skills',
+            },
+          })
+          .sort({
+            ranking: 1,
+          })
+      )
+    );
 
-    if (listPopular && listPopular.length) {
-      return res.status(200).json({
-        message: req.t('POPULARLIST'),
-        status: true,
-        data: listPopular,
-      });
-    } else {
+    if (req.userData && req.userData._id && listPopular.length) {
+      for (let i = 0; i < listPopular.length; i++) {
+        const checkIsLiked = await LikeModel.findOne({
+          userId: req.userData._id,
+          nftId: listPopular[i].nftId,
+        });
+
+        if (checkIsLiked) {
+          listPopular[i].isLiked = true;
+        } else {
+          listPopular[i].isLiked = false;
+        }
+      }
     }
+
+    return res.status(200).json({
+      message: req.t('POPULARLIST'),
+      status: true,
+      data: listPopular,
+    });
   } catch (err) {
     Utils.echoLog('error in  listing new banner ', err);
     return res.status(500).json({

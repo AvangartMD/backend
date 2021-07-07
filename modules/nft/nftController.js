@@ -494,7 +494,7 @@ nftCtr.getSingleNftDetails = async (req, res) => {
     );
 
     const getEditionDetails = await EditionModel.find({
-      nftId: getSingleNftDetails._id,
+      nftId: getNftDetails._id,
     })
       .populate({
         path: 'ownerId',
