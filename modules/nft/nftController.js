@@ -101,7 +101,7 @@ nftCtr.updateCollection = async (req, res) => {
         fetchCollection.description = req.body.description;
       }
       // remove nft from collection
-      if (req.body.nftId && req.bodynftId.length) {
+      if (req.body.nftId && req.body.nftId.length) {
         // find the nft of that user only
 
         const query = { _id: { $in: req.body.nftId } };
