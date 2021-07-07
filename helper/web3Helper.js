@@ -170,23 +170,44 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
           const result = getBuyedEvents[i].returnValues;
           const order = result['order'];
           const transactionHash = getBuyedEvents[i].transactionHash;
-          console.log('order is:', getBuyedEvents[i]);
-          // order[tokenId],order['seller],order[pricePerNft]
+
+          orderEvent(result, order, transactionHash);
+          itreateEvents(i + 1);
         } else {
+          Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
+          console.log('CRON FIRES ');
+          let object = {
+            endBlock: latestBlockNo,
+          };
+
+          let data = JSON.stringify(object);
+          fs.writeFileSync('./result/orderBlock.json', data);
+          Utils.echoLog('Cron fired successfully for fetching events');
         }
       };
       itreateEvents(0);
+    } else {
+      // update blocks
+      let object = {
+        endBlock: latestBlockNo,
+      };
+
+      let data = JSON.stringify(object);
+      fs.writeFileSync('./result/orderBlock.json', data);
     }
-  } catch (err) {}
+  } catch (err) {
+    Utils.echoLog(`orderBuyedEvent ${err}`);
+  }
 };
 
 async function orderEvent(result, order, transactionId) {
   try {
+    console.log('order is:', order['seller']);
     const getNftDetails = await NftModel.findOne({
       recordId: +order['tokenId'],
     });
     const getUserDetails = await UserModel.findOne({
-      walletAddress: order['seller'].toLowercase(),
+      walletAddress: order['seller'].toLowerCase().trim(),
     });
     if (getNftDetails && getUserDetails) {
       const checkEditionAlreadyAdded = EditionModel.findOne({
@@ -194,7 +215,33 @@ async function orderEvent(result, order, transactionId) {
         edition: order['amount'],
       });
 
+      // check edition added
       if (checkEditionAlreadyAdded) {
+        // check it is second hand sale
+        checkEditionAlreadyAdded.transactionId = transactionId;
+        checkEditionAlreadyAdded.price = order['pricePerNFT'];
+        checkEditionAlreadyAdded.walletAddress = order['seller'];
+        checkEditionAlreadyAdded.saleAction =
+          order['saleType'] === 0
+            ? 'BUY'
+            : order['saleType'] === 1
+            ? 'AUCTION'
+            : 'SECOND_HAND';
+        checkEditionAlreadyAdded.timeline = order['timeline'];
+        checkEditionAlreadyAdded.isOpenForSale = false;
+
+        await checkEditionAlreadyAdded.save();
+
+        const addNewHistory = new HistoryModel({
+          nftId: getNftDetails._id,
+          editionNo: order['amount'],
+          ownerId: getUserDetails._id,
+          text: 'Nft buyed by user',
+          buyPrice: order['pricePerNFT'],
+          timeline: order['timeline'],
+        });
+
+        await addNewHistory.save();
       } else {
         const addNewEdition = new EditionModel({
           nftId: getNftDetails._id,
@@ -203,7 +250,12 @@ async function orderEvent(result, order, transactionId) {
           transactionId: transactionId,
           price: order['pricePerNFT'],
           walletAddress: order['seller'],
-          saleAction: order['saleType'] === 0 ? 'BUY' : 'AUCTION',
+          saleAction:
+            order['saleType'] === 0
+              ? 'BUY'
+              : order['saleType'] === 1
+              ? 'AUCTION'
+              : 'SECOND_HAND',
           timeline: order['timeline'],
         });
 
@@ -220,8 +272,11 @@ async function orderEvent(result, order, transactionId) {
 
         await addNewHistory.save();
       }
+    } else {
+      console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
     }
   } catch (err) {
+    console.log('error in functin', err);
     Utils.echoLog(`Error in check orderEvent ${err}`);
   }
 }

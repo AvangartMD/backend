@@ -43,7 +43,8 @@ const editionSchema = new Schema(
     },
     saleAction: {
       type: String,
-      enum: ['AUCTION', 'BUY'],
+      enum: ['AUCTION', 'BUY', 'SECOND_HAND'],
+      default: null,
     },
     timeline: {
       type: Number,
