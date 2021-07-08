@@ -17,6 +17,25 @@ const webSocketProvider =
     ? 'wss://apis.ankr.com/wss/685960a71c81496fb48ac6f3db62fe0b/bba1c9bfcdf042fa0f335035c21d3ae5/binance/full/test'
     : 'wss://bsc-ws-node.nariox.org:443';
 
+const options = {
+  timeout: 30000,
+  clientConfig: {
+    // Useful if requests are large
+    maxReceivedFrameSize: 100000000, // bytes - default: 1MiB
+    maxReceivedMessageSize: 100000000, // bytes - default: 8MiB
+
+    // Useful to keep a connection alive
+    keepalive: true,
+    keepaliveInterval: -1, // ms
+  },
+  reconnect: {
+    auto: true,
+    delay: 1000, // ms
+    maxAttempts: 10,
+    onTimeout: false,
+  },
+};
+
 const provider =
   process.env.NODE_ENV === 'development'
     ? 'https://data-seed-prebsc-1-s1.binance.org:8545/'
@@ -26,7 +45,16 @@ const getWeb3Event = {};
 
 getWeb3Event.getTransferEvent = async (req, res) => {
   try {
-    const web3 = new Web3(provider);
+    // const web3 = new Web3(provider);
+    const web3 = new Web3(
+      new Web3(
+        new Web3.providers.WebsocketProvider(
+          'wss://bsc.getblock.io/testnet/',
+          options
+        )
+      )
+    );
+
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
@@ -44,10 +72,10 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         // console.log('eis:', e);
         const result = e.returnValues;
         const order = result['order'];
-
         checkMinting(result, order);
       });
   } catch (err) {
+    console.log('err is:', err);
     Utils.echoLog(`Error in web3 listner for mint :${err}`);
   }
 };

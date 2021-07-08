@@ -3,7 +3,7 @@ global._ = require('lodash');
 require('./winston');
 require('./database.js');
 require('../cron/cron');
-// const web3Helper = require('../helper/web3Helper');
+const web3Helper = require('../helper/web3Helper');
 const l10n = require('jm-ez-l10n');
 
 const bodyParser = require('body-parser');
@@ -13,7 +13,7 @@ const mongoose = require('mongoose');
 const app = express();
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-// web3Helper.getTransferEvent();
+web3Helper.getTransferEvent();
 function exitHandler(options) {
   mongoose.connection.close();
   process.exit();
