@@ -8,6 +8,8 @@ const popularRoute = require('./popular-nft/popularRoute');
 const dashbaordRoute = require('./dashboard/dashboardRoute');
 const Auth = require('../../helper/auth');
 const web3Helper = require('../../helper/web3Helper');
+const PopularCollectionRoute = require('./popularCollection/popularCollectionRoute');
+const popularCollectionRoute = require('./popularCollection/popularCollectionRoute');
 
 const adminRoute = express.Router();
 // get roles
@@ -36,6 +38,9 @@ adminRoute.use('/hall-frame-info', frameRoute);
 
 // dahborad route
 adminRoute.use('/dashboard', dashbaordRoute);
+
+// popular collection
+adminRoute.use('/popularCollection', popularCollectionRoute);
 
 // get past events
 const getAllPastEvnets = [web3Helper.getPastEvents];

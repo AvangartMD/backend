@@ -95,6 +95,7 @@ async function checkMinting(result, order) {
 
     // if we get token uri from token contract
     if (getTokenUri) {
+      console.log('token uri is:', getTokenUri);
       // check token id is valid mongoose object id
       const checkIsValid = mongoose.isValidObjectId(getTokenUri);
 
