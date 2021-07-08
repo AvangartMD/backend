@@ -112,21 +112,39 @@ PopularNftCtr.list = async (req, res) => {
           .populate({
             path: 'nftId',
             select: { approvedByAdmin: 0, digitalKey: 0 },
-            populate: {
-              path: 'ownerId',
-              select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
-              model: 'users',
-            },
-            populate: {
-              path: 'collectionId',
-              select: { _id: 1, name: 1, description: 1 },
-              model: 'collection',
-            },
-            populate: {
-              path: 'category',
-              select: { _id: 1, isActive: 1, image: 1, categoryName: 1 },
-              model: 'categories',
-            },
+            populate: [
+              {
+                path: 'ownerId',
+                select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+                model: 'users',
+              },
+              {
+                path: 'collectionId',
+                select: { _id: 1, name: 1, description: 1 },
+                model: 'collection',
+              },
+              {
+                path: 'category',
+                select: { _id: 1, isActive: 1, image: 1, categoryName: 1 },
+                model: 'categories',
+              },
+            ],
+
+            //   populate: {
+            //     path: 'ownerId',
+            //     select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+            //     model: 'users',
+            //   },
+            //   populate: {
+            //     path: 'collectionId',
+            //     select: { _id: 1, name: 1, description: 1 },
+            //     model: 'collection',
+            //   },
+            //   populate: {
+            //     path: 'category',
+            //     select: { _id: 1, isActive: 1, image: 1, categoryName: 1 },
+            //     model: 'categories',
+            //   },
           })
           .sort({
             ranking: 1,

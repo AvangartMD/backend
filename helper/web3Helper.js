@@ -152,7 +152,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
   try {
     const web3 = new Web3(provider);
     const latestBlockNo = await web3.eth.getBlockNumber();
-    console.log('latest block no is:', latestBlockNo);
+    console.log('latest block no is for order:', latestBlockNo);
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
