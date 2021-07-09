@@ -129,7 +129,7 @@ UserMiddleware.addNewUserByAdmin = async (req, res, next) => {
   const schema = Joi.object({
     walletAddress: Joi.string().required(),
     name: Joi.string().required(),
-    profile: Joi.string(),
+    profile: Joi.string().uri(),
     bio: Joi.string(),
     email: Joi.string().email(),
     username: Joi.string().required(),

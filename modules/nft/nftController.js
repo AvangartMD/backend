@@ -387,6 +387,21 @@ nftCtr.listUsersNft = async (req, res) => {
       query.ownerId = req.userData._id;
     }
 
+    if (req.query.status) {
+      if (req.query.status === 'SOLD') {
+        query.saleState = 'SOLD';
+      }
+      if (req.query.status === 'AUCTION') {
+        query.saleState = 'AUCTION';
+        query.auctionEndDate = { $gte: Math.floor(Date.now() / 1000) };
+        query.expr = { $lt: ['nftSold', 'edition'] };
+      }
+      if (req.query.status === 'BUY') {
+        query.saleState = 'BUY';
+        query.expr = { $lt: ['nftSold', 'edition'] };
+      }
+    }
+
     if (req.params.userId) {
       query.ownerId = req.params.userId;
     }

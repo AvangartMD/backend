@@ -109,8 +109,8 @@ async function checkMinting(result, order, nonce) {
           findNft.nonce = +nonce;
 
           if (+order.saleType === 1) {
-            findNft.auctionStartDate = order.timeline;
-            findNft.auctionEndDate = result.timestamp;
+            findNft.auctionStartDate = result.timestamp;
+            findNft.auctionEndDate = order.timeline;
           }
           const saveNft = await findNft.save();
 
@@ -320,7 +320,13 @@ async function orderEvent(result, order, transactionId) {
 
         await addNewHistory.save();
 
+        const getNftSold = getNftDetails.nftSold + 1;
         getNftDetails.nftSold = getNftDetails.nftSold + 1;
+
+        if (getNftSold >= getNftDetails.edition) {
+          getNftDetails.saleState = 'SOLD';
+        }
+
         await getNftDetails.save();
       }
     } else {
