@@ -119,8 +119,8 @@ const listCollectionsForUsers = [NftCtr.getCollectionsList];
 nftRoute.post('/listCollections', listCollectionsForUsers);
 
 // fetch nft history
-const fetchNftHistory = [NftCtr.fetchNftHistory];
-nftRoute.get('/history/:nftId/:edition');
+const fetchNftHistory = [NftCtr.getNftHistory];
+nftRoute.get('/history/:nftId/:edition', fetchNftHistory);
 
 // get liked nft by user
 const listLikedNfts = [auth.isAuthenticatedUser, nftCtr.getLikedNfts];

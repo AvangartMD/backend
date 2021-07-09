@@ -817,7 +817,7 @@ nftCtr.getNftHistory = async (req, res) => {
     }
 
     return res.status(200).json({
-      message: 'NFT_HISTORY',
+      message: req.t('NFT_HISTORY'),
       status: true,
       data: fetchNftHistory,
     });
