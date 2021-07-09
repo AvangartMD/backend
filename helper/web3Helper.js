@@ -211,7 +211,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       toBlock: latestBlockNo,
     });
 
-    // console.log('getBuyedEvents', getBuyedEvents);
+    console.log('getBuyedEvents', getBuyedEvents.length);
 
     if (getBuyedEvents.length) {
       const itreateEvents = async (i) => {
