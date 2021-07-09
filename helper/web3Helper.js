@@ -207,11 +207,9 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       process.env.ESCROW_ADDRESS
     );
     const getBuyedEvents = await contract.getPastEvents('OrderBought', {
-      fromBlock: +OrderBlockJson.endBlock,
+      fromBlock: OrderBlockJson.endBlock,
       toBlock: latestBlockNo,
     });
-
-    console.log('getBuyedEvents', getBuyedEvents.length);
 
     if (getBuyedEvents.length) {
       const itreateEvents = async (i) => {
@@ -219,7 +217,6 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
           const result = getBuyedEvents[i].returnValues;
           const order = result['order'];
           const transactionHash = getBuyedEvents[i].transactionHash;
-
           orderEvent(result, order, transactionHash);
           itreateEvents(i + 1);
         } else {
@@ -251,7 +248,6 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
 async function orderEvent(result, order, transactionId) {
   try {
-    console.log("order['saleType']", order['saleType']);
     const getNftDetails = await NftModel.findOne({
       tokenId: order['tokenId'],
     });
@@ -265,8 +261,6 @@ async function orderEvent(result, order, transactionId) {
         : +order['saleType'] === 1
         ? 'AUCTION'
         : 'SECOND_HAND';
-
-    console.log('sale type is:', saleType);
 
     if (getNftDetails && getUserDetails) {
       const checkEditionAlreadyAdded = await EditionModel.findOne({
@@ -300,7 +294,7 @@ async function orderEvent(result, order, transactionId) {
         const addNewEdition = new EditionModel({
           nftId: getNftDetails._id,
           ownerId: getUserDetails._id,
-          edition: +order['amount'],
+          edition: +result['amount'],
           transactionId: transactionId,
           price: order['pricePerNFT'],
           walletAddress: order['seller'],
