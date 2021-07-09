@@ -849,7 +849,51 @@ nftCtr.getLikedNfts = async (req, res) => {
 // get buyed Nfts
 nftCtr.getUserBuyedNfts = async (req, res) => {
   try {
-  } catch (err) {}
+    const editions = await EditionModel.find({ ownerId: req.userData._id });
+    const userNfts = [];
+
+    if (editions.length) {
+      for (let i = 0; i < editions.length; i++) {
+        userNfts.push(editions._id);
+      }
+
+      const fetchUserNft = await NftModel.find(
+        { _id: { $in: userNfts } },
+        { digitalKey: 0, createdAt: 0, updatedAt: 0 }
+      )
+        .populate({
+          path: 'collectionId',
+          select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'category',
+          select: { createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'ownerId',
+          select: { name: 1, username: 1, profile: 1, name: 1 },
+        });
+
+      return res.status(200).json({
+        message: 'USER_OWNED_NFT',
+        status: true,
+        data: fetchUserNft,
+      });
+    } else {
+      return res.status(200).json({
+        message: 'USER_OWNED_NFT',
+        status: true,
+        data: [],
+      });
+    }
+  } catch (err) {
+    Utils.echoLog(`Error in list user buyed nfts `);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
 };
 
 module.exports = nftCtr;

@@ -118,4 +118,12 @@ nftRoute.post('/listCollections', listCollectionsForUsers);
 const fetchNftHistory = [NftCtr.fetchNftHistory];
 nftRoute.get('/history/:nftId/:edition');
 
+// get liked nft by user
+const listLikedNfts = [auth.isAuthenticatedUser, nftCtr.getLikedNfts];
+nftRoute.get('/getLikedNfts', listLikedNfts);
+
+// get buyed events
+const getBuyedEvents = [auth.isAuthenticatedUser, nftCtr.getUserBuyedNfts];
+nftRoute.get('/getCollectedNfts', getBuyedEvents);
+
 module.exports = nftRoute;
