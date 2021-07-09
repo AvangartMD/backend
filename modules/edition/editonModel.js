@@ -38,7 +38,7 @@ const editionSchema = new Schema(
     },
     saleType: {
       type: String,
-      enum: ['OFFER'],
+      enum: ['OFFER', null],
       default: null,
     },
     saleAction: {
