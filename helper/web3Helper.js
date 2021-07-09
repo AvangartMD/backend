@@ -157,8 +157,12 @@ getWeb3Event.getPastEvents = async (req, res) => {
       ContractAbi,
       process.env.ESCROW_ADDRESS
     );
+    // get last block synced
+    const orderBlockFile = fs.readFileSync('./result/blockNo.json', 'utf-8');
+    const orderBlock = JSON.parse(orderBlockFile);
+
     const getPastEvents = await contract.getPastEvents('OrderPlaced', {
-      fromBlock: +BlockJson.endBlock,
+      fromBlock: +orderBlock.endBlock,
       toBlock: latestBlockNo,
     });
 
@@ -206,8 +210,11 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       ContractAbi,
       process.env.ESCROW_ADDRESS
     );
+    const orderBlockFile = fs.readFileSync('./result/orderBlock.json', 'utf-8');
+    const orderBlock = JSON.parse(orderBlockFile);
+
     const getBuyedEvents = await contract.getPastEvents('OrderBought', {
-      fromBlock: +OrderBlockJson.endBlock,
+      fromBlock: orderBlock.endBlock,
       toBlock: latestBlockNo,
     });
 
