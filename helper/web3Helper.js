@@ -251,7 +251,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
 async function orderEvent(result, order, transactionId) {
   try {
-    console.log("+order['tokenId']", +order['tokenId']);
+    console.log("order['saleType']", order['saleType']);
     const getNftDetails = await NftModel.findOne({
       tokenId: order['tokenId'],
     });
@@ -260,11 +260,10 @@ async function orderEvent(result, order, transactionId) {
     });
     if (getNftDetails && getUserDetails) {
       const checkEditionAlreadyAdded = await EditionModel.findOne({
-        nftId: getUserDetails._id,
-        edition: order['amount'],
+        nftId: getNftDetails._id,
+        edition: +order['amount'],
       });
 
-      console.log('check edition is:', checkEditionAlreadyAdded);
       // check edition added
       if (checkEditionAlreadyAdded) {
         // check it is second hand sale
@@ -272,9 +271,9 @@ async function orderEvent(result, order, transactionId) {
         checkEditionAlreadyAdded.price = order['pricePerNFT'];
         checkEditionAlreadyAdded.walletAddress = order['seller'];
         checkEditionAlreadyAdded.saleAction =
-          order['saleType'] === 0
+          +order['saleType'] === 0
             ? 'BUY'
-            : order['saleType'] === 1
+            : +order['saleType'] === 1
             ? 'AUCTION'
             : 'SECOND_HAND';
         checkEditionAlreadyAdded.timeline = order['timeline'];
@@ -301,9 +300,9 @@ async function orderEvent(result, order, transactionId) {
           price: order['pricePerNFT'],
           walletAddress: order['seller'],
           saleAction:
-            order['saleType'] === 0
+            +order['saleType'] === 0
               ? 'BUY'
-              : order['saleType'] === 1
+              : +order['saleType'] === 1
               ? 'AUCTION'
               : 'SECOND_HAND',
           timeline: order['timeline'],
