@@ -112,10 +112,22 @@ async function checkMinting(result, order, nonce) {
             findNft.auctionEndDate = result.timestamp;
           }
           const saveNft = await findNft.save();
+
           const findUser = await UserModel.findById(saveNft.ownerId);
           if (findUser) {
             findUser.nftCreated = findUser.nftCreated + 1;
             await findUser.save();
+
+            const addNewHistory = new HistoryModel({
+              nftId: saveNft._id,
+              editionNo: null,
+              ownerId: findUser._id,
+              text: 'Nft minted by user',
+              buyPrice: saveNft.price,
+              timeline: +new Date() / 1000,
+            });
+
+            addNewHistory.save();
           }
         } else if (findNft && findNft.tokenId) {
           // console.log('token already minted');

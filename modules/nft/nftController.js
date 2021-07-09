@@ -6,6 +6,7 @@ const EditionModel = require('../edition/editonModel');
 const HistoryModel = require('../history/historyModel');
 // const EditionModel = require('../edition/editonModel');
 const { statusObject } = require('../../helper/enum');
+const { query } = require('winston');
 
 const nftCtr = {};
 // add a new NFT
@@ -379,8 +380,12 @@ nftCtr.listUsersNft = async (req, res) => {
       query.status = 'NOT_MINTED';
     }
 
-    if (req.userData.role !== 'ADMIN') {
+    if (req.userData.role !== 'ADMIN' && !req.params.userId) {
       query.ownerId = req.userData._id;
+    }
+
+    if (req.params.userId) {
+      query.ownerId = req.params.userId;
     }
 
     const list = await NftModel.find(query, {
@@ -814,7 +819,13 @@ nftCtr.getNftHistory = async (req, res) => {
 // get liked nfts by user
 nftCtr.getLikedNfts = async (req, res) => {
   try {
-    const getLikedNfts = await LikeModel.find({ userId: req.userData._id });
+    let query = {};
+    if (req.parms.userId) {
+      query.userId = req.params.userId;
+    } else {
+      query.userId = req.userData._id;
+    }
+    const getLikedNfts = await LikeModel.find(query);
     const nftIds = [];
     if (getLikedNfts.length) {
       for (let i = 0; i < getLikedNfts.length; i++) {
@@ -863,7 +874,14 @@ nftCtr.getLikedNfts = async (req, res) => {
 // get buyed Nfts
 nftCtr.getUserBuyedNfts = async (req, res) => {
   try {
-    const editions = await EditionModel.find({ ownerId: req.userData._id });
+    let query = {};
+    if (req.parms.userId) {
+      query.ownerId = req.params.userId;
+    } else {
+      query.ownerId = req.userData._id;
+    }
+
+    const editions = await EditionModel.find(query);
     const userNfts = [];
 
     if (editions.length) {

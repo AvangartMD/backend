@@ -11,7 +11,7 @@ const historySchema = new Schema(
     },
     editionNo: {
       type: Number,
-      default: 0,
+      default: null,
     },
     text: {
       type: String,

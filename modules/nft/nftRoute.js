@@ -67,6 +67,10 @@ nftRoute.get('/listCollectionForAdmin', getCollectionListForAdmin);
 const getUserNft = [auth.isAuthenticatedUser, NftCtr.listUsersNft];
 nftRoute.get('/listNftByUser', getUserNft);
 
+// get nft details after passing userID
+const getUserNftById = [auth.isAuthenticatedUser, NftCtr.listUsersNft];
+nftRoute.get('/listNftByUser/:userId', getUserNft);
+
 // get single nft details
 const getSingleNftDetails = [
   auth.checkIsAutheticated,
@@ -122,8 +126,16 @@ nftRoute.get('/history/:nftId/:edition');
 const listLikedNfts = [auth.isAuthenticatedUser, nftCtr.getLikedNfts];
 nftRoute.get('/getLikedNfts', listLikedNfts);
 
+// get likes by user ID
+const listLikedNftsByUserId = [nftCtr.getLikedNfts];
+nftRoute.get('/getLikedNfts/:userId', listLikedNftsByUserId);
+
 // get buyed events
 const getBuyedEvents = [auth.isAuthenticatedUser, nftCtr.getUserBuyedNfts];
 nftRoute.get('/getCollectedNfts', getBuyedEvents);
+
+// get buyed nfts by user id
+const getBuyedEventsByUserId = [nftCtr.getUserBuyedNfts];
+nftRoute.get('/getCollectedNfts/:userId', getBuyedEvents);
 
 module.exports = nftRoute;
