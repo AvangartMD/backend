@@ -259,7 +259,7 @@ async function orderEvent(result, order, transactionId) {
       walletAddress: order['seller'].toLowerCase().trim(),
     });
     if (getNftDetails && getUserDetails) {
-      const checkEditionAlreadyAdded = EditionModel.findOne({
+      const checkEditionAlreadyAdded = await EditionModel.findOne({
         nftId: getUserDetails._id,
         edition: order['amount'],
       });
