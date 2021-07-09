@@ -835,7 +835,7 @@ nftCtr.getNftHistory = async (req, res) => {
 nftCtr.getLikedNfts = async (req, res) => {
   try {
     let query = {};
-    if (req.parms.userId) {
+    if (req.params.userId) {
       query.userId = req.params.userId;
     } else {
       query.userId = req.userData._id;
@@ -890,7 +890,7 @@ nftCtr.getLikedNfts = async (req, res) => {
 nftCtr.getUserBuyedNfts = async (req, res) => {
   try {
     let query = {};
-    if (req.parms.userId) {
+    if (req.params.userId) {
       query.ownerId = req.params.userId;
     } else {
       query.ownerId = req.userData._id;
