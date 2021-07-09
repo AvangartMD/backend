@@ -813,7 +813,7 @@ nftCtr.getNftHistory = async (req, res) => {
       )
     );
     if (fetchNftCreated) {
-      fetchNftHistory.unshift(fethcNftCreated);
+      fetchNftHistory.unshift(fetchNftCreated);
     }
 
     return res.status(200).json({
