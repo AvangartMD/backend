@@ -258,6 +258,16 @@ async function orderEvent(result, order, transactionId) {
     const getUserDetails = await UserModel.findOne({
       walletAddress: order['seller'].toLowerCase().trim(),
     });
+
+    const saleType =
+      +order['saleType'] === 0
+        ? 'BUY'
+        : +order['saleType'] === 1
+        ? 'AUCTION'
+        : 'SECOND_HAND';
+
+    console.log('sale type is:', saleType);
+
     if (getNftDetails && getUserDetails) {
       const checkEditionAlreadyAdded = await EditionModel.findOne({
         nftId: getNftDetails._id,
@@ -270,12 +280,7 @@ async function orderEvent(result, order, transactionId) {
         checkEditionAlreadyAdded.transactionId = transactionId;
         checkEditionAlreadyAdded.price = order['pricePerNFT'];
         checkEditionAlreadyAdded.walletAddress = order['seller'];
-        checkEditionAlreadyAdded.saleAction =
-          +order['saleType'] === 0
-            ? 'BUY'
-            : +order['saleType'] === 1
-            ? 'AUCTION'
-            : 'SECOND_HAND';
+        checkEditionAlreadyAdded.saleAction = saleType;
         checkEditionAlreadyAdded.timeline = order['timeline'];
         checkEditionAlreadyAdded.isOpenForSale = false;
 
@@ -299,12 +304,8 @@ async function orderEvent(result, order, transactionId) {
           transactionId: transactionId,
           price: order['pricePerNFT'],
           walletAddress: order['seller'],
-          saleAction:
-            +order['saleType'] === 0
-              ? 'BUY'
-              : +order['saleType'] === 1
-              ? 'AUCTION'
-              : 'SECOND_HAND',
+          saleAction: saleType,
+
           timeline: order['timeline'],
         });
 
