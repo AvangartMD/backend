@@ -248,6 +248,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
 async function orderEvent(result, order, transactionId) {
   try {
+    console.log("+result['amount']", +result['amount']);
     const getNftDetails = await NftModel.findOne({
       tokenId: order['tokenId'],
     });
