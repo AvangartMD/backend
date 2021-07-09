@@ -207,9 +207,13 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       process.env.ESCROW_ADDRESS
     );
     const getBuyedEvents = await contract.getPastEvents('OrderBought', {
-      fromBlock: OrderBlockJson.endBlock,
+      fromBlock: +OrderBlockJson.endBlock,
       toBlock: latestBlockNo,
     });
+
+    console.log(
+      `cron from block ${+OrderBlockJson.endBlock} -- ${latestBlockNo} `
+    );
 
     if (getBuyedEvents.length) {
       const itreateEvents = async (i) => {
