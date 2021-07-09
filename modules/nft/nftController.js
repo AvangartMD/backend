@@ -791,15 +791,30 @@ nftCtr.getNftHistory = async (req, res) => {
     const nftId = req.params.nftId;
     const edition = req.params.edition;
 
-    const fetchNftHistory = await HistoryModel.find({
-      nftId,
-      editionNo: edition,
-    })
-      .populate({
-        path: 'ownerId',
-        select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
-      })
-      .sort({ timeline: 1 });
+    const fetchNftCreated = await HistoryModel.findOne({
+      nftId: req.params.nftId,
+      editionNo: null,
+    }).populate({
+      path: 'ownerId',
+      select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+    });
+
+    const fetchNftHistory = JSON.parse(
+      JSON.stringify(
+        await HistoryModel.find({
+          nftId,
+          editionNo: edition,
+        })
+          .populate({
+            path: 'ownerId',
+            select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+          })
+          .sort({ timeline: 1 })
+      )
+    );
+    if (fetchNftCreated) {
+      fetchNftHistory.unshift(fethcNftCreated);
+    }
 
     return res.status(200).json({
       message: 'NFT_HISTORY',
