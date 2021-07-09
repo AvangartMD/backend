@@ -101,6 +101,10 @@ const nftSchema = new Schema(
       type: Number,
       default: null,
     },
+    nftSold: {
+      type: Number,
+      default: 0,
+    },
     coCreator: {
       userId: {
         type: Schema.Types.ObjectId,

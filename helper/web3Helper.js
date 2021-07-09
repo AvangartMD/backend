@@ -319,6 +319,9 @@ async function orderEvent(result, order, transactionId) {
         });
 
         await addNewHistory.save();
+
+        getNftDetails.nftSold = getNftDetails.nftSold + 1;
+        await getNftDetails.save();
       }
     } else {
       console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
