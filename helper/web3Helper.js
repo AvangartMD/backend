@@ -70,9 +70,10 @@ getWeb3Event.getTransferEvent = async (req, res) => {
       })
       .on('data', async (e) => {
         // console.log('eis:', e);
+        const nonce = getPastEvents[i].returnValues.nonce;
         const result = e.returnValues;
         const order = result['order'];
-        checkMinting(result, order);
+        checkMinting(result, order, nonce);
       });
   } catch (err) {
     console.log('err is:', err);
@@ -142,6 +143,7 @@ async function checkMinting(result, order, nonce) {
       Utils.echoLog(`Invalid token Uri ${getTokenUri}`);
     }
   } catch (err) {
+    console.log('error in check minting', err);
     Utils.echoLog(`Error in check minting ${err}`);
   }
 }
@@ -163,7 +165,7 @@ getWeb3Event.getPastEvents = async (req, res) => {
     if (getPastEvents.length) {
       const itreateEvents = (i) => {
         if (i < getPastEvents.length) {
-          console.log('getPastEvents', getPastEvents[i].returnValues);
+          // console.log('getPastEvents', getPastEvents[i].returnValues);
           // const result = getPastEvents[i].returnValues;
           const nonce = getPastEvents[i].returnValues.nonce;
           const result = getPastEvents[i].returnValues;
