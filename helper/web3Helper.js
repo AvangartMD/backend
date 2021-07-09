@@ -125,7 +125,7 @@ async function checkMinting(result, order, nonce) {
               ownerId: findUser._id,
               text: 'Nft minted by user',
               buyPrice: saveNft.price,
-              timeline: +new Date() / 1000,
+              timeline: Math.floor(Date.now() / 1000),
             });
 
             addNewHistory.save();
@@ -251,7 +251,6 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
 async function orderEvent(result, order, transactionId) {
   try {
-    console.log('order is:', order['seller']);
     const getNftDetails = await NftModel.findOne({
       recordId: +order['tokenId'],
     });
