@@ -49,10 +49,7 @@ const getList = [Auth.isAuthenticatedUser, NftCtr.getCollectionByUsers];
 nftRoute.get('/listCollection', getList);
 
 // get user collection by user id
-const getCollectionListById = [
-  Auth.isAuthenticatedUser,
-  NftCtr.getCollectionByUsers,
-];
+const getCollectionListById = [NftCtr.getCollectionByUsers];
 nftRoute.get('/listCollection/:id', getCollectionListById);
 
 // get list of collection for admin

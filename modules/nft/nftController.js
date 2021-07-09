@@ -222,7 +222,10 @@ nftCtr.getCollectionByUsers = async (req, res) => {
         isActive: 1,
       },
       { isActive: 0, createdAt: 0, updatedAt: 0 }
-    );
+    ).populate({
+      path: 'ownerId',
+      select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+    });
 
     return res.status(200).json({
       message: req.t('COLLECTION_LIST'),
