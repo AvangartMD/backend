@@ -270,7 +270,7 @@ async function orderEvent(result, order, transactionId) {
     if (getNftDetails && getUserDetails) {
       const checkEditionAlreadyAdded = await EditionModel.findOne({
         nftId: getNftDetails._id,
-        edition: +order['amount'],
+        edition: +result['amount'],
       });
 
       // check edition added
