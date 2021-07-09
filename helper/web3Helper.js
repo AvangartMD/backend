@@ -80,7 +80,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
   }
 };
 
-async function checkMinting(result, order) {
+async function checkMinting(result, order, nonce) {
   try {
     const web3 = new Web3(provider);
 
@@ -105,6 +105,8 @@ async function checkMinting(result, order) {
         if (findNft && !findNft.tokenId) {
           findNft.tokenId = order.tokenId;
           findNft.status = statusObject.APPROVED;
+          findNft.nonce = +nonce;
+
           if (+order.saleType === 1) {
             findNft.auctionStartDate = order.timeline;
             findNft.auctionEndDate = result.timestamp;
@@ -136,7 +138,7 @@ getWeb3Event.getPastEvents = async (req, res) => {
   try {
     const web3 = new Web3(provider);
     const latestBlockNo = await web3.eth.getBlockNumber();
-    console.log('latest block no is:', latestBlockNo);
+
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
@@ -149,10 +151,13 @@ getWeb3Event.getPastEvents = async (req, res) => {
     if (getPastEvents.length) {
       const itreateEvents = (i) => {
         if (i < getPastEvents.length) {
+          console.log('getPastEvents', getPastEvents[i].returnValues);
+          // const result = getPastEvents[i].returnValues;
+          const nonce = getPastEvents[i].returnValues.nonce;
           const result = getPastEvents[i].returnValues;
           const order = result['order'];
-          console.log('order is', order);
-          checkMinting(result, order);
+
+          checkMinting(result, order, nonce);
           itreateEvents(i + 1);
         } else {
           let object = {

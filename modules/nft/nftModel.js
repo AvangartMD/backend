@@ -88,10 +88,15 @@ const nftSchema = new Schema(
       type: Number,
       default: 1,
     },
+    nonce: {
+      type: Number,
+      default: null,
+    },
     auctionStartDate: {
       type: Number,
       default: null,
     },
+
     auctionEndDate: {
       type: Number,
       default: null,
