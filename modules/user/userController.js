@@ -230,6 +230,19 @@ UserCtr.list = async (req, res) => {
       query.status = req.query.status.toUpperCase();
     }
 
+    if (req.query.pagination === 'false') {
+      const listAll = await UserModel.find(query).populate({
+        path: 'role',
+        select: { _id: 1, roleName: 1 },
+      });
+
+      return res.status(200).json({
+        message: req.t('SUCCESS'),
+        status: true,
+        data: listAll,
+      });
+    }
+
     const totalCount = await UserModel.countDocuments(query);
     const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
 

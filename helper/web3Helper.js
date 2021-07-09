@@ -151,6 +151,7 @@ getWeb3Event.getPastEvents = async (req, res) => {
         if (i < getPastEvents.length) {
           const result = getPastEvents[i].returnValues;
           const order = result['order'];
+          console.log('order is', order);
           checkMinting(result, order);
           itreateEvents(i + 1);
         } else {

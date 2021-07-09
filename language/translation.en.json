@@ -78,5 +78,6 @@
     "LIKE_STATUS": "like status ",
     "ALREADY_ADDED_POPULAR": "Nft Already Added to popular list",
     "NFT_HISTORY": "Nft History ",
-    "LIKED_NFT": "Liked Nft by user"
+    "LIKED_NFT": "Liked Nft by user",
+    "USER_OWNED_NFT": "Users Buyed Nft"
 }

@@ -592,10 +592,24 @@ nftCtr.listCollectionNft = async (req, res) => {
         status: statusObject.APPROVED,
       },
       { digitalKey: 0, createdAt: 0, updatedAt: 0 }
-    ).populate({
-      path: 'category',
-      select: { _id: 1, isActive: 1, image: 1 },
-    });
+    )
+      .populate({
+        path: 'category',
+        select: { _id: 1, isActive: 1, image: 1 },
+      })
+      .populate({
+        path: 'ownerId',
+        select: {
+          _id: 1,
+          walletAddress: 1,
+          username: 1,
+          followersCount: 1,
+          followingCount: 1,
+          name: 1,
+          profile: 1,
+          cover: 1,
+        },
+      });
 
     getCollectionDetails.nft = getNftDetails;
     getCollectionDetails.isOwner = false;
