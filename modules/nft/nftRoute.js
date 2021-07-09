@@ -114,4 +114,8 @@ nftRoute.post('/listMarketPlace', marketPlaceNft);
 const listCollectionsForUsers = [NftCtr.getCollectionsList];
 nftRoute.post('/listCollections', listCollectionsForUsers);
 
+// fetch nft history
+const fetchNftHistory = [NftCtr.fetchNftHistory];
+nftRoute.get('/history/:nftId/:edition');
+
 module.exports = nftRoute;

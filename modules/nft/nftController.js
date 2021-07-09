@@ -2,8 +2,9 @@ const NftModel = require('./nftModel');
 const CollectionModel = require('./collectionModel');
 const LikeModel = require('../like/likeModel');
 const Utils = require('../../helper/utils');
-const NftMiddleware = require('./nftMiddleware');
 const EditionModel = require('../edition/editonModel');
+const HistoryModel = require('../history/historyModel');
+// const EditionModel = require('../edition/editonModel');
 const { statusObject } = require('../../helper/enum');
 
 const nftCtr = {};
@@ -504,7 +505,7 @@ nftCtr.getSingleNftDetails = async (req, res) => {
         edition: 1,
       });
 
-    getNftDetails.edition = getEditionDetails;
+    getNftDetails.editions = getEditionDetails;
 
     if (req.userData && req.userData._id) {
       const checkIsLiked = await LikeModel.findOne({
@@ -763,6 +764,92 @@ nftCtr.getCollectionsList = async (req, res) => {
       err: err.message ? err.message : err,
     });
   }
+};
+
+// get nft history
+nftCtr.getNftHistory = async (req, res) => {
+  try {
+    const nftId = req.params.nftId;
+    const edition = req.params.edition;
+
+    const fetchNftHistory = await HistoryModel.find({
+      nftId,
+      editionNo: edition,
+    })
+      .populate({
+        path: 'ownerId',
+        select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+      })
+      .sort({ timeline: 1 });
+
+    return res.status(200).json({
+      message: 'NFT_HISTORY',
+      status: true,
+      data: fetchNftHistory,
+    });
+  } catch (err) {
+    Utils.echoLog(`Error inlist nft for market place`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get liked nfts by user
+nftCtr.getLikedNfts = async (req, res) => {
+  try {
+    const getLikedNfts = await LikeModel.find({ userId: req.userData._id });
+    const nftIds = [];
+    if (getLikedNfts.length) {
+      for (let i = 0; i < getLikedNfts.length; i++) {
+        nftIds.push(getLikedNfts._id);
+      }
+
+      const nfts = await NftModel.find(
+        { _id: { $in: nftIds } },
+        { digitalKey: 0, createdAt: 0, updatedAt: 0 }
+      )
+        .populate({
+          path: 'collectionId',
+          select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'category',
+          select: { createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'ownerId',
+          select: { name: 1, username: 1, profile: 1, name: 1 },
+        });
+
+      return res.status(200).json({
+        message: 'LIKED_NFT',
+        status: true,
+        data: nfts,
+      });
+    } else {
+      return res.status(200).json({
+        message: 'LIKED_NFT',
+        status: true,
+        data: [],
+      });
+    }
+  } catch (err) {
+    Utils.echoLog(`Error in list liked nfts `);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get buyed Nfts
+nftCtr.getUserBuyedNfts = async (req, res) => {
+  try {
+  } catch (err) {}
 };
 
 module.exports = nftCtr;
