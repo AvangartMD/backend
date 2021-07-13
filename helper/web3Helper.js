@@ -227,6 +227,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
         if (i < getBuyedEvents.length) {
           const result = getBuyedEvents[i].returnValues;
           const order = result['order'];
+          console.log('order is:', result['buyer']);
           const transactionHash = getBuyedEvents[i].transactionHash;
           orderEvent(result, order, transactionHash);
           itreateEvents(i + 1);
@@ -264,7 +265,7 @@ async function orderEvent(result, order, transactionId) {
       tokenId: order['tokenId'],
     });
     const getUserDetails = await UserModel.findOne({
-      walletAddress: order['seller'].toLowerCase().trim(),
+      walletAddress: result['buyer'].toLowerCase().trim(),
     });
 
     const saleType =
@@ -285,7 +286,7 @@ async function orderEvent(result, order, transactionId) {
         // check it is second hand sale
         checkEditionAlreadyAdded.transactionId = transactionId;
         checkEditionAlreadyAdded.price = order['pricePerNFT'];
-        checkEditionAlreadyAdded.walletAddress = order['seller'];
+        checkEditionAlreadyAdded.walletAddress = result['buyer'];
         checkEditionAlreadyAdded.saleAction = saleType;
         checkEditionAlreadyAdded.timeline = order['timeline'];
         checkEditionAlreadyAdded.isOpenForSale = false;
@@ -309,7 +310,7 @@ async function orderEvent(result, order, transactionId) {
           edition: +result['amount'],
           transactionId: transactionId,
           price: order['pricePerNFT'],
-          walletAddress: order['seller'],
+          walletAddress: result['buyer'],
           saleAction: saleType,
 
           timeline: order['timeline'],

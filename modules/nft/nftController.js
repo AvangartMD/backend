@@ -641,7 +641,7 @@ nftCtr.listCollectionNft = async (req, res) => {
       req.userData &&
       req.userData._id &&
       getCollectionDetails &&
-      getCollectionDetails?.ownerId
+      getCollectionDetails.ownerId
     ) {
       if (
         req.userData._id.toString().toLowerCase() ===
