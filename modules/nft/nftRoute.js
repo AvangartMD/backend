@@ -65,7 +65,7 @@ const getUserNft = [auth.isAuthenticatedUser, NftCtr.listUsersNft];
 nftRoute.get('/listNftByUser', getUserNft);
 
 // get nft details after passing userID
-const getUserNftById = [auth.isAuthenticatedUser, NftCtr.listUsersNft];
+const getUserNftById = [NftCtr.listUsersNft];
 nftRoute.get('/listNftByUser/:userId', getUserNft);
 
 // get single nft details
@@ -135,7 +135,7 @@ nftRoute.get('/getCollectedNfts', getBuyedEvents);
 const getBuyedEventsByUserId = [nftCtr.getUserBuyedNfts];
 nftRoute.get('/getCollectedNfts/:userId', getBuyedEventsByUserId);
 
-// add aedition to buy now or accept fro offer
+// add edition to buy now or accept for offer
 const editionSell = [
   Auth.isAuthenticatedUser,
   NftMiddleware.EditionUpdate,

@@ -394,7 +394,7 @@ nftCtr.listUsersNft = async (req, res) => {
       if (req.query.status === 'AUCTION') {
         query.saleState = 'AUCTION';
         query.auctionEndDate = { $gte: Math.floor(Date.now() / 1000) };
-        query.expr = { $lt: ['nftSold', 'edition'] };
+        // query.expr = { $lt: ['nftSold', 'edition'] };
       }
       if (req.query.status === 'BUY') {
         query.saleState = 'BUY';
