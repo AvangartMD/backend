@@ -62,7 +62,7 @@ nftRoute.get('/listCollectionForAdmin', getCollectionListForAdmin);
 
 // get nft details after passing userID
 const getUserNftById = [NftCtr.listUsersNft];
-nftRoute.get('/listNftByUser/:userId', getUserNft);
+nftRoute.get('/listNftByUser/:userId', getUserNftById);
 
 // get user nft
 const getUserNft = [auth.isAuthenticatedUser, NftCtr.listUsersNft];
