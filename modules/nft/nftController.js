@@ -383,7 +383,7 @@ nftCtr.listUsersNft = async (req, res) => {
       query.status = 'NOT_MINTED';
     }
 
-    if (req.userData.role !== 'ADMIN' && !req.params.userId) {
+    if (req.userData && req.userData.role !== 'ADMIN' && !req.params.userId) {
       query.ownerId = req.userData._id;
     }
 
@@ -429,6 +429,7 @@ nftCtr.listUsersNft = async (req, res) => {
       data: list,
     });
   } catch (err) {
+    console.log('er is:', err);
     Utils.echoLog('error in listing user  nft  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
