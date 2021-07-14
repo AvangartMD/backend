@@ -377,7 +377,7 @@ nftCtr.mintNft = async (req, res) => {
 // list user NFT
 nftCtr.listUsersNft = async (req, res) => {
   try {
-    const query = { status: 'APPROVED' };
+    let query = { status: 'APPROVED' };
 
     if (req.query.filter === 'draft') {
       query.status = 'NOT_MINTED';
@@ -403,6 +403,8 @@ nftCtr.listUsersNft = async (req, res) => {
             { saleState: 'BUY' },
           ],
         };
+
+        query.status = 'APPROVED';
         // query.expr = { $lt: ['nftSold', 'edition'] };
       }
     }
