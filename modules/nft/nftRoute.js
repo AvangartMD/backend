@@ -133,6 +133,15 @@ nftRoute.get('/getCollectedNfts', getBuyedEvents);
 
 // get buyed nfts by user id
 const getBuyedEventsByUserId = [nftCtr.getUserBuyedNfts];
-nftRoute.get('/getCollectedNfts/:userId', getBuyedEvents);
+nftRoute.get('/getCollectedNfts/:userId', getBuyedEventsByUserId);
+
+// add aedition to buy now or accept fro offer
+const editionSell = [
+  Auth.isAuthenticatedUser,
+  NftMiddleware.EditionUpdate,
+  NftMiddleware.checkEditionOwner,
+  nftCtr.addNftToSecondHandSales,
+];
+nftRoute.post('/addToSecondHand', editionSell);
 
 module.exports = nftRoute;

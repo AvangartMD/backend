@@ -961,4 +961,45 @@ nftCtr.getUserBuyedNfts = async (req, res) => {
   }
 };
 
+// // add nft to second hand sales
+nftCtr.addNftToSecondHandSales = async (req, res) => {
+  try {
+    const fetchEditionDetails = await EditionModel.findOne({
+      _id: req.body.editionId,
+    });
+
+    if (fetchEditionDetails) {
+      if (req.body.saleType === 'BUY') {
+        fetchEditionDetails.saleType.type = 'BUY';
+        fetchEditionDetails.saleAction = 'SECOND_HAND';
+        fetchEditionDetails.saleType.price = +req.body.price;
+      }
+      if (req.body.saleType === 'OFFER') {
+        fetchEditionDetails.saleType.type = 'OFFER';
+        fetchEditionDetails.saleAction = 'SECOND_HAND';
+        fetchEditionDetails.saleType.price = 0;
+      }
+
+      await fetchEditionDetails.save();
+
+      return res.status(200).json({
+        message: req.t('EDITION_UPDATED'),
+        status: true,
+      });
+    } else {
+      return res.status(400).json({
+        message: req.t('INVALID_EDITION_DETAILS'),
+        status: false,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog(`Err in addNftToSecondHandSales ${err}`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
 module.exports = nftCtr;

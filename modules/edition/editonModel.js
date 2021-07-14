@@ -37,10 +37,10 @@ const editionSchema = new Schema(
       default: false,
     },
     saleType: {
-      type: String,
-      enum: ['OFFER', null],
-      default: null,
+      type: { type: String, enum: ['OFFER', 'BUY', null], default: null },
+      price: { type: Number, default: 0 },
     },
+
     saleAction: {
       type: String,
       enum: ['AUCTION', 'BUY', 'SECOND_HAND'],
