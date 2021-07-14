@@ -973,11 +973,13 @@ nftCtr.addNftToSecondHandSales = async (req, res) => {
         fetchEditionDetails.saleType.type = 'BUY';
         fetchEditionDetails.saleAction = 'SECOND_HAND';
         fetchEditionDetails.saleType.price = +req.body.price;
+        fetchEditionDetails.isOpenForSale = true;
       }
       if (req.body.saleType === 'OFFER') {
         fetchEditionDetails.saleType.type = 'OFFER';
         fetchEditionDetails.saleAction = 'SECOND_HAND';
         fetchEditionDetails.saleType.price = 0;
+        fetchEditionDetails.isOpenForSale = true;
       }
 
       await fetchEditionDetails.save();
