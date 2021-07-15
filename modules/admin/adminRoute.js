@@ -6,6 +6,7 @@ const infoRoute = require('./info/infoRoute');
 const frameRoute = require('./hall-frame-info/infoRoute');
 const popularRoute = require('./popular-nft/popularRoute');
 const dashbaordRoute = require('./dashboard/dashboardRoute');
+const profileInfoRoute = require('./profile-info/profileInfoRoute');
 const Auth = require('../../helper/auth');
 
 const adminRoute = express.Router();
@@ -35,4 +36,8 @@ adminRoute.use('/hall-frame-info', frameRoute);
 
 // dahborad route
 adminRoute.use('/dashboard', dashbaordRoute);
+
+// profile info route
+adminRoute.use('/profile-info', profileInfoRoute);
+
 module.exports = adminRoute;
