@@ -281,6 +281,8 @@ async function orderEvent(result, order, transactionId) {
         edition: +result['amount'],
       });
 
+      console.log('check edition is:', checkEditionAlreadyAdded);
+
       // check edition added
       if (checkEditionAlreadyAdded) {
         // check it is second hand sale
