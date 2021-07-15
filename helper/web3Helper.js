@@ -223,6 +223,8 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
     );
 
     if (getBuyedEvents.length) {
+      getBuyedEvents.sort((a, b) => +a.blockNumber - +b.blockNumber);
+
       const itreateEvents = async (i) => {
         if (i < getBuyedEvents.length) {
           const result = getBuyedEvents[i].returnValues;
@@ -260,7 +262,6 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
 async function orderEvent(result, order, transactionId) {
   try {
-    console.log("+result['amount']", +result['amount']);
     const getNftDetails = await NftModel.findOne({
       tokenId: order['tokenId'],
     });
@@ -285,12 +286,13 @@ async function orderEvent(result, order, transactionId) {
       if (checkEditionAlreadyAdded) {
         // check it is second hand sale
         checkEditionAlreadyAdded.transactionId = transactionId;
+        checkEditionAlreadyAdded.ownerId = getUserDetails._id;
         checkEditionAlreadyAdded.price = order['pricePerNFT'];
         checkEditionAlreadyAdded.walletAddress = result['buyer'];
         checkEditionAlreadyAdded.saleAction = saleType;
         checkEditionAlreadyAdded.timeline = order['timeline'];
         checkEditionAlreadyAdded.isOpenForSale = false;
-        checkEditionAlreadyAdded.ownerId = getUserDetails._id;
+
         await checkEditionAlreadyAdded.save();
 
         const addNewHistory = new HistoryModel({
