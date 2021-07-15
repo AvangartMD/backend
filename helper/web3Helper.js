@@ -292,7 +292,7 @@ async function orderEvent(result, order, transactionId) {
         checkEditionAlreadyAdded.saleAction = saleType;
         checkEditionAlreadyAdded.timeline = order['timeline'];
         checkEditionAlreadyAdded.isOpenForSale = false;
-
+        checkEditionAlreadyAdded.ownerId = getUserDetails._id;
         await checkEditionAlreadyAdded.save();
 
         const addNewHistory = new HistoryModel({
