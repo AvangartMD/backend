@@ -355,4 +355,65 @@ async function orderEvent(result, order, transactionId) {
   });
 }
 
+// get nft transfer event
+getWeb3Event.getTransferEvent = async (req, res) => {
+  try {
+    const web3 = new Web3(provider);
+    const latestBlockNo = await web3.eth.getBlockNumber();
+    console.log('latest block no is for order:', latestBlockNo);
+    const contract = new web3.eth.Contract(
+      ESCROW_ADDRESS,
+      process.env.ESCROW_ADDRESS
+    );
+    const orderBlockFile = fs.readFileSync('./result/orderBlock.json', 'utf-8');
+    const orderBlock = JSON.parse(orderBlockFile);
+
+    const transferEvent = await contract.getPastEvents('TransferSingle', {
+      fromBlock: orderBlock.endBlock,
+      toBlock: latestBlockNo,
+    });
+
+    console.log(
+      `cron from block ${+OrderBlockJson.endBlock} -- ${latestBlockNo} `
+    );
+
+    if (transferEvent.length) {
+      transferEvent.sort((a, b) => +a.blockNumber - +b.blockNumber);
+      console.log('transfer event is:', transferEvent);
+
+      // const itreateEvents = async (i) => {
+      //   if (i < getBuyedEvents.length) {
+      //     console.log(`i is: ${getBuyedEvents[i].blockNumber}   and i ${i}`);
+      //     const result = getBuyedEvents[i].returnValues;
+      //     const order = result['order'];
+      //     console.log('order is:', result['buyer']);
+      //     const transactionHash = getBuyedEvents[i].transactionHash;
+      //     await orderEvent(result, order, transactionHash);
+      //     itreateEvents(i + 1);
+      //   } else {
+      //     Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
+      //     console.log('CRON FIRES ');
+      //     let object = {
+      //       endBlock: latestBlockNo,
+      //     };
+
+      //     let data = JSON.stringify(object);
+      //     fs.writeFileSync('./result/orderBlock.json', data);
+      //     Utils.echoLog('Cron fired successfully for fetching events');
+      //   }
+      // };
+      // itreateEvents(0);
+    } else {
+      // update blocks
+      let object = {
+        endBlock: latestBlockNo,
+      };
+
+      let data = JSON.stringify(object);
+      fs.writeFileSync('./result/orderBlock.json', data);
+    }
+  } catch (err) {
+    Utils.echoLog(`orderBuyedEvent ${err}`);
+  }
+};
 module.exports = getWeb3Event;
