@@ -45,8 +45,6 @@ transferEvent.setTransferEvent = async (data, transactionHash) => {
         checkEditionAlreadyAdded.transactionId = transactionHash;
         checkEditionAlreadyAdded.isOpenForSale = false;
 
-        console.log('NFT TRANFERED FROM IF');
-
         checkEditionAlreadyAdded.save();
       } else {
         const addNewEdition = new EditionModel({
@@ -57,7 +55,6 @@ transferEvent.setTransferEvent = async (data, transactionHash) => {
           timeline: 0,
         });
 
-        console.log('NFT TRANFERED FROM ELSE');
         await addNewEdition.save();
       }
     } else {
@@ -93,7 +90,7 @@ transferEvent.burn = async (data, transactionHash) => {
       }
       // if edition greate than 1
       if (+findNft.edition > 1) {
-        const getEdition = EditionModel.findOne({
+        const getEdition = await EditionModel.findOne({
           edition: +data['edition'],
           nftId: findNft._id,
         });
