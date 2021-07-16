@@ -97,6 +97,7 @@ transferEvent.burn = async (data, transactionHash) => {
           edition: +data['edition'],
           nftId: findNft._id,
         });
+
         // make pertilcuar edition to burn
         if (getEdition && !getEdition.isBurned) {
           getEdition.isBurned = true;
@@ -110,6 +111,8 @@ transferEvent.burn = async (data, transactionHash) => {
           }
 
           await findNft.save();
+        } else {
+          console.log('edition already burned');
         }
       }
     } else {

@@ -222,7 +222,6 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
     // const orderBlock = JSON.parse(orderBlockFile);
 
     const getLastBlock = await BlockModel.findOne({}, { orderBlockNo: 1 });
-    console.log('order event block', getLastBlock);
 
     const getBuyedEvents = await contract.getPastEvents('OrderBought', {
       fromBlock: getLastBlock.orderBlockNo,
