@@ -507,9 +507,7 @@ nftCtr.getSingleNftDetails = async (req, res) => {
   try {
     const getNftDetails = JSON.parse(
       JSON.stringify(
-        await NftModel.findById(req.params.id, {
-          digitalKey: 0,
-        })
+        await NftModel.findById(req.params.id)
           .populate({
             path: 'collectionId',
             select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
@@ -538,6 +536,7 @@ nftCtr.getSingleNftDetails = async (req, res) => {
 
     getNftDetails.editions = getEditionDetails;
 
+    // check is Liked
     if (req.userData && req.userData._id) {
       const checkIsLiked = await LikeModel.findOne({
         nftId: getNftDetails._id,
@@ -552,6 +551,8 @@ nftCtr.getSingleNftDetails = async (req, res) => {
     } else {
       getNftDetails.isLiked = false;
     }
+
+    // check isOwner
 
     return res.status(200).json({
       message: req.t('SINGLE_NFT'),
