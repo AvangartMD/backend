@@ -15,7 +15,7 @@ mongoose
   )
   .then((res) => {
     // mongoose.pluralize(null);
-    // mongoose.set('debug',true);
+    // mongoose.set('debug', true);
 
     mongoose.set('useFindAndModify', false);
 

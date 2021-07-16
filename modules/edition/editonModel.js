@@ -21,6 +21,7 @@ const editionSchema = new Schema(
     walletAddress: {
       type: String,
       required: true,
+      lowercase: true,
     },
     edition: {
       type: Number,
@@ -30,6 +31,24 @@ const editionSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'users',
       required: true,
+    },
+    isOpenForSale: {
+      type: Boolean,
+      default: false,
+    },
+    saleType: {
+      type: { type: String, enum: ['OFFER', 'BUY', null], default: null },
+      price: { type: Number, default: 0 },
+    },
+
+    saleAction: {
+      type: String,
+      enum: ['AUCTION', 'BUY', 'SECOND_HAND'],
+      default: null,
+    },
+    timeline: {
+      type: Number,
+      default: 0,
     },
   },
 
@@ -41,4 +60,4 @@ const editionSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model('roles', rolesSchema);
+module.exports = mongoose.model('edition', editionSchema);

@@ -8,4 +8,12 @@ const likeRoute = express.Router();
 const toggle = [Auth.isAuthenticatedUser, LikeCtr.toggle];
 likeRoute.get('/toggle/:nftId', toggle);
 
+// get like sttaus
+const getIsLiked = [Auth.checkIsAutheticated, LikeCtr.checkIsLiked];
+likeRoute.get('/isLiked/:nftId', getIsLiked);
+
+// get likes count
+const getLikesCount = [LikeCtr.getLikesCount];
+likeRoute.get('/getLikesCount/:nftId', getLikesCount);
+
 module.exports = likeRoute;

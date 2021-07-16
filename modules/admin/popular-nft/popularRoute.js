@@ -1,7 +1,7 @@
-const express = require("express");
-const PopularCtr = require("./popularController");
-const PopularMiddleware = require("./popularMiddleware");
-const Auth = require("../../../helper/auth");
+const express = require('express');
+const PopularCtr = require('./popularController');
+const PopularMiddleware = require('./popularMiddleware');
+const Auth = require('../../../helper/auth');
 
 const popularRoute = express.Router();
 // get roles
@@ -12,7 +12,7 @@ const addNewEntry = [
   PopularMiddleware.checkAlreadyAdded,
   PopularCtr.addNewNft,
 ];
-popularRoute.post("/add", addNewEntry);
+popularRoute.post('/add', addNewEntry);
 
 // update
 const updatePopular = [
@@ -22,7 +22,7 @@ const updatePopular = [
   PopularMiddleware.checkAlreadyAdded,
   PopularCtr.updatePopular,
 ];
-popularRoute.put("/update/:id", updatePopular);
+popularRoute.put('/update/:id', updatePopular);
 
 // delete
 const deletePopular = [
@@ -30,11 +30,11 @@ const deletePopular = [
   Auth.isAdmin,
   PopularCtr.delete,
 ];
-popularRoute.post("/delete/:id", deletePopular);
+popularRoute.delete('/delete/:id', deletePopular);
 
 // list popular for users
 const listPopular = [Auth.checkIsAutheticated, PopularCtr.list];
-popularRoute.get("/list", listPopular);
+popularRoute.get('/list', listPopular);
 
 // list popular for admin
 const listPopularforAdmin = [
@@ -42,6 +42,14 @@ const listPopularforAdmin = [
   Auth.isAdmin,
   PopularCtr.listForAdmin,
 ];
-popularRoute.get("/listForAdmin", listPopularforAdmin);
+popularRoute.get('/listForAdmin', listPopularforAdmin);
+
+// list perticular populr nft
+const listPopularDetails = [
+  Auth.isAuthenticatedUser,
+  Auth.isAdmin,
+  PopularCtr.getPerticularNftDetails,
+];
+popularRoute.get('/listPopularDetails/:id', listPopularDetails);
 
 module.exports = popularRoute;

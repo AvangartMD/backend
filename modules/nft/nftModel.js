@@ -15,9 +15,12 @@ const nftSchema = new Schema(
       default: null,
     },
     tokenId: {
-      type: Number,
+      type: String,
       unique: true,
+      lowercase: true,
       default: undefined,
+      sparse: true,
+      required: false,
     },
     image: {
       original: {
@@ -40,6 +43,7 @@ const nftSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'collection',
       required: false,
+      default: null,
     },
     isActive: { type: Boolean, default: true },
 
@@ -73,7 +77,7 @@ const nftSchema = new Schema(
     },
     saleState: {
       type: String,
-      enum: ['BUY', 'AUCTION'],
+      enum: ['BUY', 'AUCTION', 'SOLD'],
       required: true,
     },
     auctionTime: {
@@ -84,13 +88,22 @@ const nftSchema = new Schema(
       type: Number,
       default: 1,
     },
-    auctionStartDate: {
-      type: String,
+    nonce: {
+      type: Number,
       default: null,
     },
+    auctionStartDate: {
+      type: Number,
+      default: null,
+    },
+
     auctionEndDate: {
       type: Number,
       default: null,
+    },
+    nftSold: {
+      type: Number,
+      default: 0,
     },
     coCreator: {
       userId: {

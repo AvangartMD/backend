@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { statusObject } = require('../../helper/enum');
 const Web3 = require('web3');
 const asyncRedis = require('async-redis');
+const FollowModel = require('../follow/followModel');
 const client = asyncRedis.createClient();
 
 const UserCtr = {};
@@ -229,6 +230,19 @@ UserCtr.list = async (req, res) => {
       query.status = req.query.status.toUpperCase();
     }
 
+    if (req.query.pagination === 'false') {
+      const listAll = await UserModel.find(query).populate({
+        path: 'role',
+        select: { _id: 1, roleName: 1 },
+      });
+
+      return res.status(200).json({
+        message: req.t('SUCCESS'),
+        status: true,
+        data: listAll,
+      });
+    }
+
     const totalCount = await UserModel.countDocuments(query);
     const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
 
@@ -274,7 +288,10 @@ UserCtr.getUserDetails = async (req, res) => {
     }
 
     if (Object.keys(query).length) {
-      const fetchUserData = await UserModel.findOne(query);
+      const fetchUserData = await UserModel.findOne(query).populate({
+        path: 'role',
+        select: { _id: 1, roleName: 1 },
+      });
 
       return res.status(200).json({
         message: req.t('SUCCESS'),
@@ -554,4 +571,55 @@ UserCtr.listActiveCreator = async (req, res) => {
     });
   }
 };
+
+// get user details
+UserCtr.getSingleUserDetails = async (req, res) => {
+  try {
+    const getUserDetails = JSON.parse(
+      JSON.stringify(
+        await UserModel.findOne(
+          { _id: req.params.userId },
+          { stage: 0, transactionId: 0, status: 0 }
+        )
+          .populate({
+            path: 'category',
+            select: { _id: 1, categoryName: 1, image: 1 },
+          })
+          .populate({
+            path: 'role',
+            select: { _id: 1, roleName: 1 },
+          })
+      )
+    );
+
+    if (req.userData && req.userData._id) {
+      const checkIsFollowed = await FollowModel.findOne({
+        userId: req.params.userId,
+        follow: req.userData._id,
+      });
+
+      if (checkIsFollowed) {
+        getUserDetails.isFollowed = true;
+      } else {
+        getUserDetails.isFollowed = false;
+      }
+    } else {
+      getUserDetails.isFollowed = false;
+    }
+
+    return res.status(200).json({
+      message: 'SINGLE_USER_DETAILS',
+      status: true,
+      data: getUserDetails,
+    });
+  } catch (err) {
+    Utils.echoLog('Erro in getUserDetails creator');
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
 module.exports = UserCtr;

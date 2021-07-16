@@ -1,8 +1,12 @@
 const NftModel = require('./nftModel');
 const CollectionModel = require('./collectionModel');
+const LikeModel = require('../like/likeModel');
 const Utils = require('../../helper/utils');
-const NftMiddleware = require('./nftMiddleware');
+const EditionModel = require('../edition/editonModel');
+const HistoryModel = require('../history/historyModel');
+// const EditionModel = require('../edition/editonModel');
 const { statusObject } = require('../../helper/enum');
+const { query } = require('winston');
 
 const nftCtr = {};
 // add a new NFT
@@ -98,6 +102,28 @@ nftCtr.updateCollection = async (req, res) => {
       }
       if (req.body.description) {
         fetchCollection.description = req.body.description;
+      }
+      // remove nft from collection
+      if (req.body.nftId && req.body.nftId.length) {
+        // find the nft of that user only
+
+        const query = { _id: { $in: req.body.nftId } };
+
+        if (req.role !== 'ADMIN') {
+          query.ownerId = req.userData._id;
+        }
+
+        const findNftAndUpdate = await NftModel.find(query);
+
+        if (findNftAndUpdate && findNftAndUpdate.length) {
+          for (let i = 0; i < findNftAndUpdate.length; i++) {
+            const update = await NftModel.update(
+              { _id: findNftAndUpdate[i]._id },
+              { $set: { collectionId: null } },
+              { upsert: true }
+            );
+          }
+        }
       }
 
       await fetchCollection.save();
@@ -196,7 +222,10 @@ nftCtr.getCollectionByUsers = async (req, res) => {
         isActive: 1,
       },
       { isActive: 0, createdAt: 0, updatedAt: 0 }
-    );
+    ).populate({
+      path: 'ownerId',
+      select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+    });
 
     return res.status(200).json({
       message: req.t('COLLECTION_LIST'),
@@ -348,14 +377,40 @@ nftCtr.mintNft = async (req, res) => {
 // list user NFT
 nftCtr.listUsersNft = async (req, res) => {
   try {
-    const query = { status: 'APPROVED' };
+    let query = { status: 'APPROVED' };
 
     if (req.query.filter === 'draft') {
       query.status = 'NOT_MINTED';
     }
 
-    if (req.userData.role !== 'ADMIN') {
+    if (req.userData && req.userData.role !== 'ADMIN' && !req.params.userId) {
       query.ownerId = req.userData._id;
+    }
+
+    if (req.query.status) {
+      if (req.query.status === 'SOLD') {
+        query.saleState = 'SOLD';
+      }
+      if (req.query.status === 'AUCTION') {
+        query.saleState = 'AUCTION';
+        query.auctionEndDate = { $gte: Math.floor(Date.now() / 1000) };
+        // query.expr = { $lt: ['nftSold', 'edition'] };
+      }
+      if (req.query.status === 'BUY') {
+        query = {
+          $or: [
+            { auctionEndDate: { $lt: Math.floor(Date.now() / 1000) } },
+            { saleState: 'BUY' },
+          ],
+        };
+
+        query.status = 'APPROVED';
+        // query.expr = { $lt: ['nftSold', 'edition'] };
+      }
+    }
+
+    if (req.params.userId) {
+      query.ownerId = req.params.userId;
     }
 
     const list = await NftModel.find(query, {
@@ -372,7 +427,7 @@ nftCtr.listUsersNft = async (req, res) => {
       })
       .populate({
         path: 'ownerId',
-        select: { name: 1, username: 1 },
+        select: { name: 1, username: 1, profile: 1 },
       });
 
     return res.status(200).json({
@@ -381,7 +436,7 @@ nftCtr.listUsersNft = async (req, res) => {
       data: list,
     });
   } catch (err) {
-    console.log('error is:', err);
+    console.log('er is:', err);
     Utils.echoLog('error in listing user  nft  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
@@ -450,19 +505,53 @@ nftCtr.listNftForAdmin = async (req, res) => {
 // get single nft details
 nftCtr.getSingleNftDetails = async (req, res) => {
   try {
-    const getNftDetails = await NftModel.findById(req.params.id)
-      .populate({
-        path: 'collectionId',
-        select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
-      })
-      .populate({
-        path: 'category',
-        select: { createdAt: 0, updatedAt: 0 },
-      })
+    const getNftDetails = JSON.parse(
+      JSON.stringify(
+        await NftModel.findById(req.params.id, {
+          digitalKey: 0,
+        })
+          .populate({
+            path: 'collectionId',
+            select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+          })
+          .populate({
+            path: 'category',
+            select: { createdAt: 0, updatedAt: 0 },
+          })
+          .populate({
+            path: 'ownerId',
+            select: { name: 1, username: 1, profile: 1, name: 1 },
+          })
+      )
+    );
+
+    const getEditionDetails = await EditionModel.find({
+      nftId: getNftDetails._id,
+    })
       .populate({
         path: 'ownerId',
-        select: { name: 1, username: 1 },
+        select: { name: 1, username: 1, profile: 1, name: 1 },
+      })
+      .sort({
+        edition: 1,
       });
+
+    getNftDetails.editions = getEditionDetails;
+
+    if (req.userData && req.userData._id) {
+      const checkIsLiked = await LikeModel.findOne({
+        nftId: getNftDetails._id,
+        userId: req.userData._id,
+      });
+
+      if (checkIsLiked) {
+        getNftDetails.isLiked = true;
+      } else {
+        getNftDetails.isLiked = false;
+      }
+    } else {
+      getNftDetails.isLiked = false;
+    }
 
     return res.status(200).json({
       message: req.t('SINGLE_NFT'),
@@ -508,26 +597,100 @@ nftCtr.getNftUri = async (req, res) => {
 // get nfts under collection
 nftCtr.listCollectionNft = async (req, res) => {
   try {
-    const getCollectionNfts = await NftModel.find(
+    const getCollectionDetails = JSON.parse(
+      JSON.stringify(
+        await CollectionModel.findById(req.params.collectionId).populate({
+          path: 'ownerId',
+          select: {
+            _id: 1,
+            walletAddress: 1,
+            username: 1,
+            followersCount: 1,
+            followingCount: 1,
+            name: 1,
+            profile: 1,
+            cover: 1,
+          },
+        })
+      )
+    );
+
+    // get nft details
+    const getNftDetails = await NftModel.find(
       {
-        collectionId: req.params.collectionId,
+        collectionId: getCollectionDetails._id,
         isActive: true,
+        status: statusObject.APPROVED,
       },
       { digitalKey: 0, createdAt: 0, updatedAt: 0 }
     )
       .populate({
-        path: 'ownerId',
-        select: { _id: 1, walletAddress: 1, username: 1 },
-      })
-      .populate({
         path: 'category',
         select: { _id: 1, isActive: 1, image: 1 },
+      })
+      .populate({
+        path: 'ownerId',
+        select: {
+          _id: 1,
+          walletAddress: 1,
+          username: 1,
+          followersCount: 1,
+          followingCount: 1,
+          name: 1,
+          profile: 1,
+          cover: 1,
+        },
       });
+
+    getCollectionDetails.nft = getNftDetails;
+    getCollectionDetails.isOwner = false;
+
+    if (
+      req.userData &&
+      req.userData._id &&
+      getCollectionDetails &&
+      getCollectionDetails.ownerId
+    ) {
+      if (
+        req.userData._id.toString().toLowerCase() ===
+        getCollectionDetails.ownerId._id.toString().toLowerCase()
+      ) {
+        getCollectionDetails.isOwner = true;
+      } else {
+        getCollectionDetails.isOwner = false;
+      }
+    }
+
+    // const getCollectionNfts = await NftModel.find(
+    //   {
+    //     collectionId: req.params.collectionId,
+    //     isActive: true,
+    //   },
+    //   { digitalKey: 0, createdAt: 0, updatedAt: 0 }
+    // )
+    //   .populate({
+    //     path: 'ownerId',
+    //     select: {
+    //       _id: 1,
+    //       walletAddress: 1,
+    //       username: 1,
+    //       followersCount: 1,
+    //       followingCount: 1,
+    //     },
+    //   })
+    //   .populate({
+    //     path: 'category',
+    //     select: { _id: 1, isActive: 1, image: 1 },
+    //   })
+    //   .populate({
+    //     path: 'collectionId',
+    //     select: { _id: 1, logo: 1, name: 1, description: 1 },
+    //   });
 
     return res.status(200).json({
       message: req.t('COLLECTION_NFT'),
       status: true,
-      data: getCollectionNfts,
+      data: getCollectionDetails,
     });
   } catch (err) {
     Utils.echoLog('error in listCollectionNft  ', err);
@@ -542,8 +705,311 @@ nftCtr.listCollectionNft = async (req, res) => {
 // market place api
 nftCtr.marketPlace = async (req, res) => {
   try {
-    const listNftForMarketPlace = await NftModel.find();
-  } catch (err) {}
+    const page = req.body.page || 1;
+    const query = { isActive: true, status: statusObject.APPROVED };
+
+    if (req.body.category && req.body.category.length) {
+      query.category = { $in: req.body.category };
+    }
+
+    if (req.body.filter && req.body.filter.length) {
+      query.saleState = { $in: req.body.filter };
+    }
+
+    if (req.body.search) {
+      query.title = {
+        $regex: `${req.body.search.toLowerCase()}.*`,
+        $options: 'i',
+      };
+    }
+
+    const totalCount = await NftModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const listNftForMarketPlace = await NftModel.find(query, {
+      approvedByAdmin: 0,
+      status: 0,
+      digitalKey: 0,
+    })
+      .populate({
+        path: 'ownerId',
+        select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+      })
+      .populate({
+        path: 'category',
+        select: { _id: 1, isActive: 1, image: 1 },
+      })
+      .populate({
+        path: 'collectionId',
+        select: { _id: 1, name: 1, description: 1 },
+      })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: 'NFT_MARKET_PLACE_LIST',
+      status: true,
+      data: listNftForMarketPlace,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog(`Error inlist nft for market place`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get all collections to get listed in collection tab
+nftCtr.getCollectionsList = async (req, res) => {
+  try {
+    const page = req.body.page || 1;
+    const query = { isActive: true };
+    if (req.body.search) {
+      query.name = {
+        $regex: `${req.body.search.toLowerCase()}.*`,
+        $options: 'i',
+      };
+    }
+    const totalCount = await CollectionModel.countDocuments(query);
+    const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
+
+    const getCollections = await CollectionModel.find(query)
+      .populate({
+        path: 'ownerId',
+        select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+      })
+      .sort({ createdAt: -1 })
+      .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .limit(+process.env.LIMIT);
+
+    return res.status(200).json({
+      message: req.t('COLLECTION_LIST'),
+      status: true,
+      data: getCollections,
+      pagination: {
+        pageNo: page,
+        totalRecords: totalCount,
+        totalPages: pageCount,
+        limit: +process.env.LIMIT,
+      },
+    });
+  } catch (err) {
+    Utils.echoLog(`Error in getCollectionsList ${err}`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get nft history
+nftCtr.getNftHistory = async (req, res) => {
+  try {
+    const nftId = req.params.nftId;
+    const edition = req.params.edition;
+
+    const fetchNftCreated = await HistoryModel.findOne({
+      nftId: req.params.nftId,
+      editionNo: null,
+    }).populate({
+      path: 'ownerId',
+      select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+    });
+
+    const fetchNftHistory = JSON.parse(
+      JSON.stringify(
+        await HistoryModel.find({
+          nftId,
+          editionNo: edition,
+        })
+          .populate({
+            path: 'ownerId',
+            select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+          })
+          .sort({ timeline: 1 })
+      )
+    );
+    if (fetchNftCreated) {
+      fetchNftHistory.unshift(fetchNftCreated);
+    }
+
+    return res.status(200).json({
+      message: req.t('NFT_HISTORY'),
+      status: true,
+      data: fetchNftHistory,
+    });
+  } catch (err) {
+    Utils.echoLog(`Error inlist nft for market place`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get liked nfts by user
+nftCtr.getLikedNfts = async (req, res) => {
+  try {
+    let query = {};
+    if (req.params.userId) {
+      query.userId = req.params.userId;
+    } else {
+      query.userId = req.userData._id;
+    }
+    const getLikedNfts = await LikeModel.find(query);
+    const nftIds = [];
+    if (getLikedNfts.length) {
+      for (let i = 0; i < getLikedNfts.length; i++) {
+        nftIds.push(getLikedNfts._id);
+      }
+
+      const nfts = await NftModel.find(
+        { _id: { $in: nftIds } },
+        { digitalKey: 0, createdAt: 0, updatedAt: 0 }
+      )
+        .populate({
+          path: 'collectionId',
+          select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'category',
+          select: { createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'ownerId',
+          select: { name: 1, username: 1, profile: 1, name: 1 },
+        });
+
+      return res.status(200).json({
+        message: 'LIKED_NFT',
+        status: true,
+        data: nfts,
+      });
+    } else {
+      return res.status(200).json({
+        message: 'LIKED_NFT',
+        status: true,
+        data: [],
+      });
+    }
+  } catch (err) {
+    Utils.echoLog(`Error in list liked nfts `);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// get buyed Nfts
+nftCtr.getUserBuyedNfts = async (req, res) => {
+  try {
+    let query = {};
+    if (req.params.userId) {
+      query.ownerId = req.params.userId;
+    } else {
+      query.ownerId = req.userData._id;
+    }
+
+    const editions = await EditionModel.find(query);
+    const userNfts = [];
+
+    if (editions.length) {
+      for (let i = 0; i < editions.length; i++) {
+        userNfts.push(editions._id);
+      }
+
+      const fetchUserNft = await NftModel.find(
+        { _id: { $in: userNfts } },
+        { digitalKey: 0, createdAt: 0, updatedAt: 0 }
+      )
+        .populate({
+          path: 'collectionId',
+          select: { slugText: 0, ownerId: 0, createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'category',
+          select: { createdAt: 0, updatedAt: 0 },
+        })
+        .populate({
+          path: 'ownerId',
+          select: { name: 1, username: 1, profile: 1, name: 1 },
+        });
+
+      return res.status(200).json({
+        message: 'USER_OWNED_NFT',
+        status: true,
+        data: fetchUserNft,
+      });
+    } else {
+      return res.status(200).json({
+        message: 'USER_OWNED_NFT',
+        status: true,
+        data: [],
+      });
+    }
+  } catch (err) {
+    Utils.echoLog(`Error in list user buyed nfts `);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// // add nft to second hand sales
+nftCtr.addNftToSecondHandSales = async (req, res) => {
+  try {
+    const fetchEditionDetails = await EditionModel.findOne({
+      _id: req.body.editionId,
+    });
+
+    if (fetchEditionDetails) {
+      if (req.body.saleType === 'BUY') {
+        fetchEditionDetails.saleType.type = 'BUY';
+        fetchEditionDetails.saleAction = 'SECOND_HAND';
+        fetchEditionDetails.saleType.price = +req.body.price;
+        fetchEditionDetails.isOpenForSale = true;
+      }
+      if (req.body.saleType === 'OFFER') {
+        fetchEditionDetails.saleType.type = 'OFFER';
+        fetchEditionDetails.saleAction = 'SECOND_HAND';
+        fetchEditionDetails.saleType.price = 0;
+        fetchEditionDetails.isOpenForSale = true;
+      }
+
+      await fetchEditionDetails.save();
+
+      return res.status(200).json({
+        message: req.t('EDITION_UPDATED'),
+        status: true,
+      });
+    } else {
+      return res.status(400).json({
+        message: req.t('INVALID_EDITION_DETAILS'),
+        status: false,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog(`Err in addNftToSecondHandSales ${err}`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
 };
 
 module.exports = nftCtr;

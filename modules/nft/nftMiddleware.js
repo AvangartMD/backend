@@ -2,6 +2,7 @@ const Joi = require('joi');
 const validate = require('../../helper/validateRequest');
 const NftModel = require('./nftModel');
 const CollectionModel = require('./collectionModel');
+const EditionModel = require('../edition/editonModel');
 const Utils = require('../../helper/utils');
 
 const NftMiddleware = {};
@@ -153,6 +154,7 @@ NftMiddleware.validateCollectionUpdate = async (req, res, next) => {
     name: Joi.string(),
     description: Joi.string(),
     logo: Joi.string(),
+    nftId: Joi.array(),
   });
 
   validate.validateRequest(req, res, next, schema);
@@ -232,6 +234,39 @@ NftMiddleware.canAddNft = async (req, res, next) => {
   }
 };
 
-// get users NFT
+//validate input for edition update
+NftMiddleware.EditionUpdate = async (req, res, next) => {
+  const schema = Joi.object({
+    editionId: Joi.string().required(),
+    saleType: Joi.string().valid('BUY', 'OFFER'),
+    price: Joi.number(),
+  });
+  validate.validateRequest(req, res, next, schema);
+};
 
+// check user is owner of edition or not
+NftMiddleware.checkEditionOwner = async (req, res, next) => {
+  try {
+    const fetchEdition = await EditionModel.findOne({
+      _id: req.body.editionId,
+      ownerId: req.userData._id,
+    });
+
+    if (!fetchEdition) {
+      return res.status(400).json({
+        message: req.t('YOU_ARE_NOT_OWNER'),
+        status: false,
+      });
+    }
+
+    return next();
+  } catch (err) {
+    Utils.echoLog(`Error in checkEditionOwner ${err}`);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
 module.exports = NftMiddleware;

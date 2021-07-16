@@ -49,10 +49,7 @@ const getList = [Auth.isAuthenticatedUser, NftCtr.getCollectionByUsers];
 nftRoute.get('/listCollection', getList);
 
 // get user collection by user id
-const getCollectionListById = [
-  Auth.isAuthenticatedUser,
-  NftCtr.getCollectionByUsers,
-];
+const getCollectionListById = [NftCtr.getCollectionByUsers];
 nftRoute.get('/listCollection/:id', getCollectionListById);
 
 // get list of collection for admin
@@ -62,6 +59,10 @@ const getCollectionListForAdmin = [
   NftCtr.getListOfCollectionForAdmin,
 ];
 nftRoute.get('/listCollectionForAdmin', getCollectionListForAdmin);
+
+// get nft details after passing userID
+const getUserNftById = [NftCtr.listUsersNft];
+nftRoute.get('/listNftByUser/:userId', getUserNftById);
 
 // get user nft
 const getUserNft = [auth.isAuthenticatedUser, NftCtr.listUsersNft];
@@ -103,7 +104,44 @@ const getSingleCollectionDetails = [
 nftRoute.get('/collection/:id', getSingleCollectionDetails);
 
 // get single collection nfts
-const getCollectionNfts = [NftCtr.listCollectionNft];
+const getCollectionNfts = [auth.checkIsAutheticated, NftCtr.listCollectionNft];
 nftRoute.get('/getCollectionInfo/:collectionId', getCollectionNfts);
+
+// get market place nft
+const marketPlaceNft = [NftCtr.marketPlace];
+nftRoute.post('/listMarketPlace', marketPlaceNft);
+
+// get all collection llist for active
+const listCollectionsForUsers = [NftCtr.getCollectionsList];
+nftRoute.post('/listCollections', listCollectionsForUsers);
+
+// fetch nft history
+const fetchNftHistory = [NftCtr.getNftHistory];
+nftRoute.get('/history/:nftId/:edition', fetchNftHistory);
+
+// get liked nft by user
+const listLikedNfts = [auth.isAuthenticatedUser, nftCtr.getLikedNfts];
+nftRoute.get('/getLikedNfts', listLikedNfts);
+
+// get likes by user ID
+const listLikedNftsByUserId = [nftCtr.getLikedNfts];
+nftRoute.get('/getLikedNfts/:userId', listLikedNftsByUserId);
+
+// get buyed events
+const getBuyedEvents = [auth.isAuthenticatedUser, nftCtr.getUserBuyedNfts];
+nftRoute.get('/getCollectedNfts', getBuyedEvents);
+
+// get buyed nfts by user id
+const getBuyedEventsByUserId = [nftCtr.getUserBuyedNfts];
+nftRoute.get('/getCollectedNfts/:userId', getBuyedEventsByUserId);
+
+// add edition to buy now or accept for offer
+const editionSell = [
+  Auth.isAuthenticatedUser,
+  NftMiddleware.EditionUpdate,
+  NftMiddleware.checkEditionOwner,
+  nftCtr.addNftToSecondHandSales,
+];
+nftRoute.post('/addToSecondHand', editionSell);
 
 module.exports = nftRoute;

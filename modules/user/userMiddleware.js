@@ -22,7 +22,7 @@ UserMiddleware.signUpValidator = (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string(),
     surname: Joi.string(),
-    isCreator: Joi.boolean().required(),
+    isCreator: Joi.boolean(),
     portfolio: portfolioSchema,
     email: Joi.string().email(),
     bio: Joi.string(),
@@ -51,7 +51,10 @@ UserMiddleware.checkUsernameAlreadyAdded = async (req, res, next) => {
     const checkUsernameAvalaible = await UserModel.findOne({
       username: req.body.username.toLowerCase(),
     });
-    if (checkUsernameAvalaible) {
+    if (
+      checkUsernameAvalaible &&
+      req.userData._id.toString() !== checkUsernameAvalaible._id.toString()
+    ) {
       return res.status(400).json({
         status: false,
         message: req.t('USERNAME_ALREADY'),
@@ -126,7 +129,7 @@ UserMiddleware.addNewUserByAdmin = async (req, res, next) => {
   const schema = Joi.object({
     walletAddress: Joi.string().required(),
     name: Joi.string().required(),
-    profile: Joi.string(),
+    profile: Joi.string().uri(),
     bio: Joi.string(),
     email: Joi.string().email(),
     username: Joi.string().required(),

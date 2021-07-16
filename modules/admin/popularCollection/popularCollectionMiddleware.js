@@ -1,4 +1,4 @@
-const PopularNftModel = require('./popularNftModel');
+const PopularCollectionModel = require('./popularCollectionModel');
 const Utils = require('../../../helper/utils');
 const Joi = require('joi');
 const validate = require('../../../helper/validateRequest');
@@ -7,7 +7,7 @@ const PopularMiddleware = {};
 // validate add
 PopularMiddleware.ValidateAdd = async (req, res, next) => {
   const schema = Joi.object({
-    nftId: Joi.string().required(),
+    collectionId: Joi.string().required(),
     ranking: Joi.number().required(),
   });
   validate.validateRequest(req, res, next, schema);
@@ -15,7 +15,7 @@ PopularMiddleware.ValidateAdd = async (req, res, next) => {
 // validate update
 PopularMiddleware.ValidateUpdate = async (req, res, next) => {
   const schema = Joi.object({
-    nftId: Joi.string(),
+    collectionId: Joi.string(),
     ranking: Joi.number(),
   });
   validate.validateRequest(req, res, next, schema);
@@ -24,9 +24,9 @@ PopularMiddleware.ValidateUpdate = async (req, res, next) => {
 // check perticular nft already added or not
 PopularMiddleware.checkAlreadyAdded = async (req, res, next) => {
   try {
-    if (req.body.nftId) {
-      const checkAlreadyAdded = await PopularNftModel.findOne({
-        nftId: req.body.nftId,
+    if (req.body.collectionId) {
+      const checkAlreadyAdded = await PopularCollectionModel.findOne({
+        collectionId: req.body.collectionId,
       });
       if (checkAlreadyAdded) {
         return res.status(400).json({

@@ -78,5 +78,15 @@
     "USER_CANT_FOLLOW": "User cant follow own",
     "USER_FOLLOW": "User Followed Successfully",
     "USER_UNFOLLOW": "User Unfollwed Successfully",
-    "COLLECTION_NFT": "Collection Nft List"
+    "COLLECTION_NFT": "Collection Nft List",
+    "NFT_MARKET_PLACE_LIST": "Nft market place list",
+    "SINGLE_USER_DETAILS": "Single user details",
+    "LIKE_STATUS": "like status ",
+    "ALREADY_ADDED_POPULAR": "Nft Already Added to popular list",
+    "NFT_HISTORY": "Nft History ",
+    "LIKED_NFT": "Liked Nft by user",
+    "USER_OWNED_NFT": "Users Buyed Nft",
+    "EDITION_UPDATED": "Edition updated Successfully",
+    "INVALID_EDITION_DETAILS": "Invalid Edition Details",
+    "YOU_ARE_NOT_OWNER": "You are not a owner of edition"
 }

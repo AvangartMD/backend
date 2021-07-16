@@ -8,6 +8,9 @@ const popularRoute = require('./popular-nft/popularRoute');
 const dashbaordRoute = require('./dashboard/dashboardRoute');
 const profileInfoRoute = require('./profile-info/profileInfoRoute');
 const Auth = require('../../helper/auth');
+const web3Helper = require('../../helper/web3Helper');
+const PopularCollectionRoute = require('./popularCollection/popularCollectionRoute');
+const popularCollectionRoute = require('./popularCollection/popularCollectionRoute');
 
 const adminRoute = express.Router();
 // get roles
@@ -39,5 +42,15 @@ adminRoute.use('/dashboard', dashbaordRoute);
 
 // profile info route
 adminRoute.use('/profile-info', profileInfoRoute);
+// popular collection
+adminRoute.use('/popularCollection', popularCollectionRoute);
+
+// get past events
+const getAllPastEvnets = [web3Helper.getPastEvents];
+adminRoute.get('/getPastEvents', getAllPastEvnets);
+
+// get buy nft events
+const getBuyEvents = [web3Helper.orderBuyedEvent];
+adminRoute.get('/getBuyedEvents', getBuyEvents);
 
 module.exports = adminRoute;

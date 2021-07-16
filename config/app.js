@@ -2,6 +2,7 @@ const express = require('express');
 global._ = require('lodash');
 require('./winston');
 require('./database.js');
+require('../cron/cron');
 const web3Helper = require('../helper/web3Helper');
 const l10n = require('jm-ez-l10n');
 
