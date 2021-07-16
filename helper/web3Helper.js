@@ -10,6 +10,8 @@ const { statusObject } = require('./enum');
 const Utils = require('./utils');
 const BlockJson = require('../result/blockNo.json');
 const OrderBlockJson = require('../result/orderBlock.json');
+const TransferEvent = require('../contract/transferEvent');
+const BlockModel = require('../modules/block/blockModel');
 const fs = require('fs');
 
 const webSocketProvider =
@@ -158,19 +160,19 @@ getWeb3Event.getPastEvents = async (req, res) => {
       process.env.ESCROW_ADDRESS
     );
     // get last block synced
-    const orderBlockFile = fs.readFileSync('./result/blockNo.json', 'utf-8');
-    const orderBlock = JSON.parse(orderBlockFile);
+
+    const getLastBlock = await BlockModel.findOne({}, { blockNo: 1 });
+    // const orderBlockFile = fs.readFileSync('./result/blockNo.json', 'utf-8');
+    // const orderBlock = JSON.parse(orderBlockFile);
 
     const getPastEvents = await contract.getPastEvents('OrderPlaced', {
-      fromBlock: +orderBlock.endBlock,
+      fromBlock: +getLastBlock.blockNo,
       toBlock: latestBlockNo,
     });
 
     if (getPastEvents.length) {
-      const itreateEvents = (i) => {
+      const itreateEvents = async (i) => {
         if (i < getPastEvents.length) {
-          // console.log('getPastEvents', getPastEvents[i].returnValues);
-          // const result = getPastEvents[i].returnValues;
           const nonce = getPastEvents[i].returnValues.nonce;
           const result = getPastEvents[i].returnValues;
           const order = result['order'];
@@ -178,23 +180,29 @@ getWeb3Event.getPastEvents = async (req, res) => {
           checkMinting(result, order, nonce);
           itreateEvents(i + 1);
         } else {
-          let object = {
-            endBlock: latestBlockNo,
-          };
+          //   let object = {
+          //     endBlock: latestBlockNo,
+          //   };
+          //  let data = JSON.stringify(object);
+          //   fs.writeFileSync('./result/blockNo.json', data);
 
-          let data = JSON.stringify(object);
-          fs.writeFileSync('./result/blockNo.json', data);
+          // store last block in database
+          getLastBlock.blockNo = latestBlockNo;
+          await getLastBlock.save();
           Utils.echoLog('Cron fired successfully for fetching events');
         }
       };
       itreateEvents(0);
     } else {
-      let object = {
-        endBlock: latestBlockNo,
-      };
+      // let object = {
+      //   endBlock: latestBlockNo,
+      // };
 
-      let data = JSON.stringify(object);
-      fs.writeFileSync('./result/blockNo.json', data);
+      // let data = JSON.stringify(object);
+      // fs.writeFileSync('./result/blockNo.json', data);
+
+      getLastBlock.blockNo = latestBlockNo;
+      await getLastBlock.save();
     }
   } catch (err) {
     Utils.echoLog('Err is:', err);
@@ -210,53 +218,47 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       ContractAbi,
       process.env.ESCROW_ADDRESS
     );
-    const orderBlockFile = fs.readFileSync('./result/orderBlock.json', 'utf-8');
-    const orderBlock = JSON.parse(orderBlockFile);
+    // const orderBlockFile = fs.readFileSync('./result/orderBlock.json', 'utf-8');
+    // const orderBlock = JSON.parse(orderBlockFile);
+
+    const getLastBlock = await BlockModel.findOne({}, { orderBlockNo: 1 });
+    console.log('order event block', getLastBlock);
 
     const getBuyedEvents = await contract.getPastEvents('OrderBought', {
-      fromBlock: orderBlock.endBlock,
+      fromBlock: getLastBlock.orderBlockNo,
       toBlock: latestBlockNo,
     });
-
-    console.log(
-      `cron from block ${+OrderBlockJson.endBlock} -- ${latestBlockNo} `
-    );
 
     if (getBuyedEvents.length) {
       getBuyedEvents.sort((a, b) => +a.blockNumber - +b.blockNumber);
 
       const itreateEvents = async (i) => {
         if (i < getBuyedEvents.length) {
-          console.log(`i is: ${getBuyedEvents[i].blockNumber}   and i ${i}`);
           const result = getBuyedEvents[i].returnValues;
           const order = result['order'];
-          console.log('order is:', result['buyer']);
           const transactionHash = getBuyedEvents[i].transactionHash;
+
           await orderEvent(result, order, transactionHash);
           itreateEvents(i + 1);
         } else {
           Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
           console.log('CRON FIRES ');
-          let object = {
-            endBlock: latestBlockNo,
-          };
 
-          let data = JSON.stringify(object);
-          fs.writeFileSync('./result/orderBlock.json', data);
+          getLastBlock.orderBlockNo = latestBlockNo;
+          await getLastBlock.save();
+
           Utils.echoLog('Cron fired successfully for fetching events');
         }
       };
       itreateEvents(0);
     } else {
-      // update blocks
-      let object = {
-        endBlock: latestBlockNo,
-      };
+      console.log('IN ELSE ORDER EVENT');
 
-      let data = JSON.stringify(object);
-      fs.writeFileSync('./result/orderBlock.json', data);
+      getLastBlock.orderBlockNo = latestBlockNo;
+      await getLastBlock.save();
     }
   } catch (err) {
+    console.log('err isl', err);
     Utils.echoLog(`orderBuyedEvent ${err}`);
   }
 };
@@ -289,7 +291,9 @@ async function orderEvent(result, order, transactionId) {
           // check it is second hand sale
           checkEditionAlreadyAdded.transactionId = transactionId;
           checkEditionAlreadyAdded.ownerId = getUserDetails._id;
-          checkEditionAlreadyAdded.price = order['pricePerNFT'];
+          checkEditionAlreadyAdded.price = Utils.convertToEther(
+            +order['pricePerNFT']
+          );
           checkEditionAlreadyAdded.walletAddress = result['buyer'];
           checkEditionAlreadyAdded.saleAction = saleType;
           checkEditionAlreadyAdded.timeline = order['timeline'];
@@ -302,7 +306,7 @@ async function orderEvent(result, order, transactionId) {
             editionNo: order['amount'],
             ownerId: getUserDetails._id,
             text: 'Nft buyed by user',
-            buyPrice: order['pricePerNFT'],
+            buyPrice: Utils.convertToEther(+order['pricePerNFT']),
             timeline: order['timeline'],
           });
 
@@ -314,7 +318,7 @@ async function orderEvent(result, order, transactionId) {
             ownerId: getUserDetails._id,
             edition: +result['amount'],
             transactionId: transactionId,
-            price: order['pricePerNFT'],
+            price: Utils.convertToEther(+order['pricePerNFT']),
             walletAddress: result['buyer'],
             saleAction: saleType,
 
@@ -328,7 +332,7 @@ async function orderEvent(result, order, transactionId) {
             editionNo: order['amount'],
             ownerId: getUserDetails._id,
             text: 'Nft buyed by user',
-            buyPrice: order['pricePerNFT'],
+            buyPrice: Utils.convertToEther(+order['pricePerNFT']),
             timeline: order['timeline'],
           });
 
@@ -346,73 +350,56 @@ async function orderEvent(result, order, transactionId) {
         }
       } else {
         console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
+        resolve(true);
       }
     } catch (err) {
       console.log('error in functin', err);
       Utils.echoLog(`Error in check orderEvent ${err}`);
-      reject(false);
+      resolve(false);
     }
   });
 }
 
 // get nft transfer event
-getWeb3Event.getTransferEvent = async (req, res) => {
+getWeb3Event.getTransferEventFromContract = async (req, res) => {
   try {
     const web3 = new Web3(provider);
     const latestBlockNo = await web3.eth.getBlockNumber();
-    console.log('latest block no is for order:', latestBlockNo);
+
+    const getLastBlock = await BlockModel.findOne({}, { transferBlockNo: 1 });
+
     const contract = new web3.eth.Contract(
-      ESCROW_ADDRESS,
+      ContractAbi,
       process.env.ESCROW_ADDRESS
     );
-    const orderBlockFile = fs.readFileSync('./result/orderBlock.json', 'utf-8');
-    const orderBlock = JSON.parse(orderBlockFile);
 
-    const transferEvent = await contract.getPastEvents('TransferSingle', {
-      fromBlock: orderBlock.endBlock,
+    const transferEvent = await contract.getPastEvents('EditionTransferred', {
+      fromBlock: getLastBlock.transferBlockNo,
       toBlock: latestBlockNo,
     });
 
-    console.log(
-      `cron from block ${+OrderBlockJson.endBlock} -- ${latestBlockNo} `
-    );
-
     if (transferEvent.length) {
       transferEvent.sort((a, b) => +a.blockNumber - +b.blockNumber);
-      console.log('transfer event is:', transferEvent);
+      for (let i = 0; i < transferEvent.length; i++) {
+        const result = transferEvent[i].returnValues;
+        const transactionhash = transferEvent[i].transactionHash;
 
-      // const itreateEvents = async (i) => {
-      //   if (i < getBuyedEvents.length) {
-      //     console.log(`i is: ${getBuyedEvents[i].blockNumber}   and i ${i}`);
-      //     const result = getBuyedEvents[i].returnValues;
-      //     const order = result['order'];
-      //     console.log('order is:', result['buyer']);
-      //     const transactionHash = getBuyedEvents[i].transactionHash;
-      //     await orderEvent(result, order, transactionHash);
-      //     itreateEvents(i + 1);
-      //   } else {
-      //     Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
-      //     console.log('CRON FIRES ');
-      //     let object = {
-      //       endBlock: latestBlockNo,
-      //     };
-
-      //     let data = JSON.stringify(object);
-      //     fs.writeFileSync('./result/orderBlock.json', data);
-      //     Utils.echoLog('Cron fired successfully for fetching events');
-      //   }
-      // };
-      // itreateEvents(0);
+        if (
+          result['to'].trim() === '0x0000000000000000000000000000000000000000'
+        ) {
+          TransferEvent.burn(result, transactionhash);
+        } else {
+          TransferEvent.setTransferEvent(result, transactionhash);
+        }
+      }
+      getLastBlock.transferBlockNo = latestBlockNo;
+      await getLastBlock.save();
     } else {
-      // update blocks
-      let object = {
-        endBlock: latestBlockNo,
-      };
-
-      let data = JSON.stringify(object);
-      fs.writeFileSync('./result/orderBlock.json', data);
+      getLastBlock.transferBlockNo = latestBlockNo;
+      await getLastBlock.save();
     }
   } catch (err) {
+    console.log('err is:', err);
     Utils.echoLog(`orderBuyedEvent ${err}`);
   }
 };

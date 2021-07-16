@@ -6,4 +6,5 @@ cron.schedule('* * * * *', (req, res) => {
   console.log('cron for past events and order called');
   Web3Helper.getPastEvents(req, res);
   Web3Helper.orderBuyedEvent(req, res);
+  Web3Helper.getTransferEventFromContract(req, res);
 });
