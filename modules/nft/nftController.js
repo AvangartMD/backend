@@ -187,6 +187,10 @@ nftCtr.updateNft = async (req, res) => {
         fetchNftDetails.isActive = false;
       }
 
+      if (req.body.collectionId) {
+        fetchNftDetails.collectionId = req.body.collectionId;
+      }
+
       if (req.body.isActive) {
         fetchNftDetails.isActive = true;
       }
