@@ -152,7 +152,7 @@ nftCtr.updateNft = async (req, res) => {
       if (req.body.title) {
         fetchNftDetails.title = req.body.title;
       }
-      if (req.body.category) {
+      if (req.body.category && req.body.category.length) {
         fetchNftDetails.category = req.body.category;
       }
       if (req.body.description) {
@@ -548,11 +548,26 @@ nftCtr.getSingleNftDetails = async (req, res) => {
       } else {
         getNftDetails.isLiked = false;
       }
+
+      // check isOwner
+      const checkIsOwnerOfNft = await NftModel.find({
+        _id: req.params.id,
+        ownerId: req.userData._id,
+      });
+
+      // check whether any edition buyed
+      const checkEditionBuyed = await EditionModel.findOne({
+        nftId: getNftDetails._id,
+        ownerId: req.userData._id,
+      });
+
+      if (!checkIsOwnerOfNft && !checkEditionBuyed) {
+        getNftDetails.digitalKey = null;
+      }
     } else {
       getNftDetails.isLiked = false;
+      getNftDetails.digitalKey = null;
     }
-
-    // check isOwner
 
     return res.status(200).json({
       message: req.t('SINGLE_NFT'),
