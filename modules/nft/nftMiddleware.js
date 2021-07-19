@@ -167,11 +167,22 @@ NftMiddleware.canUpdateNft = async (req, res, next) => {
 
     if (
       getNftDetails &&
-      getNftDetails.ownerId.toString() === req.userData._id.toString()
+      getNftDetails.ownerId.toString() === req.userData._id.toString() &&
+      getNftDetails.status === 'NOT_MINTED'
     ) {
       return next();
     } else if (req.role === 'ADMIN') {
       return next();
+    } else if (
+      getNftDetails &&
+      getNftDetails.ownerId.toString() === req.userData._id.toString() &&
+      (getNftDetails.status === 'APPROVED' ||
+        getNftDetails.status === 'PENDING')
+    ) {
+      return res.status(400).json({
+        message: req.t('NFT_CANT'),
+        status: false,
+      });
     } else {
       return res.status(403).json({
         message: req.t('NOT_AUTHROZIED'),
