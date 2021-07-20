@@ -35,8 +35,9 @@ auth.isAuthenticatedUser = async (req, res, next) => {
     const fetchUserDetails = await userModel.findById(userTokenData._id);
 
     if (fetchUserDetails && fetchUserDetails.isActive) {
+      const fetchUserRole = await RoleModel.findById(fetchUserDetails.role);
       req.userData = fetchUserDetails;
-      req.role = fetchRole.roleName;
+      req.role = fetchUserRole.roleName;
       return next();
     } else {
       return errorUtil.notAuthenticated(res, req);
@@ -82,7 +83,7 @@ auth.checkIsAutheticated = async (req, res, next) => {
 
     if (fetchUserDetails && fetchUserDetails.isActive) {
       const fetchUserRole = await RoleModel.findById(fetchUserDetails.role);
-      console.log('userdata is:', fetchUserRole);
+
       req.userData = fetchUserDetails;
       req.role = fetchUserRole.roleName;
       return next();
