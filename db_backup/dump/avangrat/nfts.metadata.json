@@ -1,1 +1,1 @@
-{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"unique":true,"key":{"tokenId":{"$numberInt":"1"}},"name":"tokenId_1","sparse":true,"background":true}],"uuid":"6cf4b9cc27ec48c683c508ec2e3d1680","collectionName":"nfts"}
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"},{"v":{"$numberInt":"2"},"unique":true,"key":{"tokenId":{"$numberInt":"1"}},"name":"tokenId_1","sparse":true,"background":true}],"uuid":"39444423f83540fdad42616e93363d0b","collectionName":"nfts"}
