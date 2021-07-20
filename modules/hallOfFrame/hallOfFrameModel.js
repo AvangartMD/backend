@@ -41,4 +41,4 @@ const hallOFFrameSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model('blocks', blockSchema);
+module.exports = mongoose.model('hallFrame', hallOFFrameSchema);

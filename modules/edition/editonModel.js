@@ -32,6 +32,10 @@ const editionSchema = new Schema(
       ref: 'users',
       required: true,
     },
+    nonce: {
+      type: String,
+      default: null,
+    },
     isBurned: {
       type: Boolean,
       default: false,

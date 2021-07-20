@@ -232,12 +232,13 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       getBuyedEvents.sort((a, b) => +a.blockNumber - +b.blockNumber);
 
       const itreateEvents = async (i) => {
+        console.log('OrderBought', getBuyedEvents[0].returnValues.nonce);
         if (i < getBuyedEvents.length) {
           const result = getBuyedEvents[i].returnValues;
           const order = result['order'];
           const transactionHash = getBuyedEvents[i].transactionHash;
 
-          await orderEvent(result, order, transactionHash);
+          await orderEvent(result, order, transactionHash, result.nonce);
           itreateEvents(i + 1);
         } else {
           Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
@@ -262,7 +263,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
   }
 };
 
-async function orderEvent(result, order, transactionId) {
+async function orderEvent(result, order, transactionId, nonce) {
   return new Promise(async (resolve, reject) => {
     try {
       const getNftDetails = await NftModel.findOne({
@@ -278,6 +279,24 @@ async function orderEvent(result, order, transactionId) {
           : +order['saleType'] === 1
           ? 'AUCTION'
           : 'SECOND_HAND';
+      const checkIsBuy = +order['saleType'] === 2 ? true : false;
+      const checkIsOffer = +order['saleType'] === 3 ? true : false;
+
+      const isSecondHand = checkIsBuy || checkIsOffer ? true : false;
+
+      const saleTypes = { type: null, price: 0 };
+
+      // if second hand buy
+      if (checkIsBuy) {
+        saleTypes.type = 'BUY';
+        saleTypes.price = Utils.convertToEther(+order['pricePerNFT']);
+      }
+
+      // if second hand offer
+      if (checkIsOffer) {
+        saleTypes.type = 'OFFER';
+        saleTypes.price = 0;
+      }
 
       if (getNftDetails && getUserDetails) {
         const checkEditionAlreadyAdded = await EditionModel.findOne({
@@ -290,6 +309,8 @@ async function orderEvent(result, order, transactionId) {
           // check it is second hand sale
           checkEditionAlreadyAdded.transactionId = transactionId;
           checkEditionAlreadyAdded.ownerId = getUserDetails._id;
+          checkEditionAlreadyAdded.nonce = nonce;
+          checkEditionAlreadyAdded.isOpenForSale = isSecondHand;
           checkEditionAlreadyAdded.price = Utils.convertToEther(
             +order['pricePerNFT']
           );
@@ -297,6 +318,7 @@ async function orderEvent(result, order, transactionId) {
           checkEditionAlreadyAdded.saleAction = saleType;
           checkEditionAlreadyAdded.timeline = order['timeline'];
           checkEditionAlreadyAdded.isOpenForSale = false;
+          checkEditionAlreadyAdded.saleType = saleTypes;
 
           await checkEditionAlreadyAdded.save();
 
@@ -320,8 +342,10 @@ async function orderEvent(result, order, transactionId) {
             price: Utils.convertToEther(+order['pricePerNFT']),
             walletAddress: result['buyer'],
             saleAction: saleType,
-
+            nonce: nonce,
+            isOpenForSale: isSecondHand,
             timeline: order['timeline'],
+            saleType: saleTypes,
           });
 
           await addNewEdition.save();
