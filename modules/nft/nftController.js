@@ -387,10 +387,6 @@ nftCtr.listUsersNft = async (req, res) => {
       query.status = 'NOT_MINTED';
     }
 
-    if (req.userData && req.userData.role !== 'ADMIN' && !req.params.userId) {
-      query.ownerId = req.userData._id;
-    }
-
     if (req.query.status) {
       if (req.query.status === 'SOLD') {
         query.saleState = 'SOLD';
@@ -411,6 +407,10 @@ nftCtr.listUsersNft = async (req, res) => {
         query.status = 'APPROVED';
         // query.expr = { $lt: ['nftSold', 'edition'] };
       }
+    }
+
+    if (req.userData && req.userData.role !== 'ADMIN' && !req.params.userId) {
+      query.ownerId = req.userData._id;
     }
 
     if (req.params.userId) {
@@ -890,10 +890,11 @@ nftCtr.getLikedNfts = async (req, res) => {
       query.userId = req.userData._id;
     }
     const getLikedNfts = await LikeModel.find(query);
+
     const nftIds = [];
     if (getLikedNfts.length) {
       for (let i = 0; i < getLikedNfts.length; i++) {
-        nftIds.push(getLikedNfts._id);
+        nftIds.push(getLikedNfts[i].nftId);
       }
 
       const nfts = await NftModel.find(
