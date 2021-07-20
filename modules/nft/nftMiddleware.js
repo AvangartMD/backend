@@ -82,6 +82,7 @@ NftMiddleware.validateAddCollection = async (req, res, next) => {
     name: Joi.string().required(),
     description: Joi.string().required(),
     logo: Joi.string().required(),
+    category: Joi.array().items(Joi.string()).required(),
   });
   validate.validateRequest(req, res, next, schema);
 };
@@ -155,6 +156,7 @@ NftMiddleware.validateCollectionUpdate = async (req, res, next) => {
     description: Joi.string(),
     logo: Joi.string(),
     nftId: Joi.array(),
+    category: Joi.array().items(Joi.string()),
   });
 
   validate.validateRequest(req, res, next, schema);

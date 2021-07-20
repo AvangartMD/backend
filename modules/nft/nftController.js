@@ -61,13 +61,14 @@ nftCtr.addNewNft = async (req, res) => {
 // add a new collection
 nftCtr.addNewCollection = async (req, res) => {
   try {
-    const { logo, name, description } = req.body;
+    const { logo, name, description, category } = req.body;
 
     const addNewCollection = new CollectionModel({
       logo,
       name,
       slugText: name,
       description,
+      category,
       ownerId: req.role === 'ADMIN' ? req.body.ownerId : req.userData._id,
     });
 
@@ -102,6 +103,10 @@ nftCtr.updateCollection = async (req, res) => {
       }
       if (req.body.description) {
         fetchCollection.description = req.body.description;
+      }
+
+      if (req.body.category && req.body.category.length) {
+        fetchCollection.category = req.body.category;
       }
       // remove nft from collection
       if (req.body.nftId && req.body.nftId.length) {
@@ -226,10 +231,15 @@ nftCtr.getCollectionByUsers = async (req, res) => {
         isActive: 1,
       },
       { isActive: 0, createdAt: 0, updatedAt: 0 }
-    ).populate({
-      path: 'ownerId',
-      select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
-    });
+    )
+      .populate({
+        path: 'ownerId',
+        select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+      })
+      .populate({
+        path: 'category',
+        select: { createdAt: 0, updatedAt: 0 },
+      });
 
     return res.status(200).json({
       message: req.t('COLLECTION_LIST'),
@@ -251,7 +261,11 @@ nftCtr.getSingleCollectionDetails = async (req, res) => {
   try {
     const fetchCollectionDetails = await CollectionModel.findById(
       req.params.id
-    );
+    ).populate({
+      path: 'category',
+      select: { createdAt: 0, updatedAt: 0 },
+    });
+
     return res.status(200).json({
       message: req.t('COLLECTION_DETAILS'),
       status: true,
@@ -281,6 +295,10 @@ nftCtr.getListOfCollectionForAdmin = async (req, res) => {
       .populate({
         path: 'ownerId',
         select: { _id: 1, walletAddress: 1 },
+      })
+      .populate({
+        path: 'category',
+        select: { createdAt: 0, updatedAt: 0 },
       })
       .sort({ createdAt: -1 })
       .skip((+page - 1 || 0) * +process.env.LIMIT)
@@ -622,19 +640,24 @@ nftCtr.listCollectionNft = async (req, res) => {
   try {
     const getCollectionDetails = JSON.parse(
       JSON.stringify(
-        await CollectionModel.findById(req.params.collectionId).populate({
-          path: 'ownerId',
-          select: {
-            _id: 1,
-            walletAddress: 1,
-            username: 1,
-            followersCount: 1,
-            followingCount: 1,
-            name: 1,
-            profile: 1,
-            cover: 1,
-          },
-        })
+        await CollectionModel.findById(req.params.collectionId)
+          .populate({
+            path: 'ownerId',
+            select: {
+              _id: 1,
+              walletAddress: 1,
+              username: 1,
+              followersCount: 1,
+              followingCount: 1,
+              name: 1,
+              profile: 1,
+              cover: 1,
+            },
+          })
+          .populate({
+            path: 'category',
+            select: { createdAt: 0, updatedAt: 0 },
+          })
       )
     );
 
@@ -808,6 +831,10 @@ nftCtr.getCollectionsList = async (req, res) => {
       .populate({
         path: 'ownerId',
         select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
+      })
+      .populate({
+        path: 'category',
+        select: { createdAt: 0, updatedAt: 0 },
       })
       .sort({ createdAt: -1 })
       .skip((+page - 1 || 0) * +process.env.LIMIT)

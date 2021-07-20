@@ -33,6 +33,13 @@ const collectionSchema = new Schema(
       ref: 'users',
       required: true,
     },
+    category: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'categories',
+        required: false,
+      },
+    ],
     isActive: {
       type: Boolean,
       default: true,
