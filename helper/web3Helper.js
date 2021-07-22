@@ -441,9 +441,20 @@ getWeb3Event.getTransferEventFromContract = async (req, res) => {
 // seconf hand order buy
 
 async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
+  // console.log('ORDER IS====>', order);
   return new Promise(async (resolve, reject) => {
     try {
-      console.log('order is:', order);
+      const web3 = new Web3(provider);
+
+      const tokenContract = new web3.eth.Contract(
+        ContractAbi,
+        process.env.ESCROW_ADDRESS
+      );
+      // check valid mongoose id
+      const getEdition = await tokenContract.methods
+        .secondHandOrder(order['seller'], nonce)
+        .call();
+
       const getNftDetails = await NftModel.findOne({
         tokenId: order['tokenId'],
       });
@@ -484,7 +495,7 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
       if (getNftDetails && getUserDetails) {
         const checkEditionAlreadyAdded = await EditionModel.findOne({
           nftId: getNftDetails._id,
-          edition: +order['amount'],
+          edition: +getEdition,
         });
 
         // check edition added
@@ -510,7 +521,7 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           const addNewEdition = new EditionModel({
             nftId: getNftDetails._id,
             ownerId: getUserDetails._id,
-            edition: +order['amount'],
+            edition: +getEdition,
             transactionId: transactionId,
             price: Utils.convertToEther(+order['pricePerNFT']),
             walletAddress: order['seller'],
