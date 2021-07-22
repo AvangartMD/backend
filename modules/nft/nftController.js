@@ -978,7 +978,7 @@ nftCtr.getUserBuyedNfts = async (req, res) => {
 
     if (editions.length) {
       for (let i = 0; i < editions.length; i++) {
-        userNfts.push(editions._nftId);
+        userNfts.push(editions[i].nftId);
       }
 
       const fetchUserNft = await NftModel.find(
