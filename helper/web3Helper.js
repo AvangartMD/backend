@@ -478,7 +478,7 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
       // if second hand offer
       if (checkIsOffer) {
         saleTypes.type = 'OFFER';
-        saleTypes.price = 0;
+        saleTypes.price = Utils.convertToEther(+order['pricePerNFT']);
       }
 
       if (getNftDetails && getUserDetails) {
