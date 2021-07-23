@@ -90,5 +90,6 @@
     "INVALID_EDITION_DETAILS": "Invalid Edition Details",
     "YOU_ARE_NOT_OWNER": "You are not a owner of edition",
     "NFT_CANT": "Nft cant be update",
-    "CRON_ARTIST": "Cron for artist fires successfully"
+    "CRON_ARTIST": "Cron for artist fires successfully",
+    "CRON_COLLECTOR": "Cron for top collector fired successfully"
 }

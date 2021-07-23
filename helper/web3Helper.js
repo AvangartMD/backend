@@ -517,7 +517,6 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           await checkEditionAlreadyAdded.save();
           resolve(true);
         } else {
-          console.log('IN ELSE', order['seller']);
           const addNewEdition = new EditionModel({
             nftId: getNftDetails._id,
             ownerId: getUserDetails._id,

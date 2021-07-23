@@ -824,6 +824,11 @@ nftCtr.getCollectionsList = async (req, res) => {
         $options: 'i',
       };
     }
+
+    if (req.body.category && req.body.category.length) {
+      query.category = { $in: req.body.category };
+    }
+
     const totalCount = await CollectionModel.countDocuments(query);
     const pageCount = Math.ceil(totalCount / +process.env.LIMIT);
 
