@@ -86,6 +86,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
 
 async function checkMinting(result, order, nonce, transactionhash) {
   try {
+    console.log('sale typ eis:', +order['saleType']);
     const checkIsBuy = +order['saleType'] === 2 ? true : false;
     const checkIsOffer = +order['saleType'] === 3 ? true : false;
 
@@ -181,6 +182,7 @@ getWeb3Event.getPastEvents = async (req, res) => {
     });
 
     if (getPastEvents.length) {
+      console.log('getPastEvents', getPastEvents[0]);
       const itreateEvents = async (i) => {
         if (i < getPastEvents.length) {
           const nonce = getPastEvents[i].returnValues.nonce;
@@ -241,6 +243,10 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
     if (getBuyedEvents.length) {
       getBuyedEvents.sort((a, b) => +a.blockNumber - +b.blockNumber);
+      console.log(
+        'getBuyedEvents',
+        getBuyedEvents[0].returnValues.editionNumber
+      );
 
       // const itreateEvents = async (i) => {
       for (let i = 0; i < getBuyedEvents.length; i++) {
@@ -270,6 +276,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
 async function orderEvent(result, order, transactionId, nonce) {
   return new Promise(async (resolve, reject) => {
+    // console.log('Order is:', +result['amount']);
     try {
       const getNftDetails = await NftModel.findOne({
         tokenId: order['tokenId'],
@@ -307,7 +314,7 @@ async function orderEvent(result, order, transactionId, nonce) {
       if (getNftDetails && getUserDetails) {
         const checkEditionAlreadyAdded = await EditionModel.findOne({
           nftId: getNftDetails._id,
-          edition: +result['amount'],
+          edition: +result['editionNumber'],
         });
 
         // check edition added
@@ -330,7 +337,7 @@ async function orderEvent(result, order, transactionId, nonce) {
 
           const addNewHistory = new HistoryModel({
             nftId: getNftDetails._id,
-            editionNo: order['amount'],
+            editionNo: +result['editionNumber'],
             ownerId: getUserDetails._id,
             text: 'Nft buyed by user',
             buyPrice: Utils.convertToEther(+order['pricePerNFT']),
@@ -343,7 +350,7 @@ async function orderEvent(result, order, transactionId, nonce) {
           const addNewEdition = new EditionModel({
             nftId: getNftDetails._id,
             ownerId: getUserDetails._id,
-            edition: +result['amount'],
+            edition: +result['editionNumber'],
             transactionId: transactionId,
             price: Utils.convertToEther(+order['pricePerNFT']),
             walletAddress: result['buyer'],
@@ -358,7 +365,7 @@ async function orderEvent(result, order, transactionId, nonce) {
 
           const addNewHistory = new HistoryModel({
             nftId: getNftDetails._id,
-            editionNo: order['amount'],
+            editionNo: +result['editionNumber'],
             ownerId: getUserDetails._id,
             text: 'Nft buyed by user',
             buyPrice: Utils.convertToEther(+order['pricePerNFT']),
