@@ -91,5 +91,9 @@
     "YOU_ARE_NOT_OWNER": "You are not a owner of edition",
     "NFT_CANT": "Nft cant be update",
     "CRON_ARTIST": "Cron for artist fires successfully",
-    "CRON_COLLECTOR": "Cron for top collector fired successfully"
+    "CRON_COLLECTOR": "Cron for top collector fired successfully",
+    "TOP_ARTIST": "Top Artist List",
+    "TOP_COLLECTOR": "Top Collector",
+    "TOP_ARTWORK": "Top artwork",
+    "INAVLID_TYPE": "Invalid frame type"
 }

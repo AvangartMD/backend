@@ -4,6 +4,7 @@ const ContractAbi = require('../abi/contract.json');
 const NftModel = require('../modules/nft/nftModel');
 const UserModel = require('../modules/user/userModal');
 const EditionModel = require('../modules/edition/editonModel');
+const CancelledOrder = require('../contract/cancellerOrders');
 const HistoryModel = require('../modules/history/historyModel');
 const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
@@ -255,18 +256,14 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
       }
 
       Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
-      console.log('CRON FIRES ');
 
       getLastBlock.orderBlockNo = latestBlockNo;
       await getLastBlock.save();
     } else {
-      console.log('IN ELSE ORDER EVENT');
-
       getLastBlock.orderBlockNo = latestBlockNo;
       await getLastBlock.save();
     }
   } catch (err) {
-    console.log('err isl', err);
     Utils.echoLog(`orderBuyedEvent ${err}`);
   }
 };
@@ -287,8 +284,6 @@ async function orderEvent(result, order, transactionId, nonce) {
           : +order['saleType'] === 1
           ? 'AUCTION'
           : 'SECOND_HAND';
-
-      console.log('sale Type is', +order['saleType']);
 
       const checkIsBuy = +order['saleType'] === 2 ? true : false;
       const checkIsOffer = +order['saleType'] === 3 ? true : false;
@@ -546,5 +541,48 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
     }
   });
 }
+
+// get cancelled Events
+getWeb3Event.getCancelledEvents = async (req, res) => {
+  try {
+    const web3 = new Web3(provider);
+    const latestBlockNo = await web3.eth.getBlockNumber();
+
+    const getLastBlock = await BlockModel.findOne({}, { orderCancelled: 1 });
+
+    const contract = new web3.eth.Contract(
+      ContractAbi,
+      process.env.ESCROW_ADDRESS
+    );
+
+    const cancelledEvent = await contract.getPastEvents('OrderCancelled', {
+      fromBlock: getLastBlock.orderCancelled,
+      toBlock: latestBlockNo,
+    });
+
+    if (cancelledEvent && cancelledEvent.length) {
+      // console.log('cancelled event is:', cancelledEvent[0].returnValues);
+      for (let i = 0; i < cancelledEvent.length; i++) {
+        const editionNo = cancelledEvent[i].returnValues.editionNumber;
+        const tokenId = cancelledEvent[i].returnValues.order['tokenId'];
+        const transactionHash = cancelledEvent[i].transactionHash;
+
+        await CancelledOrder.cancelTransfer(
+          editionNo,
+          tokenId,
+          transactionHash
+        );
+      }
+
+      getLastBlock.orderCancelled = latestBlockNo;
+      await getLastBlock.save();
+    } else {
+      getLastBlock.orderCancelled = latestBlockNo;
+      await getLastBlock.save();
+    }
+  } catch (err) {
+    Utils.echoLog(`Error in cancelled events ${err}`);
+  }
+};
 
 module.exports = getWeb3Event;

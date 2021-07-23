@@ -35,10 +35,7 @@ hallOfFrameHelper.getArtWorks = async (req, res) => {
         await findArts.save();
       } else {
         const addNewArts = new HallOfFrameModel({
-          artist: [],
           artwork: topArts,
-          collector: [],
-          ourPicks: [],
         });
 
         await addNewArts.save();
@@ -53,7 +50,6 @@ hallOfFrameHelper.getArtWorks = async (req, res) => {
       return true;
     }
   } catch (err) {
-    console.log('err is:', err);
     Utils.echoLog('error in art cron  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),

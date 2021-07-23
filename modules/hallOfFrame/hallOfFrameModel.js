@@ -30,7 +30,6 @@ const hallOFFrameSchema = new Schema(
     artist: [userSchema],
     artwork: [nftSchema],
     collector: [userSchema],
-    ourPicks: [userSchema],
   },
 
   {

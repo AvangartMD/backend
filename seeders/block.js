@@ -8,6 +8,7 @@ Blocks.inializeBlock = async () => {
       blockNo: 0,
       orderBlockNo: 0,
       transferBlockNo: 0,
+      orderCancelled: 0,
     });
     await addNewBlock.save();
   } catch (err) {
