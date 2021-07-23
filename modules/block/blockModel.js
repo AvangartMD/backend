@@ -16,6 +16,10 @@ const blockSchema = new Schema(
       type: Number,
       default: 0,
     },
+    orderCancelled: {
+      type: Number,
+      default: 0,
+    },
   },
 
   {

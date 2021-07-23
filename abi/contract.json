@@ -53,6 +53,12 @@
             },
             {
                 "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
                 "internalType": "address",
                 "name": "buyer",
                 "type": "address"
@@ -113,6 +119,12 @@
                 "internalType": "struct Escrow.Order",
                 "name": "order",
                 "type": "tuple"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
             },
             {
                 "indexed": false,
@@ -210,6 +222,12 @@
             },
             {
                 "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
                 "internalType": "address",
                 "name": "buyer",
                 "type": "address"
@@ -223,7 +241,7 @@
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "amount",
+                "name": "editionNumber",
                 "type": "uint256"
             }
         ],
@@ -281,6 +299,75 @@
                 "indexed": false,
                 "internalType": "uint256",
                 "name": "nonce",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "editionNumber",
+                "type": "uint256"
+            }
+        ],
+        "name": "OrderCancelled",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "seller",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "tokenId",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "pricePerNFT",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "saleType",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "timeline",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct Escrow.Order",
+                "name": "order",
+                "type": "tuple"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "nonce",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "editionNumber",
                 "type": "uint256"
             }
         ],
