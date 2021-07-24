@@ -52,7 +52,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     const web3 = new Web3(
       new Web3(
         new Web3.providers.WebsocketProvider(
-          'wss://bsc.getblock.io/testnet/',
+          'wss://speedy-nodes-nyc.moralis.io/fee2e1de4b5b781f4b6061f3/bsc/testnet/ws',
           options
         )
       )
@@ -71,22 +71,22 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         // },
         fromBlock: 6018110,
       })
-      .on('data', async (e) => {
-        // console.log('eis:', e);
-        const nonce = getPastEvents[i].returnValues.nonce;
-        const result = e.returnValues;
+      .on('data', async (getPastEvents) => {
+        const nonce = getPastEvents.returnValues.nonce;
+        const result = getPastEvents.returnValues;
         const order = result['order'];
-        checkMinting(result, order, nonce);
+        const transactionHash = getPastEvents.transactionHash;
+
+        checkMinting(result, order, nonce, transactionHash);
       });
   } catch (err) {
-    console.log('err is:', err);
     Utils.echoLog(`Error in web3 listner for mint :${err}`);
   }
 };
 
 async function checkMinting(result, order, nonce, transactionhash) {
   try {
-    console.log('sale typ eis:', +order['saleType']);
+    console.log("+order['saleType'] === 2", +order['saleType']);
     const checkIsBuy = +order['saleType'] === 2 ? true : false;
     const checkIsOffer = +order['saleType'] === 3 ? true : false;
 
@@ -181,8 +181,9 @@ getWeb3Event.getPastEvents = async (req, res) => {
       toBlock: latestBlockNo,
     });
 
+    console.log('past event is:', getPastEvents);
+
     if (getPastEvents.length) {
-      console.log('getPastEvents', getPastEvents[0]);
       const itreateEvents = async (i) => {
         if (i < getPastEvents.length) {
           const nonce = getPastEvents[i].returnValues.nonce;
@@ -243,10 +244,6 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
     if (getBuyedEvents.length) {
       getBuyedEvents.sort((a, b) => +a.blockNumber - +b.blockNumber);
-      console.log(
-        'getBuyedEvents',
-        getBuyedEvents[0].returnValues.editionNumber
-      );
 
       // const itreateEvents = async (i) => {
       for (let i = 0; i < getBuyedEvents.length; i++) {

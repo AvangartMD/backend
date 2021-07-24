@@ -4,10 +4,10 @@ const HallHelper = require('./hallOfFrame');
 const cron = require('node-cron');
 
 cron.schedule('* * * * *', (req, res) => {
-  Web3Helper.getPastEvents(req, res);
-  Web3Helper.orderBuyedEvent(req, res);
-  Web3Helper.getTransferEventFromContract(req, res);
-  Web3Helper.getCancelledEvents(req, res);
+  // Web3Helper.getPastEvents(req, res);
+  // Web3Helper.orderBuyedEvent(req, res);
+  // Web3Helper.getTransferEventFromContract(req, res);
+  // Web3Helper.getCancelledEvents(req, res);
 });
 
 cron.schedule('0 0 * * *', async (req, res) => {
