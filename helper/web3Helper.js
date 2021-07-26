@@ -58,6 +58,8 @@ getWeb3Event.getTransferEvent = async (req, res) => {
       )
     );
 
+    // order placed event
+
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
@@ -78,6 +80,50 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         const transactionHash = getPastEvents.transactionHash;
 
         checkMinting(result, order, nonce, transactionHash);
+      });
+
+    // order bought events
+    contract.events
+      .OrderBought({
+        fromBlock: 6018110,
+      })
+      .on('data', async (getPastEvents) => {
+        const result = getPastEvents.returnValues;
+        const order = result['order'];
+        const transactionHash = getPastEvents.transactionHash;
+
+        await orderEvent(result, order, transactionHash, result.nonce);
+      });
+
+    //edition transferred events
+    contract.events
+      .EditionTransferred({ fromBlock: 6018110 })
+      .on('data', async (transferred) => {
+        const result = transferred.returnValues;
+        const transactionhash = transferred.transactionHash;
+
+        if (
+          result['to'].trim() === '0x0000000000000000000000000000000000000000'
+        ) {
+          TransferEvent.burn(result, transactionhash);
+        } else {
+          TransferEvent.setTransferEvent(result, transactionhash);
+        }
+      });
+
+    // order cancelled events
+    contract.events
+      .OrderCancelled({ fromBlock: 6018110 })
+      .on('data', async (cancelledEvent) => {
+        const editionNo = cancelledEvent.returnValues.editionNumber;
+        const tokenId = cancelledEvent.returnValues.order['tokenId'];
+        const transactionHash = cancelledEvent.transactionHash;
+
+        await CancelledOrder.cancelTransfer(
+          editionNo,
+          tokenId,
+          transactionHash
+        );
       });
   } catch (err) {
     Utils.echoLog(`Error in web3 listner for mint :${err}`);
@@ -247,8 +293,6 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 
       // const itreateEvents = async (i) => {
       for (let i = 0; i < getBuyedEvents.length; i++) {
-        console.log('OrderBought', getBuyedEvents[0].returnValues.nonce);
-
         const result = getBuyedEvents[i].returnValues;
         const order = result['order'];
         const transactionHash = getBuyedEvents[i].transactionHash;
