@@ -12,13 +12,10 @@ hallOfFrameCtr.listHallOfFrame = async (req, res) => {
     const type = req.params.type ? req.params.type.toLowerCase().trim() : null;
 
     if (type === 'artist') {
-      const findArtist = HallOfFrameModel.findOne(
-        {},
-        { artist: 1, collector: 1 }
-      );
+      const findArtist = await HallOfFrameModel.findOne({}, { artist: 1 });
       const artist = [];
-      if (findArtist && findArtist.artist.length) {
-        for (let i = 0; i < findArtist.length; i++) {
+      if (findArtist && findArtist.artist && findArtist.artist.length) {
+        for (let i = 0; i < findArtist.artist.length; i++) {
           const getUserDetails = await UserModel.findOne({
             _id: findArtist.artist[i].userId,
           });
@@ -49,11 +46,18 @@ hallOfFrameCtr.listHallOfFrame = async (req, res) => {
         });
       }
     } else if (type === 'collector') {
+      const findCollector = await HallOfFrameModel.findOne(
+        {},
+        { collector: 1 }
+      );
+
       const collector = [];
-      const findCollector = HallOfFrameModel.findOne({}, { collector: 1 });
-      const artist = [];
-      if (findCollector && findCollector.collector.length) {
-        for (let i = 0; i < findCollector.length; i++) {
+      if (
+        findCollector &&
+        findCollector.collector &&
+        findCollector.collector.length
+      ) {
+        for (let i = 0; i < findCollector.collector.length; i++) {
           const getUserDetails = await UserModel.findOne({
             _id: findCollector.collector[i].userId,
           });
@@ -78,28 +82,30 @@ hallOfFrameCtr.listHallOfFrame = async (req, res) => {
         });
       } else {
         return res.status(200).json({
-          message: req.t('TOP_ARTIST'),
+          message: req.t('TOP_COLLECTOR'),
           status: true,
           data: [],
         });
       }
     } else if (type === 'artwork') {
       const artWorks = [];
-      const findArtWork = HallOfFrameModel.findOne({}, { artwork: 1 });
+      const findArtWork = await HallOfFrameModel.findOne({}, { artwork: 1 });
 
       if (findArtWork && findArtWork.artwork.length) {
-        const findNfts = NftModel.findOne({
-          _id: findArtWork.artwork[i].nftId,
-        });
+        for (let i = 0; i < findArtWork.artwork.length; i++) {
+          const findNfts = await NftModel.findOne({
+            _id: findArtWork.artwork[i].nftId,
+          });
 
-        const nfts = {
-          _id: findNfts._id,
-          image: findNfts['image'],
-          totalSale: findArtWork.artwork[i].totalBnb,
-          title: findNfts['title'],
-        };
+          const nfts = {
+            _id: findNfts._id,
+            image: findNfts['image'],
+            totalSale: findArtWork.artwork[i].totalBnb,
+            title: findNfts['title'],
+          };
 
-        artWorks.push(nfts);
+          artWorks.push(nfts);
+        }
         await Client.set(type, JSON.stringify(artWorks), 'EX', 1 * 60 * 60);
 
         return res.status(200).json({
@@ -121,6 +127,7 @@ hallOfFrameCtr.listHallOfFrame = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log('err is:', err);
     Utils.echoLog(`Error in listinh Hall of frame ${err}`);
 
     return res.status(500).json({

@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const { roles } = require("../../helper/enum");
+const mongoose = require('mongoose');
+const { roles } = require('../../helper/enum');
 
 const { Schema } = mongoose;
 
@@ -9,9 +9,13 @@ const notificationSchema = new Schema(
       type: String,
       required: true,
     },
+    route: {
+      type: String,
+      default: null,
+    },
     userId: {
       type: Schema.Types.ObjectId,
-      ref: "users",
+      ref: 'users',
       required: true,
     },
   },
@@ -24,4 +28,4 @@ const notificationSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("notification", notificationSchema);
+module.exports = mongoose.model('notification', notificationSchema);
