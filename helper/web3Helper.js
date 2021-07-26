@@ -82,7 +82,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         checkMinting(result, order, nonce, transactionHash);
       });
 
-    // order bought events
+    // // order bought events
     contract.events
       .OrderBought({
         fromBlock: 6018110,
@@ -101,14 +101,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
       .on('data', async (transferred) => {
         const result = transferred.returnValues;
         const transactionhash = transferred.transactionHash;
-
-        if (
-          result['to'].trim() === '0x0000000000000000000000000000000000000000'
-        ) {
-          TransferEvent.burn(result, transactionhash);
-        } else {
-          TransferEvent.setTransferEvent(result, transactionhash);
-        }
+        await TransferredEvent(transactionhash, result);
       });
 
     // order cancelled events
@@ -130,9 +123,21 @@ getWeb3Event.getTransferEvent = async (req, res) => {
   }
 };
 
+async function TransferredEvent(hash, result) {
+  // console.log('transactionHash', transactionHash);
+  return new Promise(async (resolve, reject) => {
+    if (result['to'].trim() === '0x0000000000000000000000000000000000000000') {
+      await TransferEvent.burn(result, hash);
+      resolve(true);
+    } else {
+      await TransferEvent.setTransferEvent(result, hash);
+      resolve(true);
+    }
+  });
+}
+
 async function checkMinting(result, order, nonce, transactionhash) {
   try {
-    console.log("+order['saleType'] === 2", +order['saleType']);
     const checkIsBuy = +order['saleType'] === 2 ? true : false;
     const checkIsOffer = +order['saleType'] === 3 ? true : false;
 
@@ -538,7 +543,7 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
       if (getNftDetails && getUserDetails) {
         const checkEditionAlreadyAdded = await EditionModel.findOne({
           nftId: getNftDetails._id,
-          edition: +getEdition,
+          edition: +result['editionNumber'],
         });
 
         // check edition added
@@ -563,7 +568,7 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           const addNewEdition = new EditionModel({
             nftId: getNftDetails._id,
             ownerId: getUserDetails._id,
-            edition: +getEdition,
+            edition: +result['editionNumber'],
             transactionId: transactionId,
             price: Utils.convertToEther(+order['pricePerNFT']),
             walletAddress: order['seller'],
