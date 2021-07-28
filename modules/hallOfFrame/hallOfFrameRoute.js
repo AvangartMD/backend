@@ -16,6 +16,9 @@ hallOfFrameRoute.get('/topArts', topArt);
 const topCollectors = [HallOfFrameHelper.getTopBuyers];
 hallOfFrameRoute.get('/topCollector', topCollectors);
 
+// get top creators
+const getTopCreators = [HallOfFrameHelper.getTopCreators];
+hallOfFrameRoute.get('/topCreator', getTopCreators);
 // get hall of frame list
 const listHallOfFrame = [HallMiddleware.checkRedis, HallCtr.listHallOfFrame];
 hallOfFrameRoute.get('/list/:type', listHallOfFrame);

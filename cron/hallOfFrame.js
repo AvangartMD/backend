@@ -1,5 +1,6 @@
 const HistoryModel = require('../modules/history/historyModel');
 const HallOfFrameModel = require('../modules/hallOfFrame/hallOfFrameModel');
+const LogsModel = require('../modules/logs/logsModel');
 const Utils = require('../helper/utils');
 const moment = require('moment');
 
@@ -125,6 +126,71 @@ hallOfFrameHelper.getTopBuyers = async (req, res) => {
       status: false,
       err: err.message ? err.message : err,
     });
+  }
+};
+
+// get top Creators
+
+hallOfFrameHelper.getTopCreators = async (req, res) => {
+  try {
+    const d = new Date();
+    d.setDate(d.getDate() - 15);
+    const timeStamp = Math.floor(+d / 1000);
+    const creators = [];
+
+    const getTopCreators = await LogsModel.aggregate([
+      {
+        $match: {
+          timestamp: {
+            $gte: timeStamp,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: '$userId',
+          // history: { $push: '$$ROOT' },
+          // total: { $sum: '$$ROOT.buyPrice ' },
+          totalBnb: { $sum: '$bnbValue' },
+        },
+      },
+      { $sort: { totalBnb: -1 } },
+      { $limit: 5 },
+    ]);
+
+    if (getTopCreators.length) {
+      for (let j = 0; j < getTopCreators.length; j++) {
+        creators.push({
+          userId: getTopCreators[j]._id,
+          totalBnb: getTopCreators[j].totalBnb,
+        });
+      }
+    }
+
+    //   check record exists or not
+    const findCreator = await HallOfFrameModel.findOne({}, { artist: 1 });
+    // if already exists
+    if (findCreator) {
+      findCreator.artist = creators;
+      await findCreator.save();
+    } else {
+      const addNewArtist = new HallOfFrameModel({
+        artist: creators,
+      });
+
+      await addNewArtist.save();
+    }
+
+    if (res) {
+      return res.status(200).json({
+        message: req.t('CRON_COLLECTOR'),
+        status: true,
+        data: creators,
+      });
+    }
+    return true;
+  } catch (err) {
+    console.log('err is:', err);
   }
 };
 module.exports = hallOfFrameHelper;

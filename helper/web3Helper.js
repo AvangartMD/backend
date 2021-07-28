@@ -6,6 +6,7 @@ const UserModel = require('../modules/user/userModal');
 const EditionModel = require('../modules/edition/editonModel');
 const CancelledOrder = require('../contract/cancellerOrders');
 const HistoryModel = require('../modules/history/historyModel');
+const LogsHelper = require('../contract/getLogs');
 const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
 const Utils = require('./utils');
@@ -65,22 +66,22 @@ getWeb3Event.getTransferEvent = async (req, res) => {
       process.env.ESCROW_ADDRESS
     );
 
-    contract.events
-      .OrderPlaced({
-        // filter: {
-        //   from: '0x0000000000000000000000000000000000000000', //,
-        //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
-        // },
-        fromBlock: 6018110,
-      })
-      .on('data', async (getPastEvents) => {
-        const nonce = getPastEvents.returnValues.nonce;
-        const result = getPastEvents.returnValues;
-        const order = result['order'];
-        const transactionHash = getPastEvents.transactionHash;
+    // contract.events
+    //   .OrderPlaced({
+    //     // filter: {
+    //     //   from: '0x0000000000000000000000000000000000000000', //,
+    //     //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
+    //     // },
+    //     fromBlock: 6018110,
+    //   })
+    //   .on('data', async (getPastEvents) => {
+    //     const nonce = getPastEvents.returnValues.nonce;
+    //     const result = getPastEvents.returnValues;
+    //     const order = result['order'];
+    //     const transactionHash = getPastEvents.transactionHash;
 
-        checkMinting(result, order, nonce, transactionHash);
-      });
+    //     checkMinting(result, order, nonce, transactionHash);
+    //   });
 
     // // order bought events
     contract.events
@@ -96,28 +97,28 @@ getWeb3Event.getTransferEvent = async (req, res) => {
       });
 
     //edition transferred events
-    contract.events
-      .EditionTransferred({ fromBlock: 6018110 })
-      .on('data', async (transferred) => {
-        const result = transferred.returnValues;
-        const transactionhash = transferred.transactionHash;
-        await TransferredEvent(transactionhash, result);
-      });
+    // contract.events
+    //   .EditionTransferred({ fromBlock: 6018110 })
+    //   .on('data', async (transferred) => {
+    //     const result = transferred.returnValues;
+    //     const transactionhash = transferred.transactionHash;
+    //     await TransferredEvent(transactionhash, result);
+    //   });
 
     // order cancelled events
-    contract.events
-      .OrderCancelled({ fromBlock: 6018110 })
-      .on('data', async (cancelledEvent) => {
-        const editionNo = cancelledEvent.returnValues.editionNumber;
-        const tokenId = cancelledEvent.returnValues.order['tokenId'];
-        const transactionHash = cancelledEvent.transactionHash;
+    // contract.events
+    //   .OrderCancelled({ fromBlock: 6018110 })
+    //   .on('data', async (cancelledEvent) => {
+    //     const editionNo = cancelledEvent.returnValues.editionNumber;
+    //     const tokenId = cancelledEvent.returnValues.order['tokenId'];
+    //     const transactionHash = cancelledEvent.transactionHash;
 
-        await CancelledOrder.cancelTransfer(
-          editionNo,
-          tokenId,
-          transactionHash
-        );
-      });
+    //     await CancelledOrder.cancelTransfer(
+    //       editionNo,
+    //       tokenId,
+    //       transactionHash
+    //     );
+    //   });
   } catch (err) {
     Utils.echoLog(`Error in web3 listner for mint :${err}`);
   }
@@ -381,16 +382,23 @@ async function orderEvent(result, order, transactionId, nonce) {
 
           await checkEditionAlreadyAdded.save();
 
-          const addNewHistory = new HistoryModel({
-            nftId: getNftDetails._id,
-            editionNo: +result['editionNumber'],
-            ownerId: getUserDetails._id,
-            text: 'Nft buyed by user',
-            buyPrice: Utils.convertToEther(+order['pricePerNFT']),
-            timeline: order['timeline'],
-          });
+          if (
+            checkEditionAlreadyAdded.transactionId.toLowerCase() !==
+            transactionId.toLowerCase()
+          ) {
+            const addNewHistory = new HistoryModel({
+              nftId: getNftDetails._id,
+              editionNo: +result['editionNumber'],
+              ownerId: getUserDetails._id,
+              text: 'Nft buyed by user',
+              buyPrice: Utils.convertToEther(+order['pricePerNFT']),
+              timeline: order['timeline'],
+            });
 
-          await addNewHistory.save();
+            await addNewHistory.save();
+            resolve(true);
+          }
+          await LogsHelper.getLogs(transactionId, getNftDetails._id);
           resolve(true);
         } else {
           const addNewEdition = new EditionModel({
@@ -419,6 +427,7 @@ async function orderEvent(result, order, transactionId, nonce) {
           });
 
           await addNewHistory.save();
+          await LogsHelper.getLogs(transactionId, getNftDetails._id);
 
           const getNftSold = getNftDetails.nftSold + 1;
           getNftDetails.nftSold = getNftDetails.nftSold + 1;

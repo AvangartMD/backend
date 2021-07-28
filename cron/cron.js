@@ -13,4 +13,5 @@ cron.schedule('* * * * *', (req, res) => {
 cron.schedule('0 0 * * *', async (req, res) => {
   await HallHelper.getArtWorks(req, res);
   await HallHelper.getTopBuyers(req, res);
+  await HallHelper.getTopCreators(req, res);
 });
