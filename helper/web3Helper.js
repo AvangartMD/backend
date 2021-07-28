@@ -66,22 +66,22 @@ getWeb3Event.getTransferEvent = async (req, res) => {
       process.env.ESCROW_ADDRESS
     );
 
-    // contract.events
-    //   .OrderPlaced({
-    //     // filter: {
-    //     //   from: '0x0000000000000000000000000000000000000000', //,
-    //     //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
-    //     // },
-    //     fromBlock: 6018110,
-    //   })
-    //   .on('data', async (getPastEvents) => {
-    //     const nonce = getPastEvents.returnValues.nonce;
-    //     const result = getPastEvents.returnValues;
-    //     const order = result['order'];
-    //     const transactionHash = getPastEvents.transactionHash;
+    contract.events
+      .OrderPlaced({
+        // filter: {
+        //   from: '0x0000000000000000000000000000000000000000', //,
+        //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
+        // },
+        fromBlock: 6018110,
+      })
+      .on('data', async (getPastEvents) => {
+        const nonce = getPastEvents.returnValues.nonce;
+        const result = getPastEvents.returnValues;
+        const order = result['order'];
+        const transactionHash = getPastEvents.transactionHash;
 
-    //     checkMinting(result, order, nonce, transactionHash);
-    //   });
+        checkMinting(result, order, nonce, transactionHash);
+      });
 
     // // order bought events
     contract.events
@@ -97,28 +97,28 @@ getWeb3Event.getTransferEvent = async (req, res) => {
       });
 
     //edition transferred events
-    // contract.events
-    //   .EditionTransferred({ fromBlock: 6018110 })
-    //   .on('data', async (transferred) => {
-    //     const result = transferred.returnValues;
-    //     const transactionhash = transferred.transactionHash;
-    //     await TransferredEvent(transactionhash, result);
-    //   });
+    contract.events
+      .EditionTransferred({ fromBlock: 6018110 })
+      .on('data', async (transferred) => {
+        const result = transferred.returnValues;
+        const transactionhash = transferred.transactionHash;
+        await TransferredEvent(transactionhash, result);
+      });
 
     // order cancelled events
-    // contract.events
-    //   .OrderCancelled({ fromBlock: 6018110 })
-    //   .on('data', async (cancelledEvent) => {
-    //     const editionNo = cancelledEvent.returnValues.editionNumber;
-    //     const tokenId = cancelledEvent.returnValues.order['tokenId'];
-    //     const transactionHash = cancelledEvent.transactionHash;
+    contract.events
+      .OrderCancelled({ fromBlock: 6018110 })
+      .on('data', async (cancelledEvent) => {
+        const editionNo = cancelledEvent.returnValues.editionNumber;
+        const tokenId = cancelledEvent.returnValues.order['tokenId'];
+        const transactionHash = cancelledEvent.transactionHash;
 
-    //     await CancelledOrder.cancelTransfer(
-    //       editionNo,
-    //       tokenId,
-    //       transactionHash
-    //     );
-    //   });
+        await CancelledOrder.cancelTransfer(
+          editionNo,
+          tokenId,
+          transactionHash
+        );
+      });
   } catch (err) {
     Utils.echoLog(`Error in web3 listner for mint :${err}`);
   }
