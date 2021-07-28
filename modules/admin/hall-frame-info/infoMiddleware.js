@@ -34,7 +34,7 @@ InfoMiddleware.validateUpdate = async (req, res, next) => {
     banner: imageSchema,
     status: Joi.boolean(),
     button_text: Joi.string().allow(null, ''),
-    button_url: Joi.string().uri().allow(null, ''),
+    button_url: Joi.string().allow(null, ''),
   });
   validate.validateRequest(req, res, next, schema);
 };
