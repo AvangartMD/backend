@@ -18,6 +18,15 @@ const updateUserDetails = [
 ];
 userRoute.put('/update', updateUserDetails);
 
+// update user details by admin
+const updateUserDetailsByAdmin = [
+  Auth.isAuthenticatedUser,
+  Auth.isAdmin,
+  UserMiddleware.signUpValidator,
+  UserCtr.updateUserDetailsByAdmin,
+];
+userRoute.put('/update/:userId', updateUserDetailsByAdmin);
+
 // login user
 const login = [UserMiddleware.loginCheck, UserCtr.login];
 userRoute.post('/login', login);

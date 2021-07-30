@@ -288,10 +288,15 @@ UserCtr.getUserDetails = async (req, res) => {
     }
 
     if (Object.keys(query).length) {
-      const fetchUserData = await UserModel.findOne(query).populate({
-        path: 'role',
-        select: { _id: 1, roleName: 1 },
-      });
+      const fetchUserData = await UserModel.findOne(query)
+        .populate({
+          path: 'role',
+          select: { _id: 1, roleName: 1 },
+        })
+        .populate({
+          path: 'category',
+          select: { _id: 1, isActive: 1, image: 1, categoryName: 1 },
+        });
 
       return res.status(200).json({
         message: req.t('SUCCESS'),
@@ -614,6 +619,80 @@ UserCtr.getSingleUserDetails = async (req, res) => {
     });
   } catch (err) {
     Utils.echoLog('Erro in getUserDetails creator');
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// update user by admin
+UserCtr.updateUserDetailsByAdmin = async (req, res) => {
+  try {
+    const {
+      name,
+      email,
+      username,
+      portfolio,
+      profile,
+      cover,
+      isCreator,
+      bio,
+      category,
+    } = req.body;
+
+    const fetchUserDetails = await UserModel.findById(req.parms.userId);
+
+    if (fetchUserDetails) {
+      if (name) {
+        fetchUserDetails.name = name;
+      }
+      if (cover) {
+        fetchUserDetails.cover = cover;
+      }
+      if (bio) {
+        fetchUserDetails.bio = bio;
+      }
+      if (email) {
+        fetchUserDetails.email = email;
+      }
+      if (portfolio && Object.keys(portfolio).length) {
+        fetchUserDetails.portfolio = portfolio;
+      }
+      if (profile) {
+        fetchUserDetails.profile = profile;
+      }
+      if (username) {
+        fetchUserDetails.username = username;
+      }
+      if (isCreator) {
+        const fetchRole = await RoleModel.findOne({ roleName: 'CREATOR' });
+        fetchUserDetails.role = fetchRole._id;
+      }
+      if (category && category.length) {
+        fetchUserDetails.category = category;
+      }
+
+      const saveUser = await fetchUserDetails.save();
+      return res.status(200).json({
+        message: req.t('USER_UPDATED_SUCCESSFULLY'),
+        status: true,
+        data: {
+          details: {
+            name: saveUser.name,
+            surname: saveUser.surname,
+            status: saveUser.status,
+            profile: saveUser.profile,
+            portfolio: saveUser.portfolio,
+            email: saveUser.email,
+            bio: saveUser.bio,
+          },
+        },
+      });
+    }
+  } catch (err) {
+    Utils.echoLog('error in creating user ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
       status: true,
