@@ -453,6 +453,16 @@ UserCtr.addUserByAdmin = async (req, res) => {
 UserCtr.genrateNonce = async (req, res) => {
   try {
     let nonce = crypto.randomBytes(16).toString('hex');
+
+    if (
+      req.params.address.toLowerCase() ===
+      process.env.ADMIN_WALLET_ADDRESS.toLowerCase()
+    ) {
+      return res.status(400).json({
+        message: req.t('ADMIN_WALLET'),
+        status: false,
+      });
+    }
     const data = {
       walletAddress: req.params.address,
       nonce: nonce,
@@ -471,7 +481,7 @@ UserCtr.genrateNonce = async (req, res) => {
     Utils.echoLog('error in genrating nonce  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
-      status: true,
+      status: false,
       err: err.message ? err.message : err,
     });
   }

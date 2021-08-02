@@ -95,5 +95,6 @@
     "TOP_ARTIST": "Top Artist List",
     "TOP_COLLECTOR": "Top Collector",
     "TOP_ARTWORK": "Top artwork",
-    "INAVLID_TYPE": "Invalid frame type"
+    "INAVLID_TYPE": "Invalid frame type",
+    "ADMIN_WALLET": "Admin wallet cant be registered"
 }
