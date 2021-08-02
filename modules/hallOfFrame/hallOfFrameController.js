@@ -62,19 +62,21 @@ hallOfFrameCtr.listHallOfFrame = async (req, res) => {
             _id: findCollector.collector[i].userId,
           });
 
-          const user = {
-            username: getUserDetails['username']
-              ? getUserDetails['username']
-              : null,
-            profile: getUserDetails['profile']
-              ? getUserDetails['profile']
-              : null,
-            name: getUserDetails['name'] ? getUserDetails['name'] : null,
-            _id: getUserDetails['_id'],
-            totalSale: findCollector.collector[i].totalBnb,
-          };
+          if (getUserDetails) {
+            const user = {
+              username: getUserDetails['username']
+                ? getUserDetails['username']
+                : null,
+              profile: getUserDetails['profile']
+                ? getUserDetails['profile']
+                : null,
+              name: getUserDetails['name'] ? getUserDetails['name'] : null,
+              _id: getUserDetails['_id'],
+              totalSale: findCollector.collector[i].totalBnb,
+            };
 
-          collector.push(user);
+            collector.push(user);
+          }
         }
 
         await Client.set(type, JSON.stringify(collector), 'EX', 1 * 60 * 60);
