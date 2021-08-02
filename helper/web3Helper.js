@@ -10,6 +10,7 @@ const LogsHelper = require('../contract/getLogs');
 const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
 const Utils = require('./utils');
+const NotificationModel = require('../modules/notification/notificationModel');
 // const BlockJson = require('../result/blockNo.json');
 // const OrderBlockJson = require('../result/orderBlock.json');
 const TransferEvent = require('../contract/transferEvent');
@@ -366,6 +367,7 @@ async function orderEvent(result, order, transactionId, nonce) {
 
         // check edition added
         if (checkEditionAlreadyAdded) {
+          let previousOwner = checkEditionAlreadyAdded.ownerId;
           // check it is second hand sale
           checkEditionAlreadyAdded.transactionId = transactionId;
           checkEditionAlreadyAdded.ownerId = getUserDetails._id;
@@ -398,6 +400,27 @@ async function orderEvent(result, order, transactionId, nonce) {
             await addNewHistory.save();
             resolve(true);
           }
+
+          const addNewNotification = await new NotificationModel({
+            text: `Your Nft named ${getNftDetails.title}for edition ${+result[
+              'editionNumber'
+            ]} is sold  `,
+            route: `/nftDetails/${getNftDetails._id}`,
+            userId: previousOwner,
+          });
+
+          await addNewNotification.save();
+
+          const addNewNotificationForBuyer = await new NotificationModel({
+            text: `You bought  ${getNftDetails.title}  `,
+            route: `/nftDetails/${getNftDetails._id}`,
+            userId: getUserDetails._id,
+          });
+
+          await addNewNotificationForBuyer.save();
+
+          await addNewNotification.save();
+
           await LogsHelper.getLogs(transactionId, getNftDetails._id);
           resolve(true);
         } else {
@@ -427,6 +450,25 @@ async function orderEvent(result, order, transactionId, nonce) {
           });
 
           await addNewHistory.save();
+
+          const addNewNotification = await new NotificationModel({
+            text: `Your Nft named ${getNftDetails.title}for edition ${+result[
+              'editionNumber'
+            ]} is sold  `,
+            route: `/nftDetails/${getNftDetails._id}`,
+            userId: getNftDetails['ownerId'],
+          });
+
+          await addNewNotification.save();
+
+          const addNewNotificationForBuyer = await new NotificationModel({
+            text: `You bought  ${getNftDetails.title}  `,
+            route: `/nftDetails/${getNftDetails._id}`,
+            userId: getUserDetails._id,
+          });
+
+          await addNewNotificationForBuyer.save();
+
           await LogsHelper.getLogs(transactionId, getNftDetails._id);
 
           const getNftSold = getNftDetails.nftSold + 1;

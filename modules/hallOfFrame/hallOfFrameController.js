@@ -63,9 +63,13 @@ hallOfFrameCtr.listHallOfFrame = async (req, res) => {
           });
 
           const user = {
-            username: getUserDetails['username'],
-            profile: getUserDetails['profile'],
-            name: getUserDetails['name'],
+            username: getUserDetails['username']
+              ? getUserDetails['username']
+              : null,
+            profile: getUserDetails['profile']
+              ? getUserDetails['profile']
+              : null,
+            name: getUserDetails['name'] ? getUserDetails['name'] : null,
             _id: getUserDetails['_id'],
             totalSale: findCollector.collector[i].totalBnb,
           };
