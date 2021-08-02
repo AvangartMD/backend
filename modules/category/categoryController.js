@@ -10,7 +10,7 @@ CategoryCtr.addNewCategory = async (req, res) => {
 
     const createNewCategory = new CategoryModel({
       categoryName: name,
-      slugText: name,
+      slugText: name.en,
       image: image ? image : null,
     });
 
@@ -74,8 +74,9 @@ CategoryCtr.updateCategory = async (req, res) => {
     if (getCategoryDetails) {
       if (req.body.categoryName) {
         getCategoryDetails.categoryName = req.body.categoryName;
-        getCategoryDetails.slugText = req.body.name;
+        getCategoryDetails.slugText = req.body.categoryName.en;
       }
+
       if (req.body.status === false) {
         getCategoryDetails.isActive = false;
       }

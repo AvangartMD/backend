@@ -7,8 +7,13 @@ const { slugText } = require('../../helper/utils');
 const CategoryMiddleware = {};
 
 CategoryMiddleware.validateAddMiddleware = (req, res, next) => {
+  const nameSchema = Joi.object().keys({
+    tu: Joi.string().required(),
+    en: Joi.string().required(),
+  });
+
   const schema = Joi.object({
-    name: Joi.string().required(),
+    name: nameSchema,
     image: Joi.string(),
   });
   validate.validateRequest(req, res, next, schema);
@@ -16,7 +21,7 @@ CategoryMiddleware.validateAddMiddleware = (req, res, next) => {
 
 CategoryMiddleware.checkCategoryAlreadyAdded = async (req, res, next) => {
   try {
-    const slugify = Utils.slugText(req.body.name).toLowerCase();
+    const slugify = Utils.slugText(req.body.name.en).toLowerCase();
     const checkAlreadyAvalaible = await CategoryModel.findOne({
       slugText: slugify.trim(),
     });
@@ -40,8 +45,13 @@ CategoryMiddleware.checkCategoryAlreadyAdded = async (req, res, next) => {
 };
 
 CategoryMiddleware.validateUpdate = (req, res, next) => {
+  const nameSchema = Joi.object().keys({
+    tu: Joi.string(),
+    en: Joi.string(),
+  });
+
   const schema = Joi.object({
-    categoryName: Joi.string(),
+    categoryName: nameSchema,
     status: Joi.boolean(),
     image: Joi.string(),
   });
@@ -54,8 +64,8 @@ CategoryMiddleware.checkCategoryAlreadyAddedForUpdate = async (
   next
 ) => {
   try {
-    if (req.body.name) {
-      const slugify = Utils.slugText(req.body.name).toLowerCase();
+    if (req.body.name && req.body.name.en) {
+      const slugify = Utils.slugText(req.body.name.en).toLowerCase();
       const checkAlreadyAvalaible = await CategoryModel.findOne({
         slugText: slugify.trim(),
         _id: { $ne: req.params.id },

@@ -9,10 +9,18 @@ const setSlugText = (value) => {
 const categorySchema = new Schema(
   {
     categoryName: {
-      type: String,
-      required: false,
-      default: null,
+      tu: {
+        type: String,
+        required: false,
+        default: null,
+      },
+      en: {
+        type: String,
+        required: false,
+        default: null,
+      },
     },
+
     slugText: {
       type: String,
       lowercase: true,
