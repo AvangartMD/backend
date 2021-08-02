@@ -642,7 +642,7 @@ UserCtr.updateUserDetailsByAdmin = async (req, res) => {
       category,
     } = req.body;
 
-    const fetchUserDetails = await UserModel.findById(req.parms.userId);
+    const fetchUserDetails = await UserModel.findById(req.params.userId);
 
     if (fetchUserDetails) {
       if (name) {
