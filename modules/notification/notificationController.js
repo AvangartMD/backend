@@ -1,4 +1,4 @@
-const NotificationModel = require("./notificationModel");
+const NotificationModel = require('./notificationModel');
 const NotificationCtr = {};
 
 NotificationCtr.addNewNotication = async (req, res) => {
@@ -11,13 +11,13 @@ NotificationCtr.addNewNotication = async (req, res) => {
     await addNewNotication.save();
 
     return res.status(200).json({
-      message: req.t("NOTIFICATION_ADDED"),
+      message: req.t('NOTIFICATION_ADDED'),
       status: true,
     });
   } catch (err) {
-    Utils.echoLog("error in addNewNotication  ", err);
+    Utils.echoLog('error in addNewNotication  ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -26,13 +26,13 @@ NotificationCtr.addNewNotication = async (req, res) => {
 
 NotificationCtr.list = async (req, res) => {
   try {
-    if (req.query.list === "all") {
+    if (req.query.list === 'all') {
       const getNotification = await NotificationModel.find({
         userId: req.userData._id,
       }).sort({ createdAt: -1 });
 
       return res.status(200).json({
-        message: req.t("NOTIFICATION_LIST"),
+        message: req.t('NOTIFICATION_LIST'),
         status: true,
         data: getNotification,
       });
@@ -40,19 +40,19 @@ NotificationCtr.list = async (req, res) => {
       const getNotification = await NotificationModel.find({
         userId: req.userData._id,
       })
-        .limit(5)
+        .limit(100)
         .sort({ createdAt: -1 });
 
       return res.status(200).json({
-        message: req.t("NOTIFICATION_LIST"),
+        message: req.t('NOTIFICATION_LIST'),
         status: true,
         data: getNotification,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in list notification  ", err);
+    Utils.echoLog('error in list notification  ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
