@@ -468,6 +468,15 @@ async function orderEvent(result, order, transactionId, nonce) {
           await addNewEdition.save();
           const addHistory = await addNewHistory.save();
 
+          const getNftSold = +getNftDetails.nftSold + 1;
+          getNftDetails.nftSold = getNftSold;
+
+          if (getNftSold >= getNftDetails.edition) {
+            getNftDetails.saleState = 'SOLD';
+          }
+
+          await getNftDetails.save();
+
           const addNewNotification = await new NotificationModel({
             text: `Your Nft named ${getNftDetails.title}for edition ${+result[
               'editionNumber'
@@ -488,14 +497,6 @@ async function orderEvent(result, order, transactionId, nonce) {
 
           await LogsHelper.getLogs(transactionId, getNftDetails._id);
 
-          const getNftSold = getNftDetails.nftSold + 1;
-          getNftDetails.nftSold = getNftDetails.nftSold + 1;
-
-          if (getNftSold >= getNftDetails.edition) {
-            getNftDetails.saleState = 'SOLD';
-          }
-
-          await getNftDetails.save();
           resolve(true);
         }
       } else {
