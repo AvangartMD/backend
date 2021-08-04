@@ -126,7 +126,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     contract.events
       .BidPlaced({ fromBlock: 6018110 })
       .on('data', async (bids) => {
-        console.log('bid is:', bids);
+        // console.log('bid is:', bids);
         const result = bids.returnValues;
         const order = result['order'];
 
@@ -221,7 +221,7 @@ async function checkMinting(result, order, nonce, transactionhash) {
       }
     }
   } catch (err) {
-    console.log('error in check minting', err);
+    // console.log('error in check minting', err);
     Utils.echoLog(`Error in check minting ${err}`);
   }
 }
@@ -246,7 +246,7 @@ getWeb3Event.getPastEvents = async (req, res) => {
       toBlock: latestBlockNo,
     });
 
-    console.log('past event is:', getPastEvents);
+    // console.log('past event is:', getPastEvents);
 
     if (getPastEvents.length) {
       const itreateEvents = async (i) => {
@@ -292,7 +292,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
   try {
     const web3 = new Web3(provider);
     const latestBlockNo = await web3.eth.getBlockNumber();
-    console.log('latest block no is for order:', latestBlockNo);
+    // console.log('latest block no is for order:', latestBlockNo);
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
@@ -494,11 +494,11 @@ async function orderEvent(result, order, transactionId, nonce) {
           resolve(true);
         }
       } else {
-        console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
+        // console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
         resolve(true);
       }
     } catch (err) {
-      console.log('error in functin', err);
+      // console.log('error in functin', err);
       Utils.echoLog(`Error in check orderEvent ${err}`);
       resolve(false);
     }
@@ -544,7 +544,7 @@ getWeb3Event.getTransferEventFromContract = async (req, res) => {
       await getLastBlock.save();
     }
   } catch (err) {
-    console.log('err is:', err);
+    // console.log('err is:', err);
     Utils.echoLog(`orderBuyedEvent ${err}`);
   }
 };
@@ -580,14 +580,14 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           ? 'AUCTION'
           : 'SECOND_HAND';
 
-      console.log('sale Type is', +order['saleType']);
+      // console.log('sale Type is', +order['saleType']);
 
       const checkIsBuy = +order['saleType'] === 2 ? true : false;
       const checkIsOffer = +order['saleType'] === 3 ? true : false;
 
       const isSecondHand = checkIsBuy || checkIsOffer ? true : false;
 
-      console.log('Is seond hand is:', isSecondHand);
+      // console.log('Is seond hand is:', isSecondHand);
 
       const saleTypes = { type: null, price: 0 };
 
@@ -647,11 +647,11 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           resolve(true);
         }
       } else {
-        console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
+        // console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
         resolve(true);
       }
     } catch (err) {
-      console.log('error in functin', err);
+      // console.log('error in functin', err);
       Utils.echoLog(`Error in check orderEvent ${err}`);
       resolve(false);
     }

@@ -51,7 +51,6 @@ bidPlaced.checkBid = async (result, order) => {
           await checkBidAlreadyPlaced.save();
         }
       } else {
-        console.log('IN ELSE', result);
         //   add the new bid
         const addNewBid = new BidModel({
           userId: fetchUser._id,
