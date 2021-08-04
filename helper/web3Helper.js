@@ -16,6 +16,7 @@ const NotificationModel = require('../modules/notification/notificationModel');
 const TransferEvent = require('../contract/transferEvent');
 const BlockModel = require('../modules/block/blockModel');
 const fs = require('fs');
+const bidPlaced = require('../contract/bidPlaced');
 
 const webSocketProvider =
   process.env.NODE_ENV === 'development'
@@ -119,6 +120,17 @@ getWeb3Event.getTransferEvent = async (req, res) => {
           tokenId,
           transactionHash
         );
+      });
+
+    // bid placed events
+    contract.events
+      .BidPlaced({ fromBlock: 6018110 })
+      .on('data', async (bids) => {
+        console.log('bid is:', bids);
+        const result = bids.returnValues;
+        const order = result['order'];
+
+        await bidPlaced.checkBid(result, order);
       });
   } catch (err) {
     Utils.echoLog(`Error in web3 listner for mint :${err}`);

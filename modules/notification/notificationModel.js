@@ -18,6 +18,11 @@ const notificationSchema = new Schema(
       ref: 'users',
       required: true,
     },
+    bidId: {
+      type: Schema.Types.ObjectId,
+      ref: 'bid',
+      default: null,
+    },
   },
 
   {
