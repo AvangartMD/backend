@@ -13,6 +13,10 @@ const bannerSchema = new Schema(
         type: String,
         required: true,
       },
+      tu: {
+        type: String,
+        required: true,
+      },
     },
     mobile: {
       en: {
