@@ -20,10 +20,8 @@ const bannerSchema = new Schema(
         required: true,
       },
       tu: {
-        tu: {
-          type: String,
-          required: true,
-        },
+        type: String,
+        required: true,
       },
     },
     isActive: {
