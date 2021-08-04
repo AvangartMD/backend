@@ -41,6 +41,16 @@ bidPlaced.checkBid = async (result, order) => {
             route: `/nftDetails/${fetchNftDetails._id}`,
           });
 
+          if (+order['saleType'] === 3) {
+            const notifySeller = new NotificationModel({
+              text: `A new Offer is received for ${fetchNftDetails.title}`,
+              userId: checkBidAlreadyPlaced.userId,
+              route: `/nftDetails/${fetchNftDetails._id}`,
+            });
+
+            await notifySeller.save();
+          }
+
           await addNewNotification.save();
 
           checkBidAlreadyPlaced.userId = fetchUser._id;
@@ -58,6 +68,16 @@ bidPlaced.checkBid = async (result, order) => {
           editionNo: +result['editionNumber'],
         });
         await addNewBid.save();
+
+        if (+order['saleType'] === 3) {
+          const notifySeller = new NotificationModel({
+            text: `A new Offer is received for ${fetchNftDetails.title}`,
+            userId: checkBidAlreadyPlaced.userId,
+            route: `/nftDetails/${fetchNftDetails._id}`,
+          });
+
+          await notifySeller.save();
+        }
       }
     }
   } catch (err) {
