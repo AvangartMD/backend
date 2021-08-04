@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
@@ -13,12 +13,19 @@ const bannerSchema = new Schema(
         type: String,
         required: true,
       },
-      tu: {
+    },
+    mobile: {
+      en: {
         type: String,
         required: true,
       },
+      tu: {
+        tu: {
+          type: String,
+          required: true,
+        },
+      },
     },
-
     isActive: {
       type: Boolean,
       default: true,
@@ -33,4 +40,4 @@ const bannerSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("banner", bannerSchema);
+module.exports = mongoose.model('banner', bannerSchema);

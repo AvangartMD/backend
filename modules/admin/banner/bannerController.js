@@ -1,23 +1,24 @@
-const BannerModel = require("./bannerModel");
-const Utils = require("../../../helper/utils");
-const asyncRedis = require("async-redis");
+const BannerModel = require('./bannerModel');
+const Utils = require('../../../helper/utils');
+const asyncRedis = require('async-redis');
 const client = asyncRedis.createClient();
-const { cachedData } = require("../../../helper/enum");
+const { cachedData } = require('../../../helper/enum');
 const BannerCtr = {};
 
 // add new banner
 BannerCtr.addNewBanner = async (req, res) => {
   try {
-    const { url, banner } = req.body;
+    const { url, banner, mobile } = req.body;
     const addNewBanner = new BannerModel({
       url,
       banner,
+      mobile,
     });
     const saveBanner = await addNewBanner.save();
 
     client.del(cachedData.LIST_BANNER);
     return res.status(200).json({
-      message: req.t("BANNER_ADDED_SUCCESSFULLY"),
+      message: req.t('BANNER_ADDED_SUCCESSFULLY'),
       status: true,
       data: {
         details: {
@@ -28,9 +29,9 @@ BannerCtr.addNewBanner = async (req, res) => {
       },
     });
   } catch (err) {
-    Utils.echoLog("error in  creating new banner ", err);
+    Utils.echoLog('error in  creating new banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -51,6 +52,9 @@ BannerCtr.updateBanner = async (req, res) => {
       if (req.body.banner) {
         fetchBannerDetails.banner = req.body.banner;
       }
+      if (req.body.mobile) {
+        fetchBannerDetails.mobile = req.body.mobile;
+      }
       if (req.body.status) {
         fetchBannerDetails.isActive = req.body.status;
       }
@@ -63,19 +67,19 @@ BannerCtr.updateBanner = async (req, res) => {
       client.del(cachedData.LIST_BANNER);
 
       return res.status(200).json({
-        message: req.t("BANNER_UPDATED_SUCCESSFULLY"),
+        message: req.t('BANNER_UPDATED_SUCCESSFULLY'),
         status: true,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_BANNER"),
+        message: req.t('INVALID_BANNER'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in  creating new banner ", err);
+    Utils.echoLog('error in  creating new banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -88,19 +92,19 @@ BannerCtr.deleteBanner = async (req, res) => {
 
     if (deleteBanner && deleteBanner.deletedCount > 0) {
       return res.status(200).json({
-        message: req.t("BANNER_DELETED"),
+        message: req.t('BANNER_DELETED'),
         status: true,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_BANNER"),
+        message: req.t('INVALID_BANNER'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in  creating deleting banner ", err);
+    Utils.echoLog('error in  creating deleting banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -115,17 +119,17 @@ BannerCtr.list = async (req, res) => {
       { isActive: 0, createdAt: 0, updatedAt: 0 }
     );
     if (getList) {
-      await client.set("banner-list", JSON.stringify(getList), "EX", 60 * 10);
+      await client.set('banner-list', JSON.stringify(getList), 'EX', 60 * 10);
       return res.status(200).json({
-        message: req.t("BANNER_LIST"),
+        message: req.t('BANNER_LIST'),
         status: true,
         data: getList,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in listing banner ", err);
+    Utils.echoLog('error in listing banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -144,7 +148,7 @@ BannerCtr.listForAdmin = async (req, res) => {
       .limit(+process.env.LIMIT);
 
     return res.status(200).json({
-      message: req.t("BANNER_LIST"),
+      message: req.t('BANNER_LIST'),
       status: true,
       data: list,
       pagination: {
@@ -155,9 +159,9 @@ BannerCtr.listForAdmin = async (req, res) => {
       },
     });
   } catch (err) {
-    Utils.echoLog("error in listing banner for admin ", err);
+    Utils.echoLog('error in listing banner for admin ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
@@ -170,20 +174,20 @@ BannerCtr.getBannerDetails = async (req, res) => {
     const getBannerDetails = await BannerModel.findOne({ _id: req.params.id });
     if (getBannerDetails) {
       return res.status(200).json({
-        message: req.t("BANNER_DETAILS"),
+        message: req.t('BANNER_DETAILS'),
         status: true,
         data: getBannerDetails,
       });
     } else {
       return res.status(400).json({
-        message: req.t("INVALID_BANNER"),
+        message: req.t('INVALID_BANNER'),
         status: true,
       });
     }
   } catch (err) {
-    Utils.echoLog("error in listing banner ", err);
+    Utils.echoLog('error in listing banner ', err);
     return res.status(500).json({
-      message: req.t("DB_ERROR"),
+      message: req.t('DB_ERROR'),
       status: true,
       err: err.message ? err.message : err,
     });
