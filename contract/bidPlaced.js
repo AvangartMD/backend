@@ -17,6 +17,10 @@ bidPlaced.checkBid = async (result, order) => {
       walletAddress: result['buyer'].toLowerCase(),
     });
 
+    const fetchSeller = await UserModal.findOne({
+      walletAddress: result['seller'].toLowerCase(),
+    });
+
     if (fetchNftDetails && fetchUser) {
       // check any bid is placed or not
       const checkBidAlreadyPlaced = await BidModel.findOne({
@@ -35,7 +39,7 @@ bidPlaced.checkBid = async (result, order) => {
         // if not add the notification
         if (!checkNotificationAdded) {
           const addNewNotification = new NotificationModel({
-            text: `Your Bid for ${fetchNftDetails.title} for edition No ${result['editonNo']} is cancelled`,
+            text: `Your Bid for ${fetchNftDetails.title} for edition No ${result['editionNumber']} is cancelled`,
             userId: checkBidAlreadyPlaced.userId,
             bidId: checkBidAlreadyPlaced._id,
             route: `/nftDetails/${fetchNftDetails._id}`,
@@ -44,7 +48,7 @@ bidPlaced.checkBid = async (result, order) => {
           if (+order['saleType'] === 3) {
             const notifySeller = new NotificationModel({
               text: `A new Offer is received for ${fetchNftDetails.title}`,
-              userId: checkBidAlreadyPlaced.userId,
+              userId: fetchSeller._id,
               route: `/nftDetails/${fetchNftDetails._id}`,
             });
 
@@ -72,7 +76,7 @@ bidPlaced.checkBid = async (result, order) => {
         if (+order['saleType'] === 3) {
           const notifySeller = new NotificationModel({
             text: `A new Offer is received for ${fetchNftDetails.title}`,
-            userId: checkBidAlreadyPlaced.userId,
+            userId: fetchSeller._id,
             route: `/nftDetails/${fetchNftDetails._id}`,
           });
 
