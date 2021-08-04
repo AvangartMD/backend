@@ -129,7 +129,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // bid placed events
     contract.events
       .BidPlaced({
-        // fromBlock: 6018110
+        // fromBlock: 6018110,
       })
       .on('data', async (bids) => {
         // console.log('bid is:', bids);
