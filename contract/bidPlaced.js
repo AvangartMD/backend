@@ -14,7 +14,7 @@ bidPlaced.checkBid = async (result, order) => {
     });
 
     const fetchUser = await UserModal.findOne({
-      walletAddress: order['seller'].toLowerCase(),
+      walletAddress: result['buyer'].toLowerCase(),
     });
 
     if (fetchNftDetails && fetchUser) {

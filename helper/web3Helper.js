@@ -450,8 +450,6 @@ async function orderEvent(result, order, transactionId, nonce) {
             saleType: saleTypes,
           });
 
-          await addNewEdition.save();
-
           const addNewHistory = new HistoryModel({
             nftId: getNftDetails._id,
             editionNo: +result['editionNumber'],
@@ -461,7 +459,8 @@ async function orderEvent(result, order, transactionId, nonce) {
             timeline: order['timeline'],
           });
 
-          await addNewHistory.save();
+          await addNewEdition.save();
+          const addHistory = await addNewHistory.save();
 
           const addNewNotification = await new NotificationModel({
             text: `Your Nft named ${getNftDetails.title}for edition ${+result[
@@ -498,7 +497,7 @@ async function orderEvent(result, order, transactionId, nonce) {
         resolve(true);
       }
     } catch (err) {
-      // console.log('error in functin', err);
+      console.log('error in functin', err);
       Utils.echoLog(`Error in check orderEvent ${err}`);
       resolve(false);
     }
