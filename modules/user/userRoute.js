@@ -90,4 +90,12 @@ const getSingleUserDetails = [
 ];
 userRoute.get('/getSingleUser/:userId', getSingleUserDetails);
 
+// validate instagrm account
+const validateInstagramAccount = [
+  Auth.isAuthenticatedUser,
+  UserMiddleware.validateInstagram,
+  UserCtr.verifyInstagramAccount,
+];
+userRoute.post('/validateInstagram', validateInstagramAccount);
+
 module.exports = userRoute;

@@ -8,6 +8,8 @@ const { statusObject } = require('../../helper/enum');
 const Web3 = require('web3');
 const asyncRedis = require('async-redis');
 const FollowModel = require('../follow/followModel');
+const axios = require('axios');
+const qs = require('qs');
 const client = asyncRedis.createClient();
 
 const UserCtr = {};
@@ -706,6 +708,74 @@ UserCtr.updateUserDetailsByAdmin = async (req, res) => {
     return res.status(500).json({
       message: req.t('DB_ERROR'),
       status: true,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// verify user intagram account
+UserCtr.verifyInstagramAccount = async (req, res) => {
+  try {
+    const code = req.body.code;
+    const fetchUserDetails = await UserModel.findOne({ _id: req.userData._id });
+
+    if (fetchUserDetails) {
+      var data = qs.stringify({
+        client_id: process.env.INSTAGRAM_CLIENT_ID,
+        client_secret: process.env.INSTAGRAM_CLIENT_SECRET,
+        grant_type: 'authorization_code',
+        redirect_uri: 'https://avangrat.52.28.101.213.nip.io/',
+        code: code,
+      });
+      var config = {
+        method: 'post',
+        url: 'https://api.instagram.com/oauth/access_token',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        data: data,
+      };
+
+      const getAccessToken = await axios(config);
+
+      if (getAccessToken.status === 200) {
+        const tokenData = getAccessToken.data;
+
+        const configUser = {
+          method: 'get',
+          url: `https://graph.instagram.com/me?fields=id,username&access_token=${tokenData.access_token}`,
+        };
+        // get user data using access token
+        const getData = await axios(configUser);
+
+        if (getData.status === 200) {
+          fetchUserDetails.portfolio.instagarm.username = getData.data.username;
+          fetchUserDetails.portfolio.instagarm.isVerified = true;
+          fetchUserDetails.portfolio.instagarm.url = `https://instagram.com/${getData.data.username}`;
+
+          await fetchUserDetails.save();
+          return res.status(200).json({
+            message: req.t('INSTAGRAM_ACCOUNT_VERIFIED'),
+            status: true,
+          });
+        }
+      } else {
+        return res.status(400).json({
+          message: req.t('INAVLID_CODE'),
+          status: false,
+        });
+      }
+    } else {
+      return res.status(400).json({
+        message: req.t('DB_ERROR'),
+        status: false,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog('error in creating user ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
       err: err.message ? err.message : err,
     });
   }

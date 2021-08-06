@@ -163,4 +163,12 @@ UserMiddleware.checkAddressAlreadyRegistered = async (req, res, next) => {
   }
 };
 
+// validate instagram
+UserMiddleware.validateInstagram = async (req, res, next) => {
+  const schema = Joi.object({
+    code: Joi.string().required(),
+  });
+  validate.validateRequest(req, res, next, schema);
+};
+
 module.exports = UserMiddleware;

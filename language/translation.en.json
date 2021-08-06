@@ -96,5 +96,7 @@
     "TOP_COLLECTOR": "Top Collector",
     "TOP_ARTWORK": "Top artwork",
     "INAVLID_TYPE": "Invalid frame type",
-    "ADMIN_WALLET": "Admin wallet cant be registered"
+    "ADMIN_WALLET": "Admin wallet cant be registered",
+    "INAVLID_CODE": "Invalid Acess token please try again",
+    "INSTAGRAM_ACCOUNT_VERIFIED": "Instagram account verified"
 }
