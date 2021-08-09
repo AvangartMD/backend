@@ -738,6 +738,7 @@ UserCtr.verifyInstagramAccount = async (req, res) => {
         client_secret: process.env.INSTAGRAM_CLIENT_SECRET,
         grant_type: 'authorization_code',
         redirect_uri: 'https://f20a909fd8cc.ngrok.io/user/edit-profile/',
+        code: code,
       });
       var config = {
         method: 'post',
