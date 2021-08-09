@@ -98,4 +98,11 @@ const validateInstagramAccount = [
 ];
 userRoute.post('/validateInstagram', validateInstagramAccount);
 
+// genrate acces token
+const genrateAccessToken = [
+  Auth.isAuthenticatedUser,
+  UserCtr.genrateAccessTokenForTwitter,
+];
+userRoute.get('/twitter/access_token', genrateAccessToken);
+
 module.exports = userRoute;

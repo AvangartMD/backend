@@ -9,10 +9,23 @@ const Web3 = require('web3');
 const asyncRedis = require('async-redis');
 const FollowModel = require('../follow/followModel');
 const axios = require('axios');
+var OAuth = require('oauth');
 const qs = require('qs');
 const client = asyncRedis.createClient();
 
 const UserCtr = {};
+
+function consumer() {
+  return new oauth.OAuth(
+    'https://twitter.com/oauth/request_token',
+    'https://twitter.com/oauth/access_token',
+    process.env.TWITTER_CONSUMER,
+    process.env.TWITTER_CONSUMER_SECRET,
+    '1.0A',
+    'https://avangrat.52.28.101.213.nip.io/',
+    'HMAC-SHA1'
+  );
+}
 
 // update user details
 UserCtr.updateUserDetails = async (req, res) => {
@@ -771,12 +784,55 @@ UserCtr.verifyInstagramAccount = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log('error sis:', err);
     Utils.echoLog('error in creating user ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
       status: false,
       err: err.message ? err.message : err,
     });
+  }
+};
+
+// genrate access token
+UserCtr.genrateAccessTokenForTwitter = async (req, res) => {
+  try {
+    consumer().getOAuthRequestToken(
+      async (error, oauthToken, oauthTokenSecret, results) => {
+        if (error) {
+          console.log('err ', error);
+          return res.status(400).json({
+            message: req.t('DB_ERROR'),
+            status: false,
+            err: error.message ? error.message : error,
+          });
+        } else {
+          client.del(`twitter-${req.userData._id}`);
+
+          const authToken = {
+            token: oauthToken,
+            secret: oauthTokenSecret,
+          };
+
+          await client.set(
+            `twitter-${req.userData._id}`,
+            JSON.stringify(authToken),
+            'EX',
+            60 * 10
+          );
+
+          return res.status(200).json({
+            message: req.t('TWITTER_CODE'),
+            status: true,
+            data: {
+              code: oauthToken,
+            },
+          });
+        }
+      }
+    );
+  } catch (err) {
+    console.log('err is');
   }
 };
 
