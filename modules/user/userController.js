@@ -22,7 +22,7 @@ function consumer() {
     process.env.TWITTER_CONSUMER,
     process.env.TWITTER_CONSUMER_SECRET,
     '1.0A',
-    'https://f20a909fd8cc.ngrok.io/user/profile',
+    'https://f20a909fd8cc.ngrok.io/user/edit-profile',
     'HMAC-SHA1'
   );
 }
