@@ -22,7 +22,7 @@ function consumer() {
     process.env.TWITTER_CONSUMER,
     process.env.TWITTER_CONSUMER_SECRET,
     '1.0A',
-    'https://avangrat.52.28.101.213.nip.io/',
+    'https://f20a909fd8cc.ngrok.io/user/profile',
     'HMAC-SHA1'
   );
 }
