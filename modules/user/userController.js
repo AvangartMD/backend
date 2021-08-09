@@ -22,7 +22,7 @@ function consumer() {
     process.env.TWITTER_CONSUMER,
     process.env.TWITTER_CONSUMER_SECRET,
     '1.0A',
-    'https://f20a909fd8cc.ngrok.io/user/edit-profile',
+    'https://avangrat.52.28.101.213.nip.io/user/edit-profile/',
     'HMAC-SHA1'
   );
 }
@@ -737,7 +737,8 @@ UserCtr.verifyInstagramAccount = async (req, res) => {
         client_id: process.env.INSTAGRAM_CLIENT_ID,
         client_secret: process.env.INSTAGRAM_CLIENT_SECRET,
         grant_type: 'authorization_code',
-        redirect_uri: 'https://f20a909fd8cc.ngrok.io/user/edit-profile/',
+        redirect_uri:
+          'https://avangrat.52.28.101.213.nip.io/user/edit-profile/',
         code: code,
       });
       var config = {
