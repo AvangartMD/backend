@@ -171,4 +171,13 @@ UserMiddleware.validateInstagram = async (req, res, next) => {
   validate.validateRequest(req, res, next, schema);
 };
 
+// twitter validator
+UserMiddleware.validateTwitter = async (req, res, next) => {
+  const schema = Joi.object({
+    oauth_token: Joi.string().required(),
+    oauth_verifier: Joi.string().required(),
+  });
+  validate.validateRequest(req, res, next, schema);
+};
+
 module.exports = UserMiddleware;

@@ -105,4 +105,11 @@ const genrateAccessToken = [
 ];
 userRoute.get('/twitter/access_token', genrateAccessToken);
 
+// verify twitter
+const validateTwitterAccount = [
+  Auth.isAuthenticatedUser,
+  UserMiddleware.validateTwitter,
+  UserCtr.verifyTwitterAccount,
+];
+userRoute.post('/validateTwitter', validateTwitterAccount);
 module.exports = userRoute;

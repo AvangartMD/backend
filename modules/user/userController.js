@@ -16,7 +16,7 @@ const client = asyncRedis.createClient();
 const UserCtr = {};
 
 function consumer() {
-  return new oauth.OAuth(
+  return new OAuth.OAuth(
     'https://twitter.com/oauth/request_token',
     'https://twitter.com/oauth/access_token',
     process.env.TWITTER_CONSUMER,
@@ -785,7 +785,6 @@ UserCtr.verifyInstagramAccount = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log('error sis:', err);
     Utils.echoLog('error in creating user ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
@@ -801,7 +800,6 @@ UserCtr.genrateAccessTokenForTwitter = async (req, res) => {
     consumer().getOAuthRequestToken(
       async (error, oauthToken, oauthTokenSecret, results) => {
         if (error) {
-          console.log('err ', error);
           return res.status(400).json({
             message: req.t('DB_ERROR'),
             status: false,
@@ -819,7 +817,7 @@ UserCtr.genrateAccessTokenForTwitter = async (req, res) => {
             `twitter-${req.userData._id}`,
             JSON.stringify(authToken),
             'EX',
-            60 * 10
+            60 * 100
           );
 
           return res.status(200).json({
@@ -827,13 +825,74 @@ UserCtr.genrateAccessTokenForTwitter = async (req, res) => {
             status: true,
             data: {
               code: oauthToken,
+              redirect_uri: `http://twitter.com/oauth/authorize?oauth_token=${oauthToken}`,
             },
           });
         }
       }
     );
   } catch (err) {
-    console.log('err is');
+    Utils.echoLog('error in creating user ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
+  }
+};
+
+// verify twitter account
+UserCtr.verifyTwitterAccount = async (req, res) => {
+  try {
+    const getTokenDetails = await client.get(`twitter-${req.userData._id}`);
+
+    if (getTokenDetails) {
+      const parsedData = JSON.parse(getTokenDetails);
+
+      const oauth_token = req.body.oauth_token;
+      const oauth_verifier = req.body.oauth_verifier;
+
+      consumer().getOAuthAccessToken(
+        oauth_token,
+        null,
+        oauth_verifier,
+        async (
+          error,
+          oauth_access_token,
+          oauth_access_token_secret,
+          result
+        ) => {
+          if (error) {
+          } else {
+            const fetchUserDetails = await UserModel.findOne({
+              _id: req.userData._id,
+            });
+
+            fetchUserDetails.portfolio.twitter.username = result.screen_name;
+            fetchUserDetails.portfolio.twitter.isVerified = true;
+            fetchUserDetails.portfolio.twitter.url = `https://twitter.com/${result.screen_name}`;
+
+            await fetchUserDetails.save();
+            return res.status(200).json({
+              message: req.t('TWITTER_ACCOUNT_VERIFIED'),
+              status: true,
+            });
+          }
+        }
+      );
+    } else {
+      return res.status(400).json({
+        message: req.t('TWITTER_ERROR'),
+        status: true,
+      });
+    }
+  } catch (err) {
+    Utils.echoLog('error in creating user ', err);
+    return res.status(500).json({
+      message: req.t('DB_ERROR'),
+      status: false,
+      err: err.message ? err.message : err,
+    });
   }
 };
 

@@ -98,5 +98,8 @@
     "INAVLID_TYPE": "Invalid frame type",
     "ADMIN_WALLET": "Admin wallet cant be registered",
     "INAVLID_CODE": "Invalid Acess token please try again",
-    "INSTAGRAM_ACCOUNT_VERIFIED": "Instagram account verified"
+    "INSTAGRAM_ACCOUNT_VERIFIED": "Instagram account verified",
+    "TWITTER_AUTH_CODE": "Twitter auth code",
+    "TWITTER_ACCOUNT_VERIFIED": "Twitter Accout Verified ",
+    "TWITTER_ERROR": "Twitter Accont not verified "
 }
