@@ -92,7 +92,7 @@ hallOfFrameHelper.getTopBuyers = async (req, res) => {
       for (let j = 0; j < getHistory.length; j++) {
         collectors.push({
           userId: getHistory[j]._id,
-          totalBnb: getHistory[j].totalBnb,
+          totalBnb: +getHistory[j].totalBnb.toFixed(3),
         });
       }
     }
@@ -162,7 +162,7 @@ hallOfFrameHelper.getTopCreators = async (req, res) => {
       for (let j = 0; j < getTopCreators.length; j++) {
         creators.push({
           userId: getTopCreators[j]._id,
-          totalBnb: getTopCreators[j].totalBnb,
+          totalBnb: +getTopCreators[j].totalBnb.toFixed(3),
         });
       }
     }
