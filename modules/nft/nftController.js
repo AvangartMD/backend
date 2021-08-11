@@ -575,7 +575,7 @@ nftCtr.getSingleNftDetails = async (req, res) => {
       }
 
       // check isOwner
-      const checkIsOwnerOfNft = await NftModel.find({
+      const checkIsOwnerOfNft = await NftModel.findOne({
         _id: req.params.id,
         ownerId: req.userData._id,
       });
