@@ -24,7 +24,7 @@ hallOfFrameHelper.getArtWorks = async (req, res) => {
       for (let i = 0; i < getHistory.length; i++) {
         topArts.push({
           nftId: getHistory[i].nftId,
-          totalBnb: getHistory[i].buyPrice,
+          totalBnb: +getHistory[i].buyPrice.toFixed(3),
         });
       }
 
