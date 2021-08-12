@@ -7,6 +7,7 @@ const HistoryModel = require('../history/historyModel');
 // const EditionModel = require('../edition/editonModel');
 const { statusObject } = require('../../helper/enum');
 const { query } = require('winston');
+const { filter } = require('bluebird');
 
 const nftCtr = {};
 // add a new NFT
@@ -752,14 +753,42 @@ nftCtr.listCollectionNft = async (req, res) => {
 nftCtr.marketPlace = async (req, res) => {
   try {
     const page = req.body.page || 1;
-    const query = { isActive: true, status: statusObject.APPROVED };
+    let query = { isActive: true, status: statusObject.APPROVED };
 
     if (req.body.category && req.body.category.length) {
       query.category = { $in: req.body.category };
     }
 
     if (req.body.filter && req.body.filter.length) {
-      query.saleState = { $in: req.body.filter };
+      // query.saleState = { $in: req.body.filter };
+      let filterQuery = [];
+      for (let i = 0; i < req.body.filter.length; i++) {
+        if (req.body.filter[i] === 'BUYNOW') {
+          filterQuery.push({
+            $or: [
+              { auctionEndDate: { $lt: Math.floor(Date.now() / 1000) } },
+              { saleState: 'BUY' },
+            ],
+          });
+        }
+        if (req.body.filter[i] === 'AUCTION') {
+          filterQuery.push({
+            saleState: 'AUCTION',
+            auctionEndDate: { $gte: Math.floor(Date.now() / 1000) },
+          });
+        }
+
+        if (req.body.filter[i] === 'SOLD') {
+          filterQuery.push({ saleState: 'SOLD' });
+        }
+      }
+
+      const prevQuery = query;
+
+      query = {
+        $or: filterQuery,
+        ...prevQuery,
+      };
     }
 
     if (req.body.search) {
