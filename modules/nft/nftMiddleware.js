@@ -20,7 +20,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
 
   const schema = Joi.object({
     title: Joi.string().required(),
-    description: Joi.string(),
+    description: Joi.string().allow(null, ''),
     image: imageSchema,
     ownerId: Joi.string(),
     collectionId: Joi.string(),
@@ -153,7 +153,7 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
 NftMiddleware.validateCollectionUpdate = async (req, res, next) => {
   const schema = Joi.object({
     name: Joi.string(),
-    description: Joi.string(),
+    description: Joi.string().allow(null, ''),
     logo: Joi.string(),
     nftId: Joi.array(),
     category: Joi.array().items(Joi.string()),
