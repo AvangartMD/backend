@@ -206,7 +206,7 @@ async function checkMinting(result, order, nonce, transactionhash) {
                 nftId: saveNft._id,
                 editionNo: null,
                 ownerId: findUser._id,
-                text: 'Nft minted by user',
+                text: 'Nft minted ',
                 buyPrice: saveNft.price,
                 timeline: Math.floor(Date.now() / 1000),
               });
