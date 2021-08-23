@@ -1000,7 +1000,7 @@ nftCtr.getLikedNfts = async (req, res) => {
 // get buyed Nfts
 nftCtr.getUserBuyedNfts = async (req, res) => {
   try {
-    let query = {};
+    let query = { isBurned: false };
     if (req.params.userId) {
       query.ownerId = req.params.userId;
     } else {
