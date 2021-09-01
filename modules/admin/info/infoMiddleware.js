@@ -14,10 +14,16 @@ InfoMiddleware.validateAdd = async (req, res, next) => {
     en: Joi.string().uri().required(),
     tu: Joi.string().uri().required(),
   });
+
+  const textSchema = Joi.object().keys({
+    en: Joi.string().allow(null, ''),
+    tu: Joi.string().allow(null, ''),
+  });
   const schema = Joi.object({
     url: Joi.string().uri().required(),
     banner: imageSchema,
-    button_text: Joi.string().allow(null, ''),
+    mobile: imageSchema,
+    button_text: textSchema,
     button_url: Joi.string().allow(null, ''),
   });
   validate.validateRequest(req, res, next, schema);
@@ -29,11 +35,16 @@ InfoMiddleware.validateUpdate = async (req, res, next) => {
     en: Joi.string().uri(),
     tu: Joi.string().uri(),
   });
+  const textSchema = Joi.object().keys({
+    en: Joi.string().allow(null, ''),
+    tu: Joi.string().allow(null, ''),
+  });
   const schema = Joi.object({
     url: Joi.string(),
     banner: imageSchema,
+    mobile: imageSchema,
     status: Joi.boolean(),
-    button_text: Joi.string().allow(null, ''),
+    button_text: textSchema,
     button_url: Joi.string().allow(null, ''),
   });
   validate.validateRequest(req, res, next, schema);

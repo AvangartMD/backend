@@ -6,7 +6,7 @@ const InfoCtr = {};
 // add new hall of frame info
 InfoCtr.addHallOfFrameInfo = async (req, res) => {
   try {
-    const { url, banner, button_text, button_url } = req.body;
+    const { url, banner, button_text, button_url, mobile } = req.body;
     if (button_text && !button_url) {
       return res.status(400).json({
         message: 'button_url is not given',
@@ -16,6 +16,7 @@ InfoCtr.addHallOfFrameInfo = async (req, res) => {
     const addHallOfFrameInfo = new InfoModel({
       url,
       banner,
+      mobile,
       button_text,
       button_url,
     });
@@ -60,6 +61,9 @@ InfoCtr.updateHallOfFrameInfo = async (req, res) => {
       }
       if (req.body.banner) {
         fetchInfoDetails.banner = req.body.banner;
+      }
+      if (req.body.mobile) {
+        fetchInfoDetails.mobile = req.body.mobile;
       }
       if (req.body.status) {
         fetchInfoDetails.isActive = req.body.status;

@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
@@ -18,15 +18,28 @@ const infoSchema = new Schema(
         required: true,
       },
     },
+    mobile: {
+      en: {
+        type: String,
+        required: true,
+      },
+      tu: {
+        type: String,
+        required: true,
+      },
+    },
 
     button_text: {
+      en: { type: String, required: false, default: null },
+      tu: {
         type: String,
         required: false,
         default: null,
+      },
     },
     button_url: {
-        type: String,
-        required: false,
+      type: String,
+      required: false,
     },
 
     isActive: {
@@ -43,4 +56,4 @@ const infoSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("info", infoSchema);
+module.exports = mongoose.model('info', infoSchema);
