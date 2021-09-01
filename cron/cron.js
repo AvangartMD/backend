@@ -1,5 +1,6 @@
 const Web3Helper = require('../helper/web3Helper');
 const HallHelper = require('./hallOfFrame');
+const BidHelper = require('../contract/bidPlaced');
 
 const cron = require('node-cron');
 
@@ -14,4 +15,8 @@ cron.schedule('0 0 * * *', async (req, res) => {
   await HallHelper.getArtWorks(req, res);
   await HallHelper.getTopBuyers(req, res);
   await HallHelper.getTopCreators(req, res);
+});
+
+cron.schedule('0 * * * *', async (req, res) => {
+  BidHelper.checkBidEnded(req, res);
 });

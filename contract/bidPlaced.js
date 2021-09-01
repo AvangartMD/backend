@@ -58,10 +58,18 @@ bidPlaced.checkBid = async (result, order) => {
           await addNewNotification.save();
 
           checkBidAlreadyPlaced.userId = fetchUser._id;
+          checkBidAlreadyPlaced.saleType = +order['saleType'];
+          checkBidAlreadyPlaced.timeline = +order['timeline']
+            ? +order['timeline']
+            : 0;
 
           await checkBidAlreadyPlaced.save();
         } else {
           checkBidAlreadyPlaced.userId = fetchUser._id;
+          checkBidAlreadyPlaced.saleType = +order['saleType'];
+          checkBidAlreadyPlaced.timeline = +order['timeline']
+            ? +order['timeline']
+            : 0;
           await checkBidAlreadyPlaced.save();
         }
       } else {
@@ -70,6 +78,8 @@ bidPlaced.checkBid = async (result, order) => {
           userId: fetchUser._id,
           nftId: fetchNftDetails._id,
           editionNo: +result['editionNumber'],
+          saleType: +order['saleType'],
+          timeline: +order['timeline'] ? +order['timeline'] : 0,
         });
         await addNewBid.save();
 
@@ -86,6 +96,43 @@ bidPlaced.checkBid = async (result, order) => {
     }
   } catch (err) {
     Utils.echoLog(`Error in bid placed event ${err}`);
+  }
+};
+
+// check bid ended
+bidPlaced.checkBidEnded = async () => {
+  console.log('Check bid ended called');
+  try {
+    var unix = Math.round(+new Date() / 1000);
+    const fetchRecords = await BidModel.find({
+      saleType: 1,
+      timeline: { $lte: unix },
+      timeline: { $ne: 0 },
+      isNotificationSent: false,
+    });
+
+    if (fetchRecords.length) {
+      for (let i = 0; i < fetchRecords.length; i++) {
+        const fetchNftDetails = await NftModel.findOne({
+          _id: fetchRecords[i].nftId,
+        });
+
+        const notifyBuyer = new NotificationModel({
+          text: `You won the bid for  ${fetchNftDetails.title}`,
+          userId: fetchRecords[i].userId,
+          route: `/nftDetails/${fetchRecords[i].nftId}`,
+        });
+        await notifyBuyer.save();
+
+        const updateBidstatus = await BidModel.findOneAndUpdate(
+          { _id: fetchRecords[i]._id },
+          { isNotificationSent: true }
+        );
+      }
+    }
+  } catch (err) {
+    console.log('error is :', err);
+    Utils.echoLog(`Error in checkBidEnded  ${err}`);
   }
 };
 
