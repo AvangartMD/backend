@@ -630,9 +630,9 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           checkEditionAlreadyAdded.ownerId = getUserDetails._id;
           checkEditionAlreadyAdded.nonce = nonce;
           checkEditionAlreadyAdded.isOpenForSale = isSecondHand;
-          checkEditionAlreadyAdded.price = Utils.convertToEther(
-            +order['pricePerNFT']
-          );
+          // checkEditionAlreadyAdded.price = Utils.convertToEther(
+          //   +order['pricePerNFT']
+          // );
           checkEditionAlreadyAdded.walletAddress = order['seller'];
           checkEditionAlreadyAdded.saleAction = saleType;
           checkEditionAlreadyAdded.timeline = order['timeline'];
