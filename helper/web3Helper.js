@@ -365,6 +365,10 @@ async function orderEvent(result, order, transactionId, nonce) {
 
       const saleTypes = { type: null, price: 0 };
 
+      console.log(
+        `Edition ${+result['editionNumber']}:${+order['pricePerNFT']}`
+      );
+
       // if second hand buy
       if (checkIsBuy) {
         saleTypes.type = 'BUY';
