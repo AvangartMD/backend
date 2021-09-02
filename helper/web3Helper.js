@@ -595,6 +595,10 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
 
       // console.log('Is seond hand is:', isSecondHand);
 
+      console.log(
+        `Edition ${+result['editionNumber']}:${+order['pricePerNFT']}`
+      );
+
       const saleTypes = { type: null, price: 0 };
 
       // if second hand buy
