@@ -819,6 +819,7 @@ nftCtr.marketPlace = async (req, res) => {
         select: { _id: 1, name: 1, description: 1 },
       })
       .skip((+page - 1 || 0) * +process.env.LIMIT)
+      .sort({ updatedAt: -1 })
       .limit(+process.env.LIMIT);
 
     return res.status(200).json({
