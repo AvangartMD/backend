@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 const { roles, status } = require('../../helper/enum');
 
 const { Schema } = mongoose;
+const decryptProperty = function (value) {
+  if (value) {
+    return `${process.env.IPFSURL}/${value}`;
+  } else {
+    return null;
+  }
+};
 
 const portFolioSchema = new Schema({
   username: {
@@ -61,11 +68,13 @@ const userSchema = new Schema(
       type: String,
       // lowercase: true,
       default: null,
+      get: decryptProperty,
     },
 
     cover: {
       type: String,
       default: null,
+      get: decryptProperty,
     },
 
     role: {
