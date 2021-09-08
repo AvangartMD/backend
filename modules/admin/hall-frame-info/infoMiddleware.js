@@ -11,8 +11,8 @@ const InfoMiddleware = {};
 //validate add middleware
 InfoMiddleware.validateAdd = async (req, res, next) => {
   const imageSchema = Joi.object().keys({
-    en: Joi.string().uri().required(),
-    tu: Joi.string().uri().required(),
+    en: Joi.string().required(),
+    tu: Joi.string().required(),
   });
 
   const textSchema = Joi.object().keys({
@@ -33,8 +33,8 @@ InfoMiddleware.validateAdd = async (req, res, next) => {
 // udpate validator
 InfoMiddleware.validateUpdate = async (req, res, next) => {
   const imageSchema = Joi.object().keys({
-    en: Joi.string().uri(),
-    tu: Joi.string().uri(),
+    en: Joi.string(),
+    tu: Joi.string(),
   });
 
   const textSchema = Joi.object().keys({

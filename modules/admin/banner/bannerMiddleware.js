@@ -10,8 +10,8 @@ const BannerMiddleware = {};
 //validate add middleware
 BannerMiddleware.validateAdd = async (req, res, next) => {
   const imageSchema = Joi.object().keys({
-    en: Joi.string().uri().required(),
-    tu: Joi.string().uri().required(),
+    en: Joi.string().required(),
+    tu: Joi.string().required(),
   });
   const schema = Joi.object({
     url: Joi.string().required(),
@@ -24,8 +24,8 @@ BannerMiddleware.validateAdd = async (req, res, next) => {
 // udpate validator
 BannerMiddleware.validateUpdate = async (req, res, next) => {
   const imageSchema = Joi.object().keys({
-    en: Joi.string().uri(),
-    tu: Joi.string().uri(),
+    en: Joi.string(),
+    tu: Joi.string(),
   });
   const schema = Joi.object({
     url: Joi.string(),
