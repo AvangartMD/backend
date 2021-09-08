@@ -2,32 +2,27 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+const imageSchema = new Schema({
+  en: {
+    type: String,
+    default: null,
+    get: decryptProperty,
+  },
+  tu: {
+    type: String,
+    default: null,
+    get: decryptProperty,
+  },
+});
+
 const infoSchema = new Schema(
   {
     url: {
       type: String,
       required: true,
     },
-    banner: {
-      en: {
-        type: String,
-        required: true,
-      },
-      tu: {
-        type: String,
-        required: true,
-      },
-    },
-    mobile: {
-      en: {
-        type: String,
-        required: true,
-      },
-      tu: {
-        type: String,
-        required: true,
-      },
-    },
+    banner: imageSchema,
+    mobile: imageSchema,
 
     button_text: {
       en: { type: String, required: false, default: null },

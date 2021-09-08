@@ -9,36 +9,27 @@ const decryptProperty = function (value) {
   }
 };
 
+const imageSchmea = new Schema({
+  en: {
+    type: String,
+    required: true,
+    get: decryptProperty,
+  },
+  tu: {
+    type: String,
+    required: true,
+    get: decryptProperty,
+  },
+});
+
 const bannerSchema = new Schema(
   {
     url: {
       type: String,
       required: true,
     },
-    banner: {
-      en: {
-        type: String,
-        required: true,
-        get: decryptProperty,
-      },
-      tu: {
-        type: String,
-        required: true,
-        get: decryptProperty,
-      },
-    },
-    mobile: {
-      en: {
-        type: String,
-        required: true,
-        get: decryptProperty,
-      },
-      tu: {
-        type: String,
-        required: true,
-        get: decryptProperty,
-      },
-    },
+    banner: imageSchmea,
+    mobile: imageSchmea,
     isActive: {
       type: Boolean,
       default: true,

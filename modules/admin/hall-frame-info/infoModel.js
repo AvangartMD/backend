@@ -10,24 +10,26 @@ const decryptProperty = function (value) {
   }
 };
 
+const imageSchema = new Schema({
+  en: {
+    type: String,
+    default: null,
+    get: decryptProperty,
+  },
+  tu: {
+    type: String,
+    default: null,
+    get: decryptProperty,
+  },
+});
+
 const infoSchema = new Schema(
   {
     url: {
       type: String,
       required: true,
     },
-    banner: {
-      en: {
-        type: String,
-        required: true,
-        get: decryptProperty,
-      },
-      tu: {
-        type: String,
-        required: true,
-        get: decryptProperty,
-      },
-    },
+    banner: imageSchema,
     mobile: {
       en: {
         type: String,

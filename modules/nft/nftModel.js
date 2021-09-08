@@ -11,6 +11,19 @@ const decryptProperty = function (value) {
   }
 };
 
+const imageSchmea = new Schema({
+  original: {
+    type: String,
+    default: null,
+    get: decryptProperty,
+  },
+  compressed: {
+    type: String,
+    default: null,
+    get: decryptProperty,
+  },
+});
+
 const nftSchema = new Schema(
   {
     title: {
@@ -30,17 +43,7 @@ const nftSchema = new Schema(
       sparse: true,
       required: false,
     },
-    image: {
-      original: {
-        type: String,
-        default: null,
-        get: decryptProperty,
-      },
-      compressed: {
-        type: String,
-        default: null,
-      },
-    },
+    image: imageSchmea,
     category: [
       {
         type: Schema.Types.ObjectId,
