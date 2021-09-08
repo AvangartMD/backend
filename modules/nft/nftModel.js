@@ -3,6 +3,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const { roles, nftStatus } = require('../../helper/enum');
 
+const decryptProperty = function (value) {
+  if (value) {
+    return `${process.env.IPFSURL}/${value}`;
+  } else {
+    return null;
+  }
+};
+
 const nftSchema = new Schema(
   {
     title: {
@@ -26,6 +34,7 @@ const nftSchema = new Schema(
       original: {
         type: String,
         default: null,
+        get: decryptProperty,
       },
       compressed: {
         type: String,

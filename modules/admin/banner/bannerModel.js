@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
+const decryptProperty = function (value) {
+  if (value) {
+    return `${process.env.IPFSURL}/${value}`;
+  } else {
+    return null;
+  }
+};
 
 const bannerSchema = new Schema(
   {
@@ -12,20 +19,24 @@ const bannerSchema = new Schema(
       en: {
         type: String,
         required: true,
+        get: decryptProperty,
       },
       tu: {
         type: String,
         required: true,
+        get: decryptProperty,
       },
     },
     mobile: {
       en: {
         type: String,
         required: true,
+        get: decryptProperty,
       },
       tu: {
         type: String,
         required: true,
+        get: decryptProperty,
       },
     },
     isActive: {

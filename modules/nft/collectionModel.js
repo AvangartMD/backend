@@ -7,11 +7,20 @@ const setSlugText = (value) => {
   return value ? Utils.slugText(value) : null;
 };
 
+const decryptProperty = function (value) {
+  if (value) {
+    return `${process.env.IPFSURL}/${value}`;
+  } else {
+    return null;
+  }
+};
+
 const collectionSchema = new Schema(
   {
     logo: {
       type: String,
       default: null,
+      get: decryptProperty,
       required: false,
     },
     name: {

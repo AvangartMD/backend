@@ -6,6 +6,14 @@ const setSlugText = (value) => {
   return value ? Utils.slugText(value) : null;
 };
 
+const decryptProperty = function (value) {
+  if (value) {
+    return `${process.env.IPFSURL}/${value}`;
+  } else {
+    return null;
+  }
+};
+
 const categorySchema = new Schema(
   {
     categoryName: {
@@ -33,6 +41,7 @@ const categorySchema = new Schema(
     image: {
       type: String,
       default: null,
+      get: decryptProperty,
     },
   },
 

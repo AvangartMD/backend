@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const Utils = require("../../../helper/utils");
+const mongoose = require('mongoose');
+const Utils = require('../../../helper/utils');
 
 const { Schema } = mongoose;
 const setSlugText = (value) => {
@@ -32,4 +32,4 @@ const dashboardSchema = new Schema(
   }
 );
 
-module.exports = mongoose.model("dashboard", dashboardSchema);
+module.exports = mongoose.model('dashboard', dashboardSchema);
