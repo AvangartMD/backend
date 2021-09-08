@@ -44,4 +44,7 @@ const bannerSchema = new Schema(
   }
 );
 
+imageSchmea.set('toObject', { getters: true });
+imageSchmea.set('toJSON', { getters: true });
+
 module.exports = mongoose.model('banner', bannerSchema);

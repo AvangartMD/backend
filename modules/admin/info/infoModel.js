@@ -59,4 +59,7 @@ const infoSchema = new Schema(
   }
 );
 
+imageSchema.set('toObject', { getters: true });
+imageSchema.set('toJSON', { getters: true });
+
 module.exports = mongoose.model('info', infoSchema);
