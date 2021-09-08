@@ -2,6 +2,14 @@ const mongoose = require('mongoose');
 
 const { Schema } = mongoose;
 
+const decryptProperty = function (value) {
+  if (value) {
+    return `${process.env.IPFSURL}/${value}`;
+  } else {
+    return null;
+  }
+};
+
 const imageSchema = new Schema({
   en: {
     type: String,
