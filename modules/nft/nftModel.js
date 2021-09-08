@@ -7,7 +7,7 @@ const decryptProperty = function (value) {
   if (value) {
     return `${process.env.IPFSURL}/${value}`;
   } else {
-    return null;
+    return value;
   }
 };
 
@@ -138,4 +138,6 @@ const nftSchema = new Schema(
   }
 );
 
+imageSchmea.set('toObject', { getters: true });
+imageSchmea.set('toJSON', { getters: true });
 module.exports = mongoose.model('nft', nftSchema);
