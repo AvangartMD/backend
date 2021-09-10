@@ -22,6 +22,7 @@ const imageSchmea = new Schema({
     default: null,
     get: decryptProperty,
   },
+  extra: { _id: false },
 });
 
 const nftSchema = new Schema(

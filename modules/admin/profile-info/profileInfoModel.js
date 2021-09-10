@@ -21,6 +21,7 @@ const imageSchmea = new Schema({
     required: true,
     get: decryptProperty,
   },
+  extra: { _id: false },
 });
 
 const profileInfoSchema = new Schema(
