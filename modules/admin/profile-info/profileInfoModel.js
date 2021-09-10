@@ -46,4 +46,7 @@ const profileInfoSchema = new Schema(
   }
 );
 
+imageSchmea.set('toObject', { getters: true });
+imageSchmea.set('toJSON', { getters: true });
+
 module.exports = mongoose.model('profileInfo', profileInfoSchema);
