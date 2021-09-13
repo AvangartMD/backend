@@ -117,7 +117,7 @@ BannerCtr.list = async (req, res) => {
     const getList = await BannerModel.find(
       { isActive: true },
       { isActive: 0, createdAt: 0, updatedAt: 0 }
-    );
+    ).sort({ createdAt: -1 });
     if (getList) {
       await client.set('banner-list', JSON.stringify(getList), 'EX', 60 * 10);
       return res.status(200).json({
