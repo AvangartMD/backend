@@ -509,9 +509,9 @@ UserCtr.searchCreator = async (req, res) => {
     const findUsers = await UserModel.find(
       {
         isActive: 1,
-        role: fetchCreatorRoleId._id,
+        // role: fetchCreatorRoleId._id,
         username: { $regex: `${req.params.name.toLowerCase()}.*` },
-        acceptedByAdmin: true,
+        // acceptedByAdmin: true,
       },
       { _id: 1, username: 1, walletAddress: 1 }
     );
