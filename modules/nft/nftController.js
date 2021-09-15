@@ -154,8 +154,6 @@ nftCtr.updateNft = async (req, res) => {
   try {
     const fetchNftDetails = await NftModel.findById(req.params.id);
 
-    console.log('fetchNftDetails', fetchNftDetails);
-
     if (fetchNftDetails) {
       if (req.body.title) {
         fetchNftDetails.title = req.body.title;
@@ -208,7 +206,6 @@ nftCtr.updateNft = async (req, res) => {
         status: true,
       });
     } else {
-      console.log('IN ELSE ===>');
       return res.status(400).json({
         message: req.t('INVALID_NFT'),
         status: false,
