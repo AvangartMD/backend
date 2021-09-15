@@ -44,10 +44,15 @@
                         "internalType": "uint256",
                         "name": "timeline",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "paymentToken",
+                        "type": "address"
                     }
                 ],
                 "indexed": false,
-                "internalType": "struct Escrow.Order",
+                "internalType": "struct NewEscrow.Order",
                 "name": "order",
                 "type": "tuple"
             },
@@ -113,10 +118,15 @@
                         "internalType": "uint256",
                         "name": "timeline",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "paymentToken",
+                        "type": "address"
                     }
                 ],
                 "indexed": false,
-                "internalType": "struct Escrow.Order",
+                "internalType": "struct NewEscrow.Order",
                 "name": "order",
                 "type": "tuple"
             },
@@ -213,10 +223,15 @@
                         "internalType": "uint256",
                         "name": "timeline",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "paymentToken",
+                        "type": "address"
                     }
                 ],
                 "indexed": false,
-                "internalType": "struct Escrow.Order",
+                "internalType": "struct NewEscrow.Order",
                 "name": "order",
                 "type": "tuple"
             },
@@ -282,10 +297,15 @@
                         "internalType": "uint256",
                         "name": "timeline",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "paymentToken",
+                        "type": "address"
                     }
                 ],
                 "indexed": false,
-                "internalType": "struct Escrow.Order",
+                "internalType": "struct NewEscrow.Order",
                 "name": "order",
                 "type": "tuple"
             },
@@ -345,10 +365,15 @@
                         "internalType": "uint256",
                         "name": "timeline",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "paymentToken",
+                        "type": "address"
                     }
                 ],
                 "indexed": false,
-                "internalType": "struct Escrow.Order",
+                "internalType": "struct NewEscrow.Order",
                 "name": "order",
                 "type": "tuple"
             },
@@ -718,6 +743,11 @@
                 "internalType": "uint256",
                 "name": "timeline",
                 "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "paymentToken",
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -796,9 +826,48 @@
                 "internalType": "uint256",
                 "name": "_adminPlatformFee",
                 "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_paymentToken",
+                "type": "address"
             }
         ],
         "name": "placeOrder",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_tokenId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_editionNumber",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_pricePerNFT",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_saleType",
+                "type": "uint256"
+            }
+        ],
+        "name": "placeSecondHandOrder",
         "outputs": [
             {
                 "internalType": "bool",
@@ -932,6 +1001,25 @@
             }
         ],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes4",
+                "name": "interfaceId",
+                "type": "bytes4"
+            }
+        ],
+        "name": "supportsInterface",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
