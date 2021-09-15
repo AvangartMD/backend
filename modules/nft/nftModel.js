@@ -22,6 +22,10 @@ const imageSchmea = new Schema({
     default: null,
     get: decryptProperty,
   },
+  format: {
+    type: String,
+    default: null,
+  },
   extra: { _id: false },
 });
 

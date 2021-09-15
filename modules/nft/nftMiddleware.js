@@ -11,6 +11,7 @@ NftMiddleware.validateAdd = async (req, res, next) => {
   const imageSchema = Joi.object().keys({
     original: Joi.string().required(),
     compressed: Joi.string().required(),
+    format: Joi.string(),
   });
 
   const coCreatorSchema = Joi.object().keys({
@@ -119,6 +120,7 @@ NftMiddleware.validateNftUpdate = async (req, res, next) => {
   const imageSchema = Joi.object().keys({
     original: Joi.string(),
     compressed: Joi.string(),
+    format: Joi.string(),
   });
 
   const coCreatorSchema = Joi.object().keys({
