@@ -39,6 +39,17 @@ cancelledEvent.cancelTransfer = async (editionNo, tokenId, transactionHash) => {
             findNft.nftSold = findNft.nftSold + 1;
             findNft.saleState = 'SOLD';
             await findNft.save();
+          } else {
+            const getNftSold = +findNft.nftSold + 1;
+            findNft.nftSold = getNftSold;
+
+            if (getNftSold >= findNft.edition) {
+              findNft.saleState = 'SOLD';
+            } else {
+              findNft.saleState = 'BUY';
+            }
+
+            await findNft.save();
           }
         } else {
           Utils.echoLog(
