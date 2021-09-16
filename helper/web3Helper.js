@@ -562,7 +562,6 @@ getWeb3Event.getTransferEventFromContract = async (req, res) => {
 // seconf hand order buy
 
 async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
-  console.log('SECOND HAND SALES====>', order['tokenId']);
   return new Promise(async (resolve, reject) => {
     try {
       const web3 = new Web3(provider);
@@ -640,6 +639,13 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           checkEditionAlreadyAdded.saleType = saleTypes;
 
           await checkEditionAlreadyAdded.save();
+
+          if (getNftDetails.edition === getNftDetails.nftSold) {
+            getNftDetails.saleState = 'BUY';
+            getNftDetails.nftSold = getNftDetails.nftSold - 1;
+            await getNftDetails.save();
+          }
+
           resolve(true);
         } else {
           const addNewEdition = new EditionModel({
@@ -657,6 +663,12 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
           });
 
           await addNewEdition.save();
+
+          if (getNftDetails.edition === getNftDetails.nftSold) {
+            getNftDetails.saleState = 'BUY';
+            getNftDetails.nftSold = getNftDetails.nftSold - 1;
+            await getNftDetails.save();
+          }
 
           resolve(true);
         }

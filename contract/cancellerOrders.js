@@ -34,6 +34,12 @@ cancelledEvent.cancelTransfer = async (editionNo, tokenId, transactionHash) => {
           findEdition.saleType = saleType;
           findEdition.transactionId = transactionHash;
           await findEdition.save();
+
+          if (findNft.edition === 1 && findNft.nftSold === 0) {
+            findNft.nftSold = findNft.nftSold + 1;
+            findNft.saleState = 'SOLD';
+            await findNft.save();
+          }
         } else {
           Utils.echoLog(
             `Edition not found for ${findNft._id} with edition no ${editionNo}`
