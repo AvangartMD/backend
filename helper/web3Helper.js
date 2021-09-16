@@ -74,7 +74,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         //   from: '0x0000000000000000000000000000000000000000', //,
         //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
         // },
-        // fromBlock: 6018110,
+        fromBlock: 6018110,
       })
       .on('data', async (getPastEvents) => {
         const nonce = getPastEvents.returnValues.nonce;
@@ -562,7 +562,7 @@ getWeb3Event.getTransferEventFromContract = async (req, res) => {
 // seconf hand order buy
 
 async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
-  // console.log('ORDER IS====>', order);
+  console.log('SECOND HAND SALES====>', order['tokenId']);
   return new Promise(async (resolve, reject) => {
     try {
       const web3 = new Web3(provider);
