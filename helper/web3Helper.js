@@ -420,6 +420,15 @@ async function orderEvent(result, order, transactionId, nonce) {
             });
 
             await addNewHistory.save();
+
+            const getNftSold = +getNftDetails.nftSold + 1;
+            getNftDetails.nftSold = getNftSold;
+
+            if (getNftSold >= getNftDetails.edition) {
+              getNftDetails.saleState = 'SOLD';
+            }
+
+            await getNftDetails.save();
             resolve(true);
           }
 
@@ -644,6 +653,12 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
             getNftDetails.saleState = 'BUY';
             getNftDetails.nftSold = getNftDetails.nftSold - 1;
             await getNftDetails.save();
+          } else {
+            if (isSecondHand) {
+              getNftDetails.saleState = 'BUY';
+              getNftDetails.nftSold = getNftDetails.nftSold - 1;
+              await getNftDetails.save();
+            }
           }
 
           resolve(true);
@@ -668,6 +683,12 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
             getNftDetails.saleState = 'BUY';
             getNftDetails.nftSold = getNftDetails.nftSold - 1;
             await getNftDetails.save();
+          } else {
+            if (isSecondHand) {
+              getNftDetails.saleState = 'BUY';
+              getNftDetails.nftSold = getNftDetails.nftSold - 1;
+              await getNftDetails.save();
+            }
           }
 
           resolve(true);
