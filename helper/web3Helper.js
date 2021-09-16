@@ -112,7 +112,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // order cancelled events
     contract.events
       .OrderCancelled({
-        fromBlock: 6018110,
+        // fromBlock: 6018110,
       })
       .on('data', async (cancelledEvent) => {
         const editionNo = cancelledEvent.returnValues.editionNumber;
