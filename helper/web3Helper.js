@@ -158,6 +158,7 @@ async function TransferredEvent(hash, result) {
 }
 
 async function checkMinting(result, order, nonce, transactionhash) {
+  console.log('check mointuing calleed ======>');
   try {
     const checkIsBuy = +order['saleType'] === 2 ? true : false;
     const checkIsOffer = +order['saleType'] === 3 ? true : false;
