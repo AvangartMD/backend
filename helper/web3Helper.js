@@ -74,9 +74,10 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         //   from: '0x0000000000000000000000000000000000000000', //,
         //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
         // },
-        // fromBlock: 6018110,
+        fromBlock: 11130135,
       })
       .on('data', async (getPastEvents) => {
+        console.log('getPastEvents', getPastEvents);
         const nonce = getPastEvents.returnValues.nonce;
         const result = getPastEvents.returnValues;
         const order = result['order'];
@@ -91,6 +92,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         // fromBlock: 6018110,
       })
       .on('data', async (getPastEvents) => {
+        console.log('OrderBought', getPastEvents);
         const result = getPastEvents.returnValues;
         const order = result['order'];
         const transactionHash = getPastEvents.transactionHash;
