@@ -179,6 +179,8 @@ async function checkMinting(result, order, nonce, transactionhash) {
         .tokenURI(order.tokenId)
         .call();
 
+      console.log('getTokenUri is', getTokenUri);
+
       // if we get token uri from token contract
       if (getTokenUri) {
         // console.log('token uri is:', getTokenUri);
