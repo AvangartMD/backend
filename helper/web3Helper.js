@@ -92,7 +92,6 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         fromBlock: 11130135,
       })
       .on('data', async (getPastEvents) => {
-        console.log('OrderBought', getPastEvents);
         const result = getPastEvents.returnValues;
         const order = result['order'];
         const transactionHash = getPastEvents.transactionHash;
@@ -391,6 +390,14 @@ async function orderEvent(result, order, transactionId, nonce) {
 
         // check edition added
         if (checkEditionAlreadyAdded) {
+          let isNew = false;
+
+          if (
+            checkEditionAlreadyAdded.transactionId.toLowerCase() !==
+            transactionId.toLowerCase()
+          ) {
+            isNew = true;
+          }
           let previousOwner = checkEditionAlreadyAdded.ownerId;
           // check it is second hand sale
           checkEditionAlreadyAdded.transactionId = transactionId;
@@ -423,6 +430,10 @@ async function orderEvent(result, order, transactionId, nonce) {
 
             await addNewHistory.save();
 
+            resolve(true);
+          }
+
+          if (isNew) {
             const getNftSold = +getNftDetails.nftSold + 1;
             getNftDetails.nftSold = getNftSold;
 
