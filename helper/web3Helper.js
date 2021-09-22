@@ -180,7 +180,7 @@ async function checkMinting(result, order, nonce, transactionhash) {
         tokenContractJson,
         process.env.TOKEN_ADDRESS
       );
-      console.log('token id is:', tokenId);
+      console.log('token id is:', order.tokenId);
       // check valid mongoose id
       const getTokenUri = await tokenContract.methods
         .tokenURI(order.tokenId)
