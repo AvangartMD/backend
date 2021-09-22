@@ -161,6 +161,7 @@ function sleep(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
 
 async function checkMinting(result, order, nonce, transactionhash) {
   console.log('check mointuing calleed ======>');
