@@ -22,6 +22,10 @@ const dashboardSchema = new Schema(
       required: true,
       default: false,
     },
+    rank: {
+      type: Number,
+      default: 0,
+    },
   },
 
   {
