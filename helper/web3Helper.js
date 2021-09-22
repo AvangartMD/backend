@@ -236,7 +236,7 @@ async function checkMinting(result, order, nonce, transactionhash) {
           Utils.echoLog(`Not a cvalid token uri ${getTokenUri}`);
         }
       } else {
-        console.log('Inavlid Token uri');
+        console.log('Inavlid Token uri', getTokenUri);
         Utils.echoLog(`Invalid token Uri ${getTokenUri}`);
       }
     }
