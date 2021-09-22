@@ -157,6 +157,11 @@ async function TransferredEvent(hash, result) {
   });
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+
 async function checkMinting(result, order, nonce, transactionhash) {
   console.log('check mointuing calleed ======>');
   try {
@@ -169,11 +174,12 @@ async function checkMinting(result, order, nonce, transactionhash) {
       await orderPlacedForSecondHand(result, order, transactionhash, nonce);
     } else {
       const web3 = new Web3(provider);
-
+      await sleep(1000);
       const tokenContract = new web3.eth.Contract(
         tokenContractJson,
         process.env.TOKEN_ADDRESS
       );
+      console.log('token id is:', tokenId);
       // check valid mongoose id
       const getTokenUri = await tokenContract.methods
         .tokenURI(order.tokenId)
