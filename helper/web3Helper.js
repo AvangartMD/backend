@@ -77,7 +77,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         // fromBlock: 11130135,
       })
       .on('data', async (getPastEvents) => {
-        console.log('getPastEvents', getPastEvents);
+        // console.log('getPastEvents', getPastEvents);
         const nonce = getPastEvents.returnValues.nonce;
         const result = getPastEvents.returnValues;
         const order = result['order'];
@@ -216,20 +216,23 @@ async function checkMinting(result, order, nonce, transactionhash) {
               addNewHistory.save();
             }
           } else if (findNft && findNft.tokenId) {
-            // console.log('token already minted');
+            console.log('token already minted =====>');
             Utils.echoLog(`token already minted ${findNft.tokenId}  `);
           } else {
+            console.log('Token Uri not found in database ===>');
             Utils.echoLog(`Token Uri not found in database ${getTokenUri}`);
           }
         } else {
+          console.log('Not a cvalid token uri');
           Utils.echoLog(`Not a cvalid token uri ${getTokenUri}`);
         }
       } else {
+        console.log('Inavlid Token uri');
         Utils.echoLog(`Invalid token Uri ${getTokenUri}`);
       }
     }
   } catch (err) {
-    // console.log('error in check minting', err);
+    console.log('error in check minting', err);
     Utils.echoLog(`Error in check minting ${err}`);
   }
 }
