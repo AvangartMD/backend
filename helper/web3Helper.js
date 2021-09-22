@@ -89,7 +89,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // // order bought events
     contract.events
       .OrderBought({
-        fromBlock: 11130135,
+        // fromBlock: 11130135,
       })
       .on('data', async (getPastEvents) => {
         const result = getPastEvents.returnValues;
