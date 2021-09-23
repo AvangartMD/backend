@@ -1,4 +1,5 @@
 const { winston } = global;
+const Web3 = require('web3');
 const fs = require('fs');
 const utils = {};
 
@@ -53,9 +54,19 @@ utils.slugText = (text) => {
   }
 };
 
+// utils.convertToEther = (number) => {
+//   if (number) {
+//     return +number / Math.pow(10, 18);
+//   } else {
+//     return 0;
+//   }
+// };
+
 utils.convertToEther = (number) => {
   if (number) {
-    return +number / Math.pow(10, 18);
+    let value = parseFloat(Web3.utils.fromWei(number)).toFixed(10);
+
+    return +value;
   } else {
     return 0;
   }
