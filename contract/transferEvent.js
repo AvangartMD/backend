@@ -110,7 +110,7 @@ transferEvent.burn = async (data, transactionHash) => {
 
             // change in NFT
             // decrement the count of NFt
-            findNft.edition -= 1;
+            // findNft.edition -= 1;
             if (findNft.nftSold > 1) {
               findNft.nftSold -= 1;
             }
