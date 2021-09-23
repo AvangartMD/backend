@@ -428,23 +428,13 @@ async function orderEvent(result, order, transactionId, nonce) {
 
           await checkEditionAlreadyAdded.save();
 
-          if (
-            checkEditionAlreadyAdded.transactionId.toLowerCase() !==
-            transactionId.toLowerCase()
-          ) {
-            const addNewHistory = new HistoryModel({
-              nftId: getNftDetails._id,
-              editionNo: +result['editionNumber'],
-              ownerId: getUserDetails._id,
-              text: 'NFT bought',
-              buyPrice: Utils.convertToEther(+order['pricePerNFT']),
-              timeline: order['timeline'],
-            });
+          // if (
+          //   checkEditionAlreadyAdded.transactionId.toLowerCase() !==
+          //   transactionId.toLowerCase()
+          // ) {
 
-            await addNewHistory.save();
-
-            resolve(true);
-          }
+          //   resolve(true);
+          // }
 
           if (isNew) {
             const getNftSold = +getNftDetails.nftSold + 1;
@@ -455,6 +445,17 @@ async function orderEvent(result, order, transactionId, nonce) {
             }
 
             await getNftDetails.save();
+
+            const addNewHistory = new HistoryModel({
+              nftId: getNftDetails._id,
+              editionNo: +result['editionNumber'],
+              ownerId: getUserDetails._id,
+              text: 'NFT bought in second hand sales',
+              buyPrice: Utils.convertToEther(+order['pricePerNFT']),
+              timeline: order['timeline'],
+            });
+
+            await addNewHistory.save();
             resolve(true);
           }
 
