@@ -34,7 +34,7 @@ nftCtr.addNewNft = async (req, res) => {
       digitalKey: digitalKey,
       unlockContent: unlockContent ? unlockContent : false,
       coCreator: coCreator ? req.body.coCreator : null,
-      price: req.body.price,
+      price: +req.body.price,
       saleState: req.body.saleState,
       auctionTime: req.body.auctionTime ? req.body.auctionTime : 0,
       edition: req.body.edition ? req.body.edition : 1,

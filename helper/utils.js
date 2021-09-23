@@ -54,21 +54,21 @@ utils.slugText = (text) => {
   }
 };
 
-// utils.convertToEther = (number) => {
-//   if (number) {
-//     return +number / Math.pow(10, 18);
-//   } else {
-//     return 0;
-//   }
-// };
-
 utils.convertToEther = (number) => {
   if (number) {
-    let value = parseFloat(Web3.utils.fromWei(number)).toFixed(10);
-
-    return +value;
+    return +number / Math.pow(10, 18);
   } else {
     return 0;
   }
 };
+
+// utils.convertToEther = (number) => {
+//   if (number) {
+//     let value = parseFloat(Web3.utils.fromWei(number)).toFixed(10);
+
+//     return +value;
+//   } else {
+//     return 0;
+//   }
+// };
 module.exports = utils;
