@@ -920,7 +920,7 @@ nftCtr.getNftHistory = async (req, res) => {
             path: 'ownerId',
             select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
           })
-          .sort({ timeline: 1 })
+          .sort({ createdAt: 1 })
       )
     );
     if (fetchNftCreated) {
