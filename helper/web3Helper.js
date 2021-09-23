@@ -450,7 +450,7 @@ async function orderEvent(result, order, transactionId, nonce) {
               nftId: getNftDetails._id,
               editionNo: +result['editionNumber'],
               ownerId: getUserDetails._id,
-              text: 'NFT bought in second hand sales',
+              text: 'NFT bought',
               buyPrice: Utils.convertToEther(+order['pricePerNFT']),
               timeline: order['timeline'],
             });
