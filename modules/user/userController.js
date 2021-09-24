@@ -202,6 +202,7 @@ UserCtr.login = async (req, res) => {
             });
           }
         } else {
+          console.log('INVALID ADDRESS =====>');
           // invalid address
           return res.status(400).json({
             message: req.t('INVALID_CALL'),
@@ -209,6 +210,7 @@ UserCtr.login = async (req, res) => {
           });
         }
       } else {
+        console.log('redids data not ');
         // redis data not avalible login again
         return res.status(400).json({
           message: req.t('LOGIN_AGAIN'),
@@ -217,12 +219,14 @@ UserCtr.login = async (req, res) => {
       }
     } else {
       // inavlid signature
+      console.log('err in signature :');
       return res.status(400).json({
         message: req.t('INVALID_SIGNATURE'),
         status: false,
       });
     }
   } catch (err) {
+    console.log('err in signup :', err);
     Utils.echoLog('error in singnup  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
