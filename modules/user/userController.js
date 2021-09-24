@@ -129,6 +129,7 @@ UserCtr.login = async (req, res) => {
     );
 
     console.log('Signature is:', signature);
+    console.log('nonce is:', nonce);
 
     const signer = await web3.eth.accounts.recover(nonce, signature);
 
