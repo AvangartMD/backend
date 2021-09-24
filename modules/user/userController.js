@@ -125,10 +125,10 @@ UserCtr.login = async (req, res) => {
   try {
     const { nonce, signature } = req.body;
     const web3 = new Web3(
-      new Web3.providers.HttpProvider(
-        'https://data-seed-prebsc-1-s1.binance.org:8545/'
-      )
+      new Web3.providers.HttpProvider('https://bsc-dataseed.binance.org/')
     );
+
+    console.log('Signature is:', signature);
 
     const signer = await web3.eth.accounts.recover(nonce, signature);
 
