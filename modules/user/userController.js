@@ -137,6 +137,13 @@ UserCtr.login = async (req, res) => {
 
       if (fetchRedisData) {
         const parsedRedisData = JSON.parse(fetchRedisData);
+        console.log(
+          'parsedRedisData.walletAddress.toLowerCase()',
+          parsedRedisData.walletAddress.toLowerCase()
+        );
+
+        console.log('signer.toLowerCase()', signer.toLowerCase());
+
         const checkAddressMatched =
           parsedRedisData.walletAddress.toLowerCase() === signer.toLowerCase();
 
