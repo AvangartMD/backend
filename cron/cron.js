@@ -17,6 +17,6 @@ cron.schedule('0 0 * * *', async (req, res) => {
   await HallHelper.getTopCreators(req, res);
 });
 
-cron.schedule('0 * * * *', async (req, res) => {
+cron.schedule('0,30 * * * *', async (req, res) => {
   BidHelper.checkBidEnded(req, res);
 });
