@@ -117,11 +117,37 @@ bidPlaced.checkBidEnded = async () => {
           _id: fetchRecords[i].nftId,
         });
 
+        const fetchUser = await UserModal.findOne({
+          _id: fetchRecords[i].userId,
+        });
+
         const notifyBuyer = new NotificationModel({
           text: `You won the bid for ${fetchNftDetails.title}.Please go & claim your NFT from the related NFT page.`,
           userId: fetchRecords[i].userId,
           route: `/nftDetails/${fetchRecords[i].nftId}`,
         });
+
+        // check edition added
+        const checkEditionAlreadyAdded = await EditionModel.findOne({
+          nftId: fetchNftDetails._id,
+          edition: +fetchRecords[i].editionNo,
+        });
+
+        if (!checkEditionAlreadyAdded) {
+          const addNewEdition = new EditionModel({
+            nftId: fetchNftDetails._id,
+            ownerId: fetchRecords[i].userId,
+            edition: fetchRecords[i].editionNo,
+            transactionId: '0x',
+            price: 0,
+            walletAddress: fetchUser.walletAddress,
+            saleAction: 'AUCTION',
+            nonce: null,
+            isOpenForSale: false,
+            timeline: 0,
+          });
+          await addNewEdition.save();
+        }
         await notifyBuyer.save();
 
         const updateBidstatus = await BidModel.findOneAndUpdate(
