@@ -6,8 +6,14 @@ const { Schema } = mongoose;
 const notificationSchema = new Schema(
   {
     text: {
-      type: String,
-      required: true,
+      en: {
+        type: String,
+        default: null,
+      },
+      tu: {
+        type: String,
+        default: null,
+      },
     },
     route: {
       type: String,

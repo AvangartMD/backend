@@ -1004,8 +1004,10 @@ nftCtr.getUserBuyedNfts = async (req, res) => {
     let query = { isBurned: false };
     if (req.params.userId) {
       query.ownerId = req.params.userId;
+      query.transactionId = { $ne: '0x' };
     } else {
       query.ownerId = req.userData._id;
+      query.transactionId = { $ne: '0x' };
     }
 
     const editions = await EditionModel.find(query);

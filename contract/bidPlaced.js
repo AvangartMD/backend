@@ -39,7 +39,10 @@ bidPlaced.checkBid = async (result, order) => {
         // if not add the notification
         if (!checkNotificationAdded) {
           const addNewNotification = new NotificationModel({
-            text: `Your Bid for ${fetchNftDetails.title} for edition No ${result['editionNumber']} is overbid`,
+            text: {
+              en: `Your Bid for ${fetchNftDetails.title} for edition No ${result['editionNumber']} is overbid`,
+              tr: ` ${fetchNftDetails.title} eserinin ${result['editionNumber']} numaralı edisyonu için verdiğiniz teklif bir başka kullanıcı tarafından yükseltildi.`,
+            },
             userId: checkBidAlreadyPlaced.userId,
             bidId: checkBidAlreadyPlaced._id,
             route: `/nftDetails/${fetchNftDetails._id}`,
@@ -47,7 +50,10 @@ bidPlaced.checkBid = async (result, order) => {
 
           if (+order['saleType'] === 3) {
             const notifySeller = new NotificationModel({
-              text: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action`,
+              text: {
+                en: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action`,
+                tr: `${fetchNftDetails.title} için yeni bir teklif aldınız. İşleme devam etmek için ilgili NFT sayfasına gidebilirsiniz.`,
+              },
               userId: fetchSeller._id,
               route: `/nftDetails/${fetchNftDetails._id}`,
             });
@@ -85,7 +91,10 @@ bidPlaced.checkBid = async (result, order) => {
 
         if (+order['saleType'] === 3) {
           const notifySeller = new NotificationModel({
-            text: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action.`,
+            text: {
+              en: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action.`,
+              tr: `${fetchNftDetails.title} için yeni bir teklif aldınız. İşleme devam etmek için ilgili NFT sayfasına gidebilirsiniz.`,
+            },
             userId: fetchSeller._id,
             route: `/nftDetails/${fetchNftDetails._id}`,
           });
@@ -122,7 +131,10 @@ bidPlaced.checkBidEnded = async () => {
         });
 
         const notifyBuyer = new NotificationModel({
-          text: `You won the bid for ${fetchNftDetails.title}.Please go & claim your NFT from the related NFT page.`,
+          text: {
+            en: `You won the bid for ${fetchNftDetails.title}.Please go & claim your NFT from the related NFT page.`,
+            tr: `${fetchNftDetails.title} için müzayedeyi kazandınız! Lütfen ilgili NFT sayfasına giderek alım işleminizi sonlandırın.`,
+          },
           userId: fetchRecords[i].userId,
           route: `/nftDetails/${fetchRecords[i].nftId}`,
         });

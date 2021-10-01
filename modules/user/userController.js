@@ -377,9 +377,14 @@ UserCtr.approveAsCreator = async (req, res) => {
           await getUserDetails.save();
 
           const addNewNotication = new NotificationModel({
-            text: user[i].status
-              ? req.t('REQUEST_ACCEPTED')
-              : req.t('REQUSET_REJECTED'),
+            text: {
+              en: user[i].status
+                ? req.t('REQUEST_ACCEPTED')
+                : req.t('REQUSET_REJECTED'),
+              tr: user[i].status
+                ? req.t('REQUEST_ACCEPTED_TR')
+                : req.t('REQUSET_REJECTED_TR'),
+            },
             userId: getUserDetails,
           });
 

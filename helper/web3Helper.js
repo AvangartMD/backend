@@ -460,9 +460,15 @@ async function orderEvent(result, order, transactionId, nonce) {
           }
 
           const addNewNotification = await new NotificationModel({
-            text: `Your Nft named ${getNftDetails.title}for edition ${+result[
-              'editionNumber'
-            ]} is sold  `,
+            text: {
+              en: `Your Nft named ${getNftDetails.title}for edition ${+result[
+                'editionNumber'
+              ]} is sold `,
+
+              tr: `${getNftDetails.title} eserinizin ${+result[
+                'editionNumber'
+              ]} numaralı edisyonu satıldı.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: previousOwner,
           });
@@ -470,7 +476,10 @@ async function orderEvent(result, order, transactionId, nonce) {
           await addNewNotification.save();
 
           const addNewNotificationForBuyer = await new NotificationModel({
-            text: `You bought  ${getNftDetails.title}  `,
+            text: {
+              en: `You bought  ${getNftDetails.title}.`,
+              tr: `${getNftDetails.title} adlı eseri aldınız.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
           });
@@ -518,9 +527,15 @@ async function orderEvent(result, order, transactionId, nonce) {
           await getNftDetails.save();
 
           const addNewNotification = await new NotificationModel({
-            text: `Your Nft named ${getNftDetails.title}for edition ${+result[
-              'editionNumber'
-            ]} is sold  `,
+            text: {
+              en: `Your Nft named ${getNftDetails.title}for edition ${+result[
+                'editionNumber'
+              ]} is sold`,
+
+              tr: `${getNftDetails.title} eserinizin ${+result[
+                'editionNumber'
+              ]} numaralı edisyonu satıldı.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getNftDetails['ownerId'],
           });
@@ -528,7 +543,10 @@ async function orderEvent(result, order, transactionId, nonce) {
           await addNewNotification.save();
 
           const addNewNotificationForBuyer = await new NotificationModel({
-            text: `You bought  ${getNftDetails.title}  `,
+            text: {
+              en: `You bought  ${getNftDetails.title}`,
+              tr: `${getNftDetails.title} adlı eseri aldınız.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
           });
