@@ -369,7 +369,7 @@ UserCtr.approveAsCreator = async (req, res) => {
               en: user[i].status
                 ? req.t('REQUEST_ACCEPTED')
                 : req.t('REQUSET_REJECTED'),
-              tr: user[i].status
+              tu: user[i].status
                 ? req.t('REQUEST_ACCEPTED_TR')
                 : req.t('REQUSET_REJECTED_TR'),
             },

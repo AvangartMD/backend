@@ -465,7 +465,7 @@ async function orderEvent(result, order, transactionId, nonce) {
                 'editionNumber'
               ]} is sold `,
 
-              tr: `${getNftDetails.title} eserinizin ${+result[
+              tu: `${getNftDetails.title} eserinizin ${+result[
                 'editionNumber'
               ]} numaralı edisyonu satıldı.`,
             },
@@ -478,7 +478,7 @@ async function orderEvent(result, order, transactionId, nonce) {
           const addNewNotificationForBuyer = await new NotificationModel({
             text: {
               en: `You bought  ${getNftDetails.title}.`,
-              tr: `${getNftDetails.title} adlı eseri aldınız.`,
+              tu: `${getNftDetails.title} adlı eseri aldınız.`,
             },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
@@ -532,7 +532,7 @@ async function orderEvent(result, order, transactionId, nonce) {
                 'editionNumber'
               ]} is sold`,
 
-              tr: `${getNftDetails.title} eserinizin ${+result[
+              tu: `${getNftDetails.title} eserinizin ${+result[
                 'editionNumber'
               ]} numaralı edisyonu satıldı.`,
             },
@@ -545,7 +545,7 @@ async function orderEvent(result, order, transactionId, nonce) {
           const addNewNotificationForBuyer = await new NotificationModel({
             text: {
               en: `You bought  ${getNftDetails.title}`,
-              tr: `${getNftDetails.title} adlı eseri aldınız.`,
+              tu: `${getNftDetails.title} adlı eseri aldınız.`,
             },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
