@@ -128,9 +128,6 @@ UserCtr.login = async (req, res) => {
       new Web3.providers.HttpProvider('https://bsc-dataseed.binance.org/')
     );
 
-    console.log('Signature is:', signature);
-    console.log('nonce is:', nonce);
-
     const signer = await web3.eth.accounts.recover(nonce, signature);
 
     if (signer) {
@@ -138,12 +135,6 @@ UserCtr.login = async (req, res) => {
 
       if (fetchRedisData) {
         const parsedRedisData = JSON.parse(fetchRedisData);
-        console.log(
-          'parsedRedisData.walletAddress.toLowerCase()',
-          parsedRedisData.walletAddress.toLowerCase()
-        );
-
-        console.log('signer.toLowerCase()', signer.toLowerCase());
 
         const checkAddressMatched =
           parsedRedisData.walletAddress.toLowerCase() === signer.toLowerCase();
@@ -210,7 +201,6 @@ UserCtr.login = async (req, res) => {
             });
           }
         } else {
-          console.log('INVALID ADDRESS =====>');
           // invalid address
           return res.status(400).json({
             message: req.t('INVALID_CALL'),
@@ -218,7 +208,6 @@ UserCtr.login = async (req, res) => {
           });
         }
       } else {
-        console.log('redids data not ');
         // redis data not avalible login again
         return res.status(400).json({
           message: req.t('LOGIN_AGAIN'),
@@ -227,7 +216,6 @@ UserCtr.login = async (req, res) => {
       }
     } else {
       // inavlid signature
-      console.log('err in signature :');
       return res.status(400).json({
         message: req.t('INVALID_SIGNATURE'),
         status: false,
