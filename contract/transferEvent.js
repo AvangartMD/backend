@@ -41,7 +41,13 @@ transferEvent.setTransferEvent = async (data, transactionHash) => {
           edition: +data['edition'],
         });
 
+        let userDetails = {};
+
         if (checkEditionAlreadyAdded) {
+          userDetails = await UserModel.findOne({
+            _id: checkEditionAlreadyAdded.ownerId,
+          });
+
           checkEditionAlreadyAdded.ownerId = findUser._id;
           checkEditionAlreadyAdded.walletAddress = data['to'];
           checkEditionAlreadyAdded.transactionId = transactionHash;
@@ -61,9 +67,11 @@ transferEvent.setTransferEvent = async (data, transactionHash) => {
           await addNewEdition.save();
         }
 
-        const userName = findUser.userName
-          ? findUser.userName
-          : findUser.walletAddress;
+        const userName = Object.keys(userDetails).length
+          ? userDetails.userName
+            ? userDetails.userName
+            : userDetails.walletAddress
+          : '';
 
         const addNewNotification = new NotificationModel({
           text: {
