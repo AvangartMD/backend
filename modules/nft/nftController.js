@@ -451,7 +451,8 @@ nftCtr.listUsersNft = async (req, res) => {
       .populate({
         path: 'ownerId',
         select: { name: 1, username: 1, profile: 1 },
-      });
+      })
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: req.t('USER_NFT_LIST'),
