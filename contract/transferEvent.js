@@ -68,8 +68,8 @@ transferEvent.setTransferEvent = async (data, transactionHash) => {
         }
 
         const userName = Object.keys(userDetails).length
-          ? userDetails.userName
-            ? userDetails.userName
+          ? userDetails.username
+            ? userDetails.username
             : userDetails.walletAddress
           : '';
 
