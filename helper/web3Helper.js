@@ -74,7 +74,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         //   from: '0x0000000000000000000000000000000000000000', //,
         //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
         // },
-        fromBlock: 11617760,
+        // fromBlock: 11617760,
       })
       .on('data', async (getPastEvents) => {
         const nonce = getPastEvents.returnValues.nonce;
