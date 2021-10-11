@@ -74,7 +74,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         //   from: '0x0000000000000000000000000000000000000000', //,
         //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
         // },
-        // fromBlock: 11130135,
+        fromBlock: 11671139,
       })
       .on('data', async (getPastEvents) => {
         // console.log('getPastEvents', getPastEvents);
@@ -89,7 +89,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // // order bought events
     contract.events
       .OrderBought({
-        // fromBlock: 11130135,
+        fromBlock: 11671139,
       })
       .on('data', async (getPastEvents) => {
         const result = getPastEvents.returnValues;
@@ -102,7 +102,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     //edition transferred events
     contract.events
       .EditionTransferred({
-        // fromBlock: 11130135,
+        fromBlock: 11671139,
       })
       .on('data', async (transferred) => {
         const result = transferred.returnValues;
@@ -113,7 +113,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // order cancelled events
     contract.events
       .OrderCancelled({
-        // fromBlock: 11130135,
+        fromBlock: 11671139,
       })
       .on('data', async (cancelledEvent) => {
         const editionNo = cancelledEvent.returnValues.editionNumber;
