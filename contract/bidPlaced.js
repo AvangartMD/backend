@@ -123,6 +123,8 @@ bidPlaced.checkBidEnded = async () => {
       isNotificationSent: false,
     });
 
+    console.log('fetchRecords', fetchRecords);
+
     if (fetchRecords.length) {
       for (let i = 0; i < fetchRecords.length; i++) {
         const fetchNftDetails = await NftModel.findOne({
