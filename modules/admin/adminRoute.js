@@ -11,6 +11,7 @@ const Auth = require('../../helper/auth');
 const web3Helper = require('../../helper/web3Helper');
 const PopularCollectionRoute = require('./popularCollection/popularCollectionRoute');
 const popularCollectionRoute = require('./popularCollection/popularCollectionRoute');
+const bidEndedHelper = require('../../contract/bidPlaced');
 
 const adminRoute = express.Router();
 // get roles
@@ -52,5 +53,9 @@ adminRoute.get('/getPastEvents', getAllPastEvnets);
 // get buy nft events
 const getBuyEvents = [web3Helper.orderBuyedEvent];
 adminRoute.get('/getBuyedEvents', getBuyEvents);
+
+// check if bid ended
+const bidEnded = [bidEndedHelper.checkBidEnded];
+adminRoute.get('/checkBidEnded', getBuyEvents);
 
 module.exports = adminRoute;

@@ -113,6 +113,9 @@ bidPlaced.checkBidEnded = async () => {
   console.log('Check bid ended called');
   try {
     var unix = Math.round(+new Date() / 1000);
+
+    console.log('unix timestamp is:', unix);
+
     const fetchRecords = await BidModel.find({
       saleType: 1,
       timeline: { $lte: unix },
