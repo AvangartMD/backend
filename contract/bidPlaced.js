@@ -119,7 +119,7 @@ bidPlaced.checkBidEnded = async () => {
     const fetchRecords = await BidModel.find({
       saleType: 1,
       timeline: { $lte: unix },
-      // timeline: { $ne: 0 },
+      timeline: { $ne: 0 },
       isNotificationSent: false,
     });
 
