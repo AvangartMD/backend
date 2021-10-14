@@ -56,6 +56,6 @@ adminRoute.get('/getBuyedEvents', getBuyEvents);
 
 // check if bid ended
 const bidEnded = [bidEndedHelper.checkBidEnded];
-adminRoute.get('/checkBidEnded', getBuyEvents);
+adminRoute.get('/checkBidEnded', bidEnded);
 
 module.exports = adminRoute;
