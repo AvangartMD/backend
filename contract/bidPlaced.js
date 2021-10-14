@@ -119,60 +119,60 @@ bidPlaced.checkBidEnded = async () => {
     const fetchRecords = await BidModel.find({
       saleType: 1,
       timeline: { $lte: unix },
-      timeline: { $ne: 0 },
+      // timeline: { $ne: 0 },
       isNotificationSent: false,
     });
 
     console.log('fetchRecords', fetchRecords);
 
-    if (fetchRecords.length) {
-      for (let i = 0; i < fetchRecords.length; i++) {
-        const fetchNftDetails = await NftModel.findOne({
-          _id: fetchRecords[i].nftId,
-        });
+    // if (fetchRecords.length) {
+    //   for (let i = 0; i < fetchRecords.length; i++) {
+    //     const fetchNftDetails = await NftModel.findOne({
+    //       _id: fetchRecords[i].nftId,
+    //     });
 
-        const fetchUser = await UserModal.findOne({
-          _id: fetchRecords[i].userId,
-        });
+    //     const fetchUser = await UserModal.findOne({
+    //       _id: fetchRecords[i].userId,
+    //     });
 
-        const notifyBuyer = new NotificationModel({
-          text: {
-            en: `You won the bid for ${fetchNftDetails.title}.Please go & claim your NFT from the related NFT page.`,
-            tu: `${fetchNftDetails.title} için müzayedeyi kazandınız! Lütfen ilgili NFT sayfasına giderek alım işleminizi sonlandırın.`,
-          },
-          userId: fetchRecords[i].userId,
-          route: `/nftDetails/${fetchRecords[i].nftId}`,
-        });
+    //     const notifyBuyer = new NotificationModel({
+    //       text: {
+    //         en: `You won the bid for ${fetchNftDetails.title}.Please go & claim your NFT from the related NFT page.`,
+    //         tu: `${fetchNftDetails.title} için müzayedeyi kazandınız! Lütfen ilgili NFT sayfasına giderek alım işleminizi sonlandırın.`,
+    //       },
+    //       userId: fetchRecords[i].userId,
+    //       route: `/nftDetails/${fetchRecords[i].nftId}`,
+    //     });
 
-        // check edition added
-        const checkEditionAlreadyAdded = await EditionModel.findOne({
-          nftId: fetchNftDetails._id,
-          edition: +fetchRecords[i].editionNo,
-        });
+    //     // check edition added
+    //     const checkEditionAlreadyAdded = await EditionModel.findOne({
+    //       nftId: fetchNftDetails._id,
+    //       edition: +fetchRecords[i].editionNo,
+    //     });
 
-        if (!checkEditionAlreadyAdded) {
-          const addNewEdition = new EditionModel({
-            nftId: fetchNftDetails._id,
-            ownerId: fetchRecords[i].userId,
-            edition: fetchRecords[i].editionNo,
-            transactionId: '0x',
-            price: 0,
-            walletAddress: fetchUser.walletAddress,
-            saleAction: 'AUCTION',
-            nonce: null,
-            isOpenForSale: false,
-            timeline: 0,
-          });
-          await addNewEdition.save();
-        }
-        await notifyBuyer.save();
+    //     if (!checkEditionAlreadyAdded) {
+    //       const addNewEdition = new EditionModel({
+    //         nftId: fetchNftDetails._id,
+    //         ownerId: fetchRecords[i].userId,
+    //         edition: fetchRecords[i].editionNo,
+    //         transactionId: '0x',
+    //         price: 0,
+    //         walletAddress: fetchUser.walletAddress,
+    //         saleAction: 'AUCTION',
+    //         nonce: null,
+    //         isOpenForSale: false,
+    //         timeline: 0,
+    //       });
+    //       await addNewEdition.save();
+    //     }
+    //     await notifyBuyer.save();
 
-        const updateBidstatus = await BidModel.findOneAndUpdate(
-          { _id: fetchRecords[i]._id },
-          { isNotificationSent: true }
-        );
-      }
-    }
+    //     const updateBidstatus = await BidModel.findOneAndUpdate(
+    //       { _id: fetchRecords[i]._id },
+    //       { isNotificationSent: true }
+    //     );
+    //   }
+    // }
   } catch (err) {
     console.log('error is :', err);
     Utils.echoLog(`Error in checkBidEnded  ${err}`);
