@@ -20,7 +20,7 @@ InfoMiddleware.validateAdd = async (req, res, next) => {
     tu: Joi.string().allow(null, ''),
   });
   const schema = Joi.object({
-    url: Joi.string().uri().required(),
+    url: Joi.string().required(),
     banner: imageSchema,
     mobile: imageSchema,
     button_text: textSchema,

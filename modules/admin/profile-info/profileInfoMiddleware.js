@@ -14,7 +14,7 @@ ProfileInfoMiddleware.validateAdd = async (req, res, next) => {
     tu: Joi.string().required(),
   });
   const schema = Joi.object({
-    url: Joi.string().uri().required(),
+    url: Joi.string().required(),
     banner: imageSchema,
     mobile: imageSchema,
   });

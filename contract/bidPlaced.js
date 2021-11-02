@@ -39,7 +39,10 @@ bidPlaced.checkBid = async (result, order) => {
         // if not add the notification
         if (!checkNotificationAdded) {
           const addNewNotification = new NotificationModel({
-            text: `Your Bid for ${fetchNftDetails.title} for edition No ${result['editionNumber']} is overbid`,
+            text: {
+              en: `Your Bid for ${fetchNftDetails.title} for edition No ${result['editionNumber']} is overbid`,
+              tu: `${fetchNftDetails.title} eserinin ${result['editionNumber']} numaralı edisyonu için verdiğiniz teklif bir başka kullanıcı tarafından yükseltildi.`,
+            },
             userId: checkBidAlreadyPlaced.userId,
             bidId: checkBidAlreadyPlaced._id,
             route: `/nftDetails/${fetchNftDetails._id}`,
@@ -47,7 +50,10 @@ bidPlaced.checkBid = async (result, order) => {
 
           if (+order['saleType'] === 3) {
             const notifySeller = new NotificationModel({
-              text: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action`,
+              text: {
+                en: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action`,
+                tu: `${fetchNftDetails.title} için yeni bir teklif aldınız. İşleme devam etmek için ilgili NFT sayfasına gidebilirsiniz.`,
+              },
               userId: fetchSeller._id,
               route: `/nftDetails/${fetchNftDetails._id}`,
             });
@@ -85,7 +91,10 @@ bidPlaced.checkBid = async (result, order) => {
 
         if (+order['saleType'] === 3) {
           const notifySeller = new NotificationModel({
-            text: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action.`,
+            text: {
+              en: `A new Offer is received for ${fetchNftDetails.title}.Please go to your related NFT page to take action.`,
+              tu: `${fetchNftDetails.title} için yeni bir teklif aldınız. İşleme devam etmek için ilgili NFT sayfasına gidebilirsiniz.`,
+            },
             userId: fetchSeller._id,
             route: `/nftDetails/${fetchNftDetails._id}`,
           });
@@ -104,10 +113,12 @@ bidPlaced.checkBidEnded = async () => {
   console.log('Check bid ended called');
   try {
     var unix = Math.round(+new Date() / 1000);
+
+    console.log('unix timestamp is:', unix);
+
     const fetchRecords = await BidModel.find({
       saleType: 1,
-      timeline: { $lte: unix },
-      timeline: { $ne: 0 },
+      timeline: { $lte: unix, $ne: 0 },
       isNotificationSent: false,
     });
 
@@ -117,11 +128,40 @@ bidPlaced.checkBidEnded = async () => {
           _id: fetchRecords[i].nftId,
         });
 
+        const fetchUser = await UserModal.findOne({
+          _id: fetchRecords[i].userId,
+        });
+
         const notifyBuyer = new NotificationModel({
-          text: `You won the bid for ${fetchNftDetails.title}.Please go & claim your NFT from the related NFT page.`,
+          text: {
+            en: `You won the bid for ${fetchNftDetails.title}.Please go & claim your NFT from the related NFT page.`,
+            tu: `${fetchNftDetails.title} için müzayedeyi kazandınız! Lütfen ilgili NFT sayfasına giderek alım işleminizi sonlandırın.`,
+          },
           userId: fetchRecords[i].userId,
           route: `/nftDetails/${fetchRecords[i].nftId}`,
         });
+
+        // check edition added
+        const checkEditionAlreadyAdded = await EditionModel.findOne({
+          nftId: fetchNftDetails._id,
+          edition: +fetchRecords[i].editionNo,
+        });
+
+        if (!checkEditionAlreadyAdded) {
+          const addNewEdition = new EditionModel({
+            nftId: fetchNftDetails._id,
+            ownerId: fetchRecords[i].userId,
+            edition: fetchRecords[i].editionNo,
+            transactionId: '0x',
+            price: 0,
+            walletAddress: fetchUser.walletAddress,
+            saleAction: 'AUCTION',
+            nonce: null,
+            isOpenForSale: false,
+            timeline: 0,
+          });
+          await addNewEdition.save();
+        }
         await notifyBuyer.save();
 
         const updateBidstatus = await BidModel.findOneAndUpdate(

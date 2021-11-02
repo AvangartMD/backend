@@ -31,7 +31,7 @@ DashBoardCtr.add = async (req, res) => {
 // list
 DashBoardCtr.list = async (req, res) => {
   try {
-    const list = await DashboardModel.find({});
+    const list = await DashboardModel.find({}).sort({ rank: 1 });
 
     return res.status(200).json({
       message: req.t('BANNER_ADDED_SUCCESSFULLY'),

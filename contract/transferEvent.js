@@ -2,6 +2,7 @@ const Web3 = require('web3');
 const mongoose = require('mongoose');
 const ContractAbi = require('../abi/contract.json');
 const NftModel = require('../modules/nft/nftModel');
+const NotificationModel = require('../modules/notification/notificationModel');
 const UserModel = require('../modules/user/userModal');
 const EditionModel = require('../modules/edition/editonModel');
 const RoleModel = require('../modules/roles/rolesModal');
@@ -40,7 +41,13 @@ transferEvent.setTransferEvent = async (data, transactionHash) => {
           edition: +data['edition'],
         });
 
+        let userDetails = {};
+
         if (checkEditionAlreadyAdded) {
+          userDetails = await UserModel.findOne({
+            _id: checkEditionAlreadyAdded.ownerId,
+          });
+
           checkEditionAlreadyAdded.ownerId = findUser._id;
           checkEditionAlreadyAdded.walletAddress = data['to'];
           checkEditionAlreadyAdded.transactionId = transactionHash;
@@ -59,6 +66,24 @@ transferEvent.setTransferEvent = async (data, transactionHash) => {
 
           await addNewEdition.save();
         }
+
+        const userName = Object.keys(userDetails).length
+          ? userDetails.username
+            ? userDetails.username
+            : userDetails.walletAddress
+          : '';
+
+        const addNewNotification = new NotificationModel({
+          text: {
+            en: `${userName} sent you this NFT  ${findNft.title}`,
+            tu: `${userName} adlı kullanıcı size bir NFT gönderdi ${findNft.title}`,
+          },
+          userId: findUser._id,
+          route: `/nftDetails/${findNft._id}`,
+        });
+
+        await addNewNotification.save();
+
         resolve(true);
       } else {
         console.log('NFT AND USER NOT FOUND', data);
@@ -84,6 +109,22 @@ transferEvent.burn = async (data, transactionHash) => {
       if (findNft) {
         // check number of edition
         if (+findNft.edition === 1) {
+          const findEdition = await EditionModel.findOne({
+            nftId: findNft._id,
+          });
+
+          if (findEdition) {
+            const addNewNotification = new NotificationModel({
+              text: {
+                en: `You burned your ${findNft.title} titled NFT`,
+                tu: `${findNft.title}  adlı NFT'nizi burn ettiniz.`,
+              },
+              userId: findEdition.ownerId,
+            });
+
+            await addNewNotification.save();
+          }
+
           // delete the edition
           const deletEdition = await EditionModel.deleteOne({
             nftId: findNft._id,
@@ -91,7 +132,7 @@ transferEvent.burn = async (data, transactionHash) => {
           // delete the nft
           const deleteNft = await NftModel.deleteOne({ _id: findNft._id });
           // delete if in popular
-          const deletePopulat = await PopularNftModel.findOne({
+          const deletePopulat = await PopularNftModel.deleteOne({
             nftId: findNft._id,
           });
         }
@@ -102,6 +143,16 @@ transferEvent.burn = async (data, transactionHash) => {
             nftId: findNft._id,
           });
 
+          const addNewNotification = new NotificationModel({
+            text: {
+              en: `You burned your ${findNft.title} titled NFT`,
+              tu: `${findNft.title}  adlı NFT'nizi burn ettiniz.`,
+            },
+            userId: getEdition.ownerId,
+          });
+
+          await addNewNotification.save();
+
           // make pertilcuar edition to burn
           if (getEdition && !getEdition.isBurned) {
             getEdition.isBurned = true;
@@ -110,7 +161,7 @@ transferEvent.burn = async (data, transactionHash) => {
 
             // change in NFT
             // decrement the count of NFt
-            findNft.edition -= 1;
+            // findNft.edition -= 1;
             if (findNft.nftSold > 1) {
               findNft.nftSold -= 1;
             }

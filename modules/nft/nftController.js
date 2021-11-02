@@ -34,7 +34,7 @@ nftCtr.addNewNft = async (req, res) => {
       digitalKey: digitalKey,
       unlockContent: unlockContent ? unlockContent : false,
       coCreator: coCreator ? req.body.coCreator : null,
-      price: req.body.price,
+      price: +req.body.price,
       saleState: req.body.saleState,
       auctionTime: req.body.auctionTime ? req.body.auctionTime : 0,
       edition: req.body.edition ? req.body.edition : 1,
@@ -451,7 +451,8 @@ nftCtr.listUsersNft = async (req, res) => {
       .populate({
         path: 'ownerId',
         select: { name: 1, username: 1, profile: 1 },
-      });
+      })
+      .sort({ createdAt: -1 });
 
     return res.status(200).json({
       message: req.t('USER_NFT_LIST'),
@@ -920,7 +921,7 @@ nftCtr.getNftHistory = async (req, res) => {
             path: 'ownerId',
             select: { _id: 1, walletAddress: 1, username: 1, profile: 1 },
           })
-          .sort({ timeline: 1 })
+          .sort({ createdAt: 1 })
       )
     );
     if (fetchNftCreated) {
@@ -1004,8 +1005,10 @@ nftCtr.getUserBuyedNfts = async (req, res) => {
     let query = { isBurned: false };
     if (req.params.userId) {
       query.ownerId = req.params.userId;
+      query.transactionId = { $ne: '0x' };
     } else {
       query.ownerId = req.userData._id;
+      query.transactionId = { $ne: '0x' };
     }
 
     const editions = await EditionModel.find(query);

@@ -44,7 +44,7 @@ const options = {
 
 const provider =
   process.env.NODE_ENV === 'development'
-    ? 'https://data-seed-prebsc-2-s1.binance.org:8545/'
+    ? 'https://bsc-dataseed.binance.org/'
     : 'https://bsc-dataseed.binance.org/';
 
 const getWeb3Event = {};
@@ -55,7 +55,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     const web3 = new Web3(
       new Web3(
         new Web3.providers.WebsocketProvider(
-          'wss://speedy-nodes-nyc.moralis.io/fee2e1de4b5b781f4b6061f3/bsc/testnet/ws',
+          'wss://speedy-nodes-nyc.moralis.io/5be1af5bcc43ff8e4432ee14/bsc/mainnet/archive/ws',
           options
         )
       )
@@ -74,9 +74,10 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         //   from: '0x0000000000000000000000000000000000000000', //,
         //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
         // },
-        // fromBlock: 6018110,
+        // fromBlock: 11130135,
       })
       .on('data', async (getPastEvents) => {
+        // console.log('getPastEvents', getPastEvents);
         const nonce = getPastEvents.returnValues.nonce;
         const result = getPastEvents.returnValues;
         const order = result['order'];
@@ -88,7 +89,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // // order bought events
     contract.events
       .OrderBought({
-        // fromBlock: 6018110,
+        // fromBlock: 11130135,
       })
       .on('data', async (getPastEvents) => {
         const result = getPastEvents.returnValues;
@@ -101,7 +102,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     //edition transferred events
     contract.events
       .EditionTransferred({
-        // fromBlock: 6018110
+        // fromBlock: 11130135,
       })
       .on('data', async (transferred) => {
         const result = transferred.returnValues;
@@ -112,7 +113,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // order cancelled events
     contract.events
       .OrderCancelled({
-        // fromBlock: 6018110,
+        // fromBlock: 11130135,
       })
       .on('data', async (cancelledEvent) => {
         const editionNo = cancelledEvent.returnValues.editionNumber;
@@ -129,7 +130,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     // bid placed events
     contract.events
       .BidPlaced({
-        // fromBlock: 6018110,
+        // fromBlock: 11130135,
       })
       .on('data', async (bids) => {
         // console.log('bid is:', bids);
@@ -156,7 +157,14 @@ async function TransferredEvent(hash, result) {
   });
 }
 
+function sleep(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 async function checkMinting(result, order, nonce, transactionhash) {
+  console.log('check mointuing calleed ======>');
   try {
     const checkIsBuy = +order['saleType'] === 2 ? true : false;
     const checkIsOffer = +order['saleType'] === 3 ? true : false;
@@ -167,15 +175,18 @@ async function checkMinting(result, order, nonce, transactionhash) {
       await orderPlacedForSecondHand(result, order, transactionhash, nonce);
     } else {
       const web3 = new Web3(provider);
-
+      await sleep(1000);
       const tokenContract = new web3.eth.Contract(
         tokenContractJson,
         process.env.TOKEN_ADDRESS
       );
+      console.log('token id is:', order.tokenId);
       // check valid mongoose id
       const getTokenUri = await tokenContract.methods
         .tokenURI(order.tokenId)
         .call();
+
+      console.log('getTokenUri is', getTokenUri);
 
       // if we get token uri from token contract
       if (getTokenUri) {
@@ -214,20 +225,23 @@ async function checkMinting(result, order, nonce, transactionhash) {
               addNewHistory.save();
             }
           } else if (findNft && findNft.tokenId) {
-            // console.log('token already minted');
+            console.log('token already minted =====>');
             Utils.echoLog(`token already minted ${findNft.tokenId}  `);
           } else {
+            console.log('Token Uri not found in database ===>');
             Utils.echoLog(`Token Uri not found in database ${getTokenUri}`);
           }
         } else {
+          console.log('Not a cvalid token uri');
           Utils.echoLog(`Not a cvalid token uri ${getTokenUri}`);
         }
       } else {
+        console.log('Inavlid Token uri', getTokenUri);
         Utils.echoLog(`Invalid token Uri ${getTokenUri}`);
       }
     }
   } catch (err) {
-    // console.log('error in check minting', err);
+    console.log('error in check minting', err);
     Utils.echoLog(`Error in check minting ${err}`);
   }
 }
@@ -389,6 +403,14 @@ async function orderEvent(result, order, transactionId, nonce) {
 
         // check edition added
         if (checkEditionAlreadyAdded) {
+          let isNew = false;
+
+          if (
+            checkEditionAlreadyAdded.transactionId.toLowerCase() !==
+            transactionId.toLowerCase()
+          ) {
+            isNew = true;
+          }
           let previousOwner = checkEditionAlreadyAdded.ownerId;
           // check it is second hand sale
           checkEditionAlreadyAdded.transactionId = transactionId;
@@ -406,10 +428,24 @@ async function orderEvent(result, order, transactionId, nonce) {
 
           await checkEditionAlreadyAdded.save();
 
-          if (
-            checkEditionAlreadyAdded.transactionId.toLowerCase() !==
-            transactionId.toLowerCase()
-          ) {
+          // if (
+          //   checkEditionAlreadyAdded.transactionId.toLowerCase() !==
+          //   transactionId.toLowerCase()
+          // ) {
+
+          //   resolve(true);
+          // }
+
+          if (isNew) {
+            const getNftSold = +getNftDetails.nftSold + 1;
+            getNftDetails.nftSold = getNftSold;
+
+            if (getNftSold >= getNftDetails.edition) {
+              getNftDetails.saleState = 'SOLD';
+            }
+
+            await getNftDetails.save();
+
             const addNewHistory = new HistoryModel({
               nftId: getNftDetails._id,
               editionNo: +result['editionNumber'],
@@ -420,22 +456,19 @@ async function orderEvent(result, order, transactionId, nonce) {
             });
 
             await addNewHistory.save();
-
-            const getNftSold = +getNftDetails.nftSold + 1;
-            getNftDetails.nftSold = getNftSold;
-
-            if (getNftSold >= getNftDetails.edition) {
-              getNftDetails.saleState = 'SOLD';
-            }
-
-            await getNftDetails.save();
             resolve(true);
           }
 
           const addNewNotification = await new NotificationModel({
-            text: `Your Nft named ${getNftDetails.title}for edition ${+result[
-              'editionNumber'
-            ]} is sold  `,
+            text: {
+              en: `Your Nft named ${getNftDetails.title}for edition ${+result[
+                'editionNumber'
+              ]} is sold `,
+
+              tu: `${getNftDetails.title} eserinizin ${+result[
+                'editionNumber'
+              ]} numaralı edisyonu satıldı.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: previousOwner,
           });
@@ -443,7 +476,10 @@ async function orderEvent(result, order, transactionId, nonce) {
           await addNewNotification.save();
 
           const addNewNotificationForBuyer = await new NotificationModel({
-            text: `You bought  ${getNftDetails.title}  `,
+            text: {
+              en: `You bought  ${getNftDetails.title}.`,
+              tu: `${getNftDetails.title} adlı eseri aldınız.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
           });
@@ -491,9 +527,15 @@ async function orderEvent(result, order, transactionId, nonce) {
           await getNftDetails.save();
 
           const addNewNotification = await new NotificationModel({
-            text: `Your Nft named ${getNftDetails.title}for edition ${+result[
-              'editionNumber'
-            ]} is sold  `,
+            text: {
+              en: `Your Nft named ${getNftDetails.title}for edition ${+result[
+                'editionNumber'
+              ]} is sold`,
+
+              tu: `${getNftDetails.title} eserinizin ${+result[
+                'editionNumber'
+              ]} numaralı edisyonu satıldı.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getNftDetails['ownerId'],
           });
@@ -501,7 +543,10 @@ async function orderEvent(result, order, transactionId, nonce) {
           await addNewNotification.save();
 
           const addNewNotificationForBuyer = await new NotificationModel({
-            text: `You bought  ${getNftDetails.title}  `,
+            text: {
+              en: `You bought  ${getNftDetails.title}`,
+              tu: `${getNftDetails.title} adlı eseri aldınız.`,
+            },
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
           });

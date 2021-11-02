@@ -125,9 +125,7 @@ UserCtr.login = async (req, res) => {
   try {
     const { nonce, signature } = req.body;
     const web3 = new Web3(
-      new Web3.providers.HttpProvider(
-        'https://data-seed-prebsc-1-s1.binance.org:8545/'
-      )
+      new Web3.providers.HttpProvider('https://bsc-dataseed.binance.org/')
     );
 
     const signer = await web3.eth.accounts.recover(nonce, signature);
@@ -137,6 +135,7 @@ UserCtr.login = async (req, res) => {
 
       if (fetchRedisData) {
         const parsedRedisData = JSON.parse(fetchRedisData);
+
         const checkAddressMatched =
           parsedRedisData.walletAddress.toLowerCase() === signer.toLowerCase();
 
@@ -223,6 +222,7 @@ UserCtr.login = async (req, res) => {
       });
     }
   } catch (err) {
+    console.log('err in signup :', err);
     Utils.echoLog('error in singnup  ', err);
     return res.status(500).json({
       message: req.t('DB_ERROR'),
@@ -365,9 +365,14 @@ UserCtr.approveAsCreator = async (req, res) => {
           await getUserDetails.save();
 
           const addNewNotication = new NotificationModel({
-            text: user[i].status
-              ? req.t('REQUEST_ACCEPTED')
-              : req.t('REQUSET_REJECTED'),
+            text: {
+              en: user[i].status
+                ? req.t('REQUEST_ACCEPTED')
+                : req.t('REQUSET_REJECTED'),
+              tu: user[i].status
+                ? req.t('REQUEST_ACCEPTED_TR')
+                : req.t('REQUSET_REJECTED_TR'),
+            },
             userId: getUserDetails,
           });
 

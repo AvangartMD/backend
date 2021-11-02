@@ -101,5 +101,7 @@
     "INSTAGRAM_ACCOUNT_VERIFIED": "Instagram account verified",
     "TWITTER_AUTH_CODE": "Twitter auth code",
     "TWITTER_ACCOUNT_VERIFIED": "Twitter Accout Verified ",
-    "TWITTER_ERROR": "Twitter Accont not verified "
+    "TWITTER_ERROR": "Twitter Accont not verified ",
+    "REQUEST_ACCEPTED_TR": "Tebrikler, üretici başvurunuz onaylandı!",
+    "REQUSET_REJECTED_TR": "Üzgünüz, üretici başvurunuz reddedildi."
 }
