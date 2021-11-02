@@ -1,16 +1,18 @@
 const mongoose = require('mongoose');
 const Utils = require('../helper/utils');
 mongoose.Promise = require('bluebird');
-const mongoUrl = `mongodb+srv://minddeft:Yd$@f5dd5QNSX4Y@cluster0.jkyx3.mongodb.net/avangrat?retryWrites=true&w=majority`;
 
 mongoose
-  .connect(mongoUrl, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
+  .connect(
+    `mongodb://${process.env.DATABASEURL}:${process.env.DATABSEPORT}/${process.env.DATABASE}`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
+    }
+  )
   .then((res) => {
     // mongoose.pluralize(null);
     // mongoose.set('debug', true);
