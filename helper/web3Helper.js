@@ -55,7 +55,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     const web3 = new Web3(
       new Web3(
         new Web3.providers.WebsocketProvider(
-          'wss://speedy-nodes-nyc.moralis.io/fee2e1de4b5b781f4b6061f3/bsc/testnet/ws',
+          'wss://speedy-nodes-nyc.moralis.io/5be1af5bcc43ff8e4432ee14/bsc/testnet/archive/ws',
           options
         )
       )
@@ -74,7 +74,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
         //   from: '0x0000000000000000000000000000000000000000', //,
         //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
         // },
-        fromBlock: 12298700,
+        // fromBlock: 12298700,
       })
       .on('data', async (getPastEvents) => {
         // console.log('getPastEvents', getPastEvents);
