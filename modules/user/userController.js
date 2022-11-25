@@ -132,14 +132,16 @@ UserCtr.login = async (req, res) => {
 
     if (signer) {
       const fetchRedisData = await client.get(nonce);
+      console.log('Signer at line 135 is', signer)
 
       if (fetchRedisData) {
         const parsedRedisData = JSON.parse(fetchRedisData);
-
+        console.log('fetchRedisData at line 139 is', fetchRedisData)
         const checkAddressMatched =
           parsedRedisData.walletAddress.toLowerCase() === signer.toLowerCase();
 
         if (checkAddressMatched) {
+          console.log('checkAddressMatched at line 144 is', checkAddressMatched)
           const checkAddressAvalaible = await UserModel.findOne(
             {
               walletAddress: signer.toLowerCase().trim(),
@@ -152,6 +154,7 @@ UserCtr.login = async (req, res) => {
 
           if (checkAddressAvalaible) {
             // create the token and sent i tin response
+            console.log('checkAddressAvalaible at line 157 is', checkAddressAvalaible)
             const token = jwtUtil.getAuthToken({
               _id: checkAddressAvalaible._id,
               role: checkAddressAvalaible.role,
@@ -168,6 +171,7 @@ UserCtr.login = async (req, res) => {
             });
           } else {
             const getRoles = await RoleModel.findOne({ roleName: 'COLLECTOR' });
+            console.log('Roles at line')
             const createUser = new UserModel({
               role: getRoles._id,
               walletAddress: parsedRedisData.walletAddress.toLowerCase(),
@@ -473,11 +477,12 @@ UserCtr.addUserByAdmin = async (req, res) => {
 UserCtr.genrateNonce = async (req, res) => {
   try {
     let nonce = crypto.randomBytes(16).toString('hex');
-
+    console.log('Nonce at line 476 is', nonce) 
     if (
       req.params.address.toLowerCase() ===
       process.env.ADMIN_WALLET_ADDRESS.toLowerCase()
     ) {
+      console.log('Inside if condition')
       return res.status(400).json({
         message: req.t('ADMIN_WALLET'),
         status: false,
@@ -487,7 +492,7 @@ UserCtr.genrateNonce = async (req, res) => {
       walletAddress: req.params.address,
       nonce: nonce,
     };
-
+    console.log('Data at line 491 is', data)
     await client.set(nonce, JSON.stringify(data), 'EX', 60 * 10);
 
     return res.status(200).json({

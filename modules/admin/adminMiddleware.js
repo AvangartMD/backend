@@ -6,6 +6,7 @@ const Utils = require("../../helper/utils");
 const AdminMiddleware = {};
 
 AdminMiddleware.validateAdd = async (req, res, next) => {
+  console.log('joi object us',req.body)
   const schema = Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().required(),

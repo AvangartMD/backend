@@ -20,7 +20,7 @@ const bidPlaced = require('../contract/bidPlaced');
 
 const webSocketProvider =
   process.env.NODE_ENV === 'development'
-    ? 'wss://apis.ankr.com/wss/685960a71c81496fb48ac6f3db62fe0b/bba1c9bfcdf042fa0f335035c21d3ae5/binance/full/test'
+    ? 'wss://bsc.getblock.io/testnet/?api_key=WKVA1JMSXHG6WRV7BUGXAUICW3BCNFTV2Z'
     : 'wss://bsc-ws-node.nariox.org:443';
 
 const options = {
@@ -44,8 +44,8 @@ const options = {
 
 const provider =
   process.env.NODE_ENV === 'development'
-    ? 'https://bsc-dataseed.binance.org/'
-    : 'https://bsc-dataseed.binance.org/';
+    ? 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+    : 'https://data-seed-prebsc-1-s1.binance.org:8545/';
 
 const getWeb3Event = {};
 
@@ -55,7 +55,7 @@ getWeb3Event.getTransferEvent = async (req, res) => {
     const web3 = new Web3(
       new Web3(
         new Web3.providers.WebsocketProvider(
-          'wss://speedy-nodes-nyc.moralis.io/5be1af5bcc43ff8e4432ee14/bsc/mainnet/archive/ws',
+          'wss://speedy-nodes-nyc.moralis.io/fee2e1de4b5b781f4b6061f3/bsc/testnet/ws',
           options
         )
       )

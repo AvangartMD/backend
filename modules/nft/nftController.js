@@ -753,6 +753,7 @@ nftCtr.listCollectionNft = async (req, res) => {
 // market place api
 nftCtr.marketPlace = async (req, res) => {
   try {
+    console.log('Calling nft market place listing')
     const page = req.body.page || 1;
     let query = { isActive: true, status: statusObject.APPROVED };
 
