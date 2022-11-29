@@ -68,18 +68,18 @@ const userSchema = new Schema(
       type: String,
       // lowercase: true,
       default: null,
-      get: decryptProperty,
+      // get: decryptProperty,
     },
 
     cover: {
       type: String,
       default: null,
-      get: decryptProperty,
+      // get: decryptProperty,
     },
 
     role: {
       type: Schema.Types.ObjectId,
-      ref: 'roles',
+      ref: "roles",
       required: true,
     },
     walletAddress: {
@@ -95,7 +95,7 @@ const userSchema = new Schema(
     category: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'categories',
+        ref: "categories",
         required: false,
       },
     ],
@@ -108,7 +108,7 @@ const userSchema = new Schema(
       type: String,
       required: true,
       enum: status,
-      default: 'PENDING',
+      default: "PENDING",
     },
     stage: {
       createdOn: {

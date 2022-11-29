@@ -14,12 +14,12 @@ const imageSchema = new Schema({
   en: {
     type: String,
     default: null,
-    get: decryptProperty,
+    // get: decryptProperty,
   },
   tu: {
     type: String,
     default: null,
-    get: decryptProperty,
+    // get: decryptProperty,
   },
   extra: { _id: false },
 });

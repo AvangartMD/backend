@@ -15,11 +15,11 @@ mongoose
     // mongoose.pluralize(null);
     // mongoose.set('debug', true);
 
-    mongoose.set('useFindAndModify', false);
+    mongoose.set("useFindAndModify", false);
 
-    console.log('database connected successfully');
+    console.log("database connected successfully");
   })
   .catch((error) => {
-    Utils.echoLog('error in connecting with database ', error);
-    console.log('error in connecting with database ', error);
+    Utils.echoLog("error in connecting with database ", error);
+    console.log("error in connecting with database ", error);
   });

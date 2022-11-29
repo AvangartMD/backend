@@ -13,12 +13,12 @@ const imageSchmea = new Schema({
   en: {
     type: String,
     required: true,
-    get: decryptProperty,
+    // get: decryptProperty,
   },
   tu: {
     type: String,
     required: true,
-    get: decryptProperty,
+    // get: decryptProperty,
   },
   extra: { _id: false },
 });

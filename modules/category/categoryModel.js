@@ -41,7 +41,7 @@ const categorySchema = new Schema(
     image: {
       type: String,
       default: null,
-      get: decryptProperty,
+      // get: decryptProperty,
     },
   },
 

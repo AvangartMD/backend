@@ -20,7 +20,7 @@ const collectionSchema = new Schema(
     logo: {
       type: String,
       default: null,
-      get: decryptProperty,
+      // get: decryptProperty,
       required: false,
     },
     name: {
@@ -39,13 +39,13 @@ const collectionSchema = new Schema(
     },
     ownerId: {
       type: Schema.Types.ObjectId,
-      ref: 'users',
+      ref: "users",
       required: true,
     },
     category: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'categories',
+        ref: "categories",
         required: false,
       },
     ],

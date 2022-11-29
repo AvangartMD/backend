@@ -15,12 +15,12 @@ const imageSchmea = new Schema({
   original: {
     type: String,
     default: null,
-    get: decryptProperty,
+    // get: decryptProperty,
   },
   compressed: {
     type: String,
     default: null,
-    get: decryptProperty,
+    // get: decryptProperty,
   },
   format: {
     type: String,
