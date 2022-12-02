@@ -1129,7 +1129,7 @@ nftCtr.addTokenHash = async (req, res) => {
 
 nftCtr.tokenList = async (req, res) => {
   try {
-    const tokenList = await tokenHashModel({ status: "APPROVED" });
+    const tokenList = await tokenHashModel.find({ status: "APPROVED" });
     return res.status(200).json({
       status: true,
       message: "Token list",
