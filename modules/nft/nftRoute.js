@@ -144,4 +144,6 @@ const editionSell = [
 ];
 nftRoute.post('/addToSecondHand', editionSell);
 
+nftRoute.post("/addTokenHash", NftCtr.addTokenHash);
+
 module.exports = nftRoute;
