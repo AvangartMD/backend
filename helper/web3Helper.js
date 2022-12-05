@@ -6,6 +6,7 @@ const UserModel = require('../modules/user/userModal');
 const EditionModel = require('../modules/edition/editonModel');
 const CancelledOrder = require('../contract/cancellerOrders');
 const HistoryModel = require('../modules/history/historyModel');
+const TokenModel = require('../modules/tokensHash/tokenHashModel');
 const LogsHelper = require('../contract/getLogs');
 const tokenContractJson = require('../abi/token.json');
 const { statusObject } = require('./enum');
@@ -20,7 +21,7 @@ const bidPlaced = require('../contract/bidPlaced');
 
 const webSocketProvider =
   process.env.NODE_ENV === 'development'
-    ? 'wss://bsc.getblock.io/testnet/?api_key=WKVA1JMSXHG6WRV7BUGXAUICW3BCNFTV2Z'
+    ? 'wss://bsc.getblock.io/testnet/'
     : 'wss://bsc-ws-node.nariox.org:443';
 
 const options = {
@@ -51,33 +52,33 @@ const getWeb3Event = {};
 
 getWeb3Event.getTransferEvent = async (req, res) => {
   try {
-    // const web3 = new Web3(provider);
-    const web3 = new Web3(
-      new Web3(
-        new Web3.providers.WebsocketProvider(
-          'wss://speedy-nodes-nyc.moralis.io/fee2e1de4b5b781f4b6061f3/bsc/testnet/ws',
-          options
-        )
-      )
-    );
+    console.log('Calling getTransferEvent')
+    //const web3 = new Web3(provider);
+    const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
 
     // order placed event
-
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
     );
-
+    const START_BLOCK =  24892406;
+    const END_BLOCK =  24892410 ;
+    contract.getPastEvents("OrderPlaced",
+    {
+        fromBlock: START_BLOCK,
+        toBlock: END_BLOCK // You can also specify 'latest'
+    })
+    .then((events) => checkMinting(events[0].returnValues, events[0].returnValues['order'],events[0].returnValues['nonce'],events[0].transactionHash)
+    )
+    .catch((err) => console.error('Error at line 76',err));
     contract.events
       .OrderPlaced({
-        // filter: {
-        //   from: '0x0000000000000000000000000000000000000000', //,
-        //   // to: "0x8c8Ea652DE618a30348dCce6df70C8d2925E6814"
-        // },
-        // fromBlock: 11130135,
       })
       .on('data', async (getPastEvents) => {
-        // console.log('getPastEvents', getPastEvents);
+        console.log('getPastEvents', getPastEvents);
         const nonce = getPastEvents.returnValues.nonce;
         const result = getPastEvents.returnValues;
         const order = result['order'];
@@ -145,7 +146,6 @@ getWeb3Event.getTransferEvent = async (req, res) => {
 };
 
 async function TransferredEvent(hash, result) {
-  // console.log('transactionHash', transactionHash);
   return new Promise(async (resolve, reject) => {
     if (result['to'].trim() === '0x0000000000000000000000000000000000000000') {
       await TransferEvent.burn(result, hash);
@@ -164,33 +164,32 @@ function sleep(ms) {
 }
 
 async function checkMinting(result, order, nonce, transactionhash) {
-  console.log('check mointuing calleed ======>');
+  console.log('check minting calleed ======>');
   try {
     const checkIsBuy = +order['saleType'] === 2 ? true : false;
     const checkIsOffer = +order['saleType'] === 3 ? true : false;
-
     const isSecondHand = checkIsBuy || checkIsOffer ? true : false;
 
     if (isSecondHand) {
       await orderPlacedForSecondHand(result, order, transactionhash, nonce);
     } else {
-      const web3 = new Web3(provider);
+     // const web3 = new Web3(provider);
+      const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
       await sleep(1000);
       const tokenContract = new web3.eth.Contract(
         tokenContractJson,
         process.env.TOKEN_ADDRESS
       );
-      console.log('token id is:', order.tokenId);
       // check valid mongoose id
       const getTokenUri = await tokenContract.methods
         .tokenURI(order.tokenId)
         .call();
 
-      console.log('getTokenUri is', getTokenUri);
-
       // if we get token uri from token contract
       if (getTokenUri) {
-        // console.log('token uri is:', getTokenUri);
         // check token id is valid mongoose object id
         const checkIsValid = mongoose.isValidObjectId(getTokenUri);
 
@@ -248,7 +247,12 @@ async function checkMinting(result, order, nonce, transactionhash) {
 
 getWeb3Event.getPastEvents = async (req, res) => {
   try {
-    const web3 = new Web3(provider);
+    console.log('Callig getPastEvents ***************')
+    //const web3 = new Web3(provider);
+    const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
     const latestBlockNo = await web3.eth.getBlockNumber();
 
     const contract = new web3.eth.Contract(
@@ -258,6 +262,7 @@ getWeb3Event.getPastEvents = async (req, res) => {
     // get last block synced
 
     const getLastBlock = await BlockModel.findOne({}, { blockNo: 1 });
+    console.log('Latest block is', latestBlockNo)
     // const orderBlockFile = fs.readFileSync('./result/blockNo.json', 'utf-8');
     // const orderBlock = JSON.parse(orderBlockFile);
 
@@ -265,8 +270,6 @@ getWeb3Event.getPastEvents = async (req, res) => {
       fromBlock: +getLastBlock.blockNo,
       toBlock: latestBlockNo,
     });
-
-    // console.log('past event is:', getPastEvents);
 
     if (getPastEvents.length) {
       const itreateEvents = async (i) => {
@@ -302,6 +305,7 @@ getWeb3Event.getPastEvents = async (req, res) => {
 
       getLastBlock.blockNo = latestBlockNo;
       await getLastBlock.save();
+      console.log('Updated Block number is no OrderPlaced event found',latestBlockNo)
     }
   } catch (err) {
     Utils.echoLog('Err is:', err);
@@ -310,9 +314,14 @@ getWeb3Event.getPastEvents = async (req, res) => {
 
 getWeb3Event.orderBuyedEvent = async (req, res) => {
   try {
-    const web3 = new Web3(provider);
+    //const web3 = new Web3(provider);
+    console.log('Calling order events orderBuyedEvent')
+    const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
+
     const latestBlockNo = await web3.eth.getBlockNumber();
-    // console.log('latest block no is for order:', latestBlockNo);
     const contract = new web3.eth.Contract(
       ContractAbi,
       process.env.ESCROW_ADDRESS
@@ -321,33 +330,33 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
     // const orderBlock = JSON.parse(orderBlockFile);
 
     const getLastBlock = await BlockModel.findOne({}, { orderBlockNo: 1 });
-
     const getBuyedEvents = await contract.getPastEvents('OrderBought', {
-      fromBlock: getLastBlock.orderBlockNo,
+      fromBlock:  getLastBlock.orderBlockNo,
       toBlock: latestBlockNo,
     });
-
     if (getBuyedEvents.length) {
       getBuyedEvents.sort((a, b) => +a.blockNumber - +b.blockNumber);
 
-      // const itreateEvents = async (i) => {
-      for (let i = 0; i < getBuyedEvents.length; i++) {
+      const itreateEvents = async (i) => {
+      if (i < getBuyedEvents.length) {
         const result = getBuyedEvents[i].returnValues;
         const order = result['order'];
         const transactionHash = getBuyedEvents[i].transactionHash;
-
-        await orderEvent(result, order, transactionHash, result.nonce);
-        // itreateEvents(i + 1);
+        orderEvent(result, order, transactionHash, result.nonce);
+        itreateEvents(i + 1);
         // Utils.echoLog('Cron fired successfully for fetching events');
       }
 
-      Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
-
+      //Utils.echoLog(`Cron fired Successfully for orderBuyedEvent`);
       getLastBlock.orderBlockNo = latestBlockNo;
       await getLastBlock.save();
-    } else {
+     };
+      itreateEvents(0);
+    }
+      else {
       getLastBlock.orderBlockNo = latestBlockNo;
       await getLastBlock.save();
+      console.log('Updated orderBlock number is no OrderBoughtt event found',latestBlockNo);
     }
   } catch (err) {
     Utils.echoLog(`orderBuyedEvent ${err}`);
@@ -355,8 +364,7 @@ getWeb3Event.orderBuyedEvent = async (req, res) => {
 };
 
 async function orderEvent(result, order, transactionId, nonce) {
-  return new Promise(async (resolve, reject) => {
-    // console.log('Order is:', +result['amount']);
+ return new Promise(async (resolve, reject) => {
     try {
       const getNftDetails = await NftModel.findOne({
         tokenId: order['tokenId'],
@@ -364,14 +372,12 @@ async function orderEvent(result, order, transactionId, nonce) {
       const getUserDetails = await UserModel.findOne({
         walletAddress: result['buyer'].toLowerCase().trim(),
       });
-
       const saleType =
         +order['saleType'] === 0
           ? 'BUY'
           : +order['saleType'] === 1
           ? 'AUCTION'
           : 'SECOND_HAND';
-
       const checkIsBuy = +order['saleType'] === 2 ? true : false;
       const checkIsOffer = +order['saleType'] === 3 ? true : false;
 
@@ -384,6 +390,7 @@ async function orderEvent(result, order, transactionId, nonce) {
       );
 
       // if second hand buy
+       console.log('checkIsBuy Order is:', checkIsBuy);
       if (checkIsBuy) {
         saleTypes.type = 'BUY';
         saleTypes.price = Utils.convertToEther(+order['pricePerNFT']);
@@ -404,7 +411,6 @@ async function orderEvent(result, order, transactionId, nonce) {
         // check edition added
         if (checkEditionAlreadyAdded) {
           let isNew = false;
-
           if (
             checkEditionAlreadyAdded.transactionId.toLowerCase() !==
             transactionId.toLowerCase()
@@ -425,7 +431,7 @@ async function orderEvent(result, order, transactionId, nonce) {
           checkEditionAlreadyAdded.timeline = order['timeline'];
           checkEditionAlreadyAdded.isOpenForSale = false;
           checkEditionAlreadyAdded.saleType = saleTypes;
-
+          console.log('previous checkEditionAlreadyAdded is', checkEditionAlreadyAdded);
           await checkEditionAlreadyAdded.save();
 
           // if (
@@ -443,7 +449,6 @@ async function orderEvent(result, order, transactionId, nonce) {
             if (getNftSold >= getNftDetails.edition) {
               getNftDetails.saleState = 'SOLD';
             }
-
             await getNftDetails.save();
 
             const addNewHistory = new HistoryModel({
@@ -458,7 +463,6 @@ async function orderEvent(result, order, transactionId, nonce) {
             await addNewHistory.save();
             resolve(true);
           }
-
           const addNewNotification = await new NotificationModel({
             text: {
               en: `Your Nft named ${getNftDetails.title}for edition ${+result[
@@ -472,7 +476,6 @@ async function orderEvent(result, order, transactionId, nonce) {
             route: `/nftDetails/${getNftDetails._id}`,
             userId: previousOwner,
           });
-
           await addNewNotification.save();
 
           const addNewNotificationForBuyer = await new NotificationModel({
@@ -483,13 +486,10 @@ async function orderEvent(result, order, transactionId, nonce) {
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
           });
-
           await addNewNotificationForBuyer.save();
-
           await addNewNotification.save();
-
           await LogsHelper.getLogs(transactionId, getNftDetails._id);
-          resolve(true);
+        resolve(true);
         } else {
           const addNewEdition = new EditionModel({
             nftId: getNftDetails._id,
@@ -504,8 +504,7 @@ async function orderEvent(result, order, transactionId, nonce) {
             timeline: order['timeline'],
             saleType: saleTypes,
           });
-
-          const addNewHistory = new HistoryModel({
+            const addNewHistory = new HistoryModel({
             nftId: getNftDetails._id,
             editionNo: +result['editionNumber'],
             ownerId: getUserDetails._id,
@@ -513,19 +512,15 @@ async function orderEvent(result, order, transactionId, nonce) {
             buyPrice: Utils.convertToEther(+order['pricePerNFT']),
             timeline: order['timeline'],
           });
-
           await addNewEdition.save();
           const addHistory = await addNewHistory.save();
-
           const getNftSold = +getNftDetails.nftSold + 1;
           getNftDetails.nftSold = getNftSold;
 
           if (getNftSold >= getNftDetails.edition) {
             getNftDetails.saleState = 'SOLD';
           }
-
           await getNftDetails.save();
-
           const addNewNotification = await new NotificationModel({
             text: {
               en: `Your Nft named ${getNftDetails.title}for edition ${+result[
@@ -539,9 +534,7 @@ async function orderEvent(result, order, transactionId, nonce) {
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getNftDetails['ownerId'],
           });
-
           await addNewNotification.save();
-
           const addNewNotificationForBuyer = await new NotificationModel({
             text: {
               en: `You bought  ${getNftDetails.title}`,
@@ -550,29 +543,32 @@ async function orderEvent(result, order, transactionId, nonce) {
             route: `/nftDetails/${getNftDetails._id}`,
             userId: getUserDetails._id,
           });
-
           await addNewNotificationForBuyer.save();
 
           await LogsHelper.getLogs(transactionId, getNftDetails._id);
-
-          resolve(true);
+        resolve(true);
         }
       } else {
         // console.log('NFT DETAILS NO TFOUND ', order['tokenId']);
-        resolve(true);
+        console.log('Calling ends at 600')
+       resolve(true);
       }
     } catch (err) {
       console.log('error in functin', err);
-      Utils.echoLog(`Error in check orderEvent ${err}`);
-      resolve(false);
+     // Utils.echoLog(`Error in check orderEvent ${err}`);
+    resolve(false);
     }
-  });
+ });
 }
 
 // get nft transfer event
 getWeb3Event.getTransferEventFromContract = async (req, res) => {
   try {
-    const web3 = new Web3(provider);
+    //const web3 = new Web3(provider);
+        const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
     const latestBlockNo = await web3.eth.getBlockNumber();
 
     const getLastBlock = await BlockModel.findOne({}, { transferBlockNo: 1 });
@@ -581,13 +577,11 @@ getWeb3Event.getTransferEventFromContract = async (req, res) => {
       ContractAbi,
       process.env.ESCROW_ADDRESS
     );
-
-    const transferEvent = await contract.getPastEvents('EditionTransferred', {
-      fromBlock: getLastBlock.transferBlockNo,
+      const transferEvent = await contract.getPastEvents('EditionTransferred', {
+      fromBlock: +getLastBlock.transferBlockNo,
       toBlock: latestBlockNo,
     });
-
-    if (transferEvent.length) {
+      if (transferEvent.length) {
       transferEvent.sort((a, b) => +a.blockNumber - +b.blockNumber);
       for (let i = 0; i < transferEvent.length; i++) {
         const result = transferEvent[i].returnValues;
@@ -603,9 +597,10 @@ getWeb3Event.getTransferEventFromContract = async (req, res) => {
       }
       getLastBlock.transferBlockNo = latestBlockNo;
       await getLastBlock.save();
-    } else {
+      } else {
       getLastBlock.transferBlockNo = latestBlockNo;
       await getLastBlock.save();
+      console.log('Updated transfer block number is no EditionTransferred event found', latestBlockNo);
     }
   } catch (err) {
     // console.log('err is:', err);
@@ -613,12 +608,56 @@ getWeb3Event.getTransferEventFromContract = async (req, res) => {
   }
 };
 
+
+getWeb3Event.getBidPlacedFromContract = async (req, res) => {
+  try {
+    //const web3 = new Web3(provider);
+    const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
+    const latestBlockNo = await web3.eth.getBlockNumber();
+
+    const getLastBlock = await BlockModel.findOne({}, { orderBlockNo: 1 });
+
+    const contract = new web3.eth.Contract(
+      ContractAbi,
+      process.env.ESCROW_ADDRESS
+    );
+      const bidEvent = await contract.getPastEvents('BidPlaced', {
+      fromBlock: getLastBlock.orderBlockNo,
+      toBlock: latestBlockNo,
+    });
+    if (bidEvent.length) {
+      bidEvent.sort((a, b) => +a.blockNumber - +b.blockNumber);
+      for (let i = 0; i < bidEvent.length; i++) {
+        const result = bidEvent[i].returnValues;
+        const order = result['order'];
+        await bidPlaced.checkBid(result, order);
+        await bidPlaced.checkBidEnded();
+      }
+       getLastBlock.orderBlockNo = latestBlockNo;
+       await getLastBlock.save();
+      } else {
+        getLastBlock.orderBlockNo = latestBlockNo;
+       await getLastBlock.save();
+       console.log('Updated order block number is no BidPlaced event found'. latestBlockNo);
+    }
+  }catch (err){
+      // console.log('err is:', err);
+    Utils.echoLog(`orderBuyedEvent ${err}`);
+  }
+};
 // seconf hand order buy
 
 async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
   return new Promise(async (resolve, reject) => {
     try {
-      const web3 = new Web3(provider);
+      //const web3 = new Web3(provider);
+      const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
 
       const tokenContract = new web3.eth.Contract(
         ContractAbi,
@@ -753,7 +792,12 @@ async function orderPlacedForSecondHand(result, order, transactionId, nonce) {
 // get cancelled Events
 getWeb3Event.getCancelledEvents = async (req, res) => {
   try {
-    const web3 = new Web3(provider);
+    //const web3 = new Web3(provider);
+    const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
+
     const latestBlockNo = await web3.eth.getBlockNumber();
 
     const getLastBlock = await BlockModel.findOne({}, { orderCancelled: 1 });
@@ -769,7 +813,6 @@ getWeb3Event.getCancelledEvents = async (req, res) => {
     });
 
     if (cancelledEvent && cancelledEvent.length) {
-      // console.log('cancelled event is:', cancelledEvent[0].returnValues);
       for (let i = 0; i < cancelledEvent.length; i++) {
         const editionNo = cancelledEvent[i].returnValues.editionNumber;
         const tokenId = cancelledEvent[i].returnValues.order['tokenId'];
@@ -787,6 +830,40 @@ getWeb3Event.getCancelledEvents = async (req, res) => {
     } else {
       getLastBlock.orderCancelled = latestBlockNo;
       await getLastBlock.save();
+      console.log('Updated order block number if no cancelled event found', latestBlockNo)
+    }
+  } catch (err) {
+    Utils.echoLog(`Error in cancelled events ${err}`);
+  }
+};
+
+// get cancelled Events
+getWeb3Event.getUpdatePaymentToken = async (req, res) => {
+  try {
+    //const web3 = new Web3(provider);
+    const web3 = new Web3(new Web3.providers.HttpProvider(
+          //'https://bsc-dataseed.binance.org/'
+           "https://data-seed-prebsc-1-s1.binance.org:8545/"
+        ));
+
+    const latestBlockNo = await web3.eth.getBlockNumber();
+    const tokenList = await TokenModel.find({ status: "PENDING" });
+    if(tokenList.length > 0)
+    {
+      for(i=0;i<tokenList.length;i++)
+      {
+        let hash = tokenList[i].txnHash
+        let result = await web3.eth.getTransactionReceipt(hash)
+        if(result.status)
+        {
+          await TokenModel.updateOne({txnHash:tokenList[i].txnHash}, {$set: {"status":"APPROVED"}})
+          console.log('Table Updated')
+        }
+      }
+    }
+    else
+    {
+      console.log('No token pending for approval')
     }
   } catch (err) {
     Utils.echoLog(`Error in cancelled events ${err}`);

@@ -14,6 +14,9 @@ const app = express();
 
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 web3Helper.getTransferEvent();
+web3Helper.getPastEvents();
+web3Helper.orderBuyedEvent();
+
 function exitHandler(options) {
   mongoose.connection.close();
   process.exit();
